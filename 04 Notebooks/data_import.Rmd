@@ -1,0 +1,220 @@
+---
+title: "Import Coastal Water Quality Data"
+author: "Francois van Schalkwyk"
+date: "2025-03-19"
+output: html_document
+---
+
+# Workspace Set-Up
+
+Make sure that you are working in the outfalls project, found in the working directory.
+
+## Set working directory for all code chunks to project root directory
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## Load required packages
+
+```{r message = FALSE}
+library(tidyverse)
+library(dbplyr)
+library(DBI)
+library(pdftools)
+```
+
+## Database Connection
+
+```{r db connection}
+# Connect to the Postgres database
+con <- dbConnect(RPostgres::Postgres(),
+  host = "infinity.cdmqm0mu0qf8.eu-north-1.rds.amazonaws.com",
+  port = 5432,
+  user = rstudioapi::askForPassword(prompt = "Username: "),
+  password = rstudioapi::askForPassword(),
+  dbname = "infinity"
+)
+```
+
+```{r}
+dbGetInfo(con)
+```
+
+# Data Import
+
+```{r import data from pdf}
+filename <- "CWQ_15(21.01.2025).pdf"
+
+pdf_data <- pdf_text(paste("../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/", filename, sep = "")) |>
+  str_split("\n") |>
+  unlist()
+
+sample_date <- pdf_data |>
+  keep(~str_detect(.x, "Sample taken")) |>
+  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+  pluck(1) |>
+  dmy()
+
+analysis_completed <- pdf_data |>
+  keep(~str_detect(.x, "Analysis completed")) |>
+  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+  pluck(1) |>
+  dmy()
+
+sample_temp_c <- pdf_data |>
+  keep(~str_detect(.x, "Sample temperature:")) |>
+  str_extract("(?<=(Sample temperature:\\s))\\d{1,2}\\.\\d") |>
+  pluck(1) |>
+  as.numeric()
+
+site_id <- pdf_data |>
+  str_extract_all("[:alpha:]{2,3}\\d{2}\\d?[IOA]?") |>
+  unlist() |>
+  str_trim()
+
+sample_time <- pdf_data |>
+  str_extract_all("\\d{2}h\\d{2}") |>
+  unlist() |>
+  str_replace("h", ":")
+
+enterococci_cfu_per_100ml <- pdf_data |>
+  keep(~str_detect(.x, "[:alpha:]{2,3}\\d{2}\\d?[IOA]?")) |>
+  str_extract("(\\d{1,5}|None found)$")
+
+tbl <- tibble(
+  filename = filename,
+  sample_date = sample_date,
+  analysis_completed = analysis_completed,
+  sample_temp_c = sample_temp_c,
+  site_id = site_id,
+  sample_time = sample_time,
+  enterococci_cfu_per_100ml = enterococci_cfu_per_100ml
+)
+
+tbl <- tbl |>
+  mutate(
+    enterococci_cfu_per_100ml = if_else(enterococci_cfu_per_100ml == "None found", "ND", enterococci_cfu_per_100ml)
+    ) |>
+  mutate(site_id = case_when(
+    str_detect(site_id, "\\d{2}1") ~ str_replace(site_id, "1$", "I"),
+    str_detect(site_id, "\\d{2}0") ~ str_replace(site_id, "0$", "O"),
+    .default = site_id
+  ), .after = site_id)
+
+tbl(con, I("coastal.sites"))
+
+copy_to(con, tbl, name = "coastal", overwrite = TRUE)
+```
+
+```{r alternative method}
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_16(22.01.2025).pdf"
+
+pdf_data <- pdf_text(path) |>
+  str_split("\n")
+
+filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
+
+sample_date <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Sample taken")) |>
+  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+  pluck(1) |>
+  dmy()
+
+analysis_completed <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Analysis completed")) |>
+  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+  pluck(1) |>
+  dmy()
+
+sample_temp_c <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Sample temperature:")) |>
+  str_extract("(?<=(Sample temperature:\\s))\\d{1,2}\\.\\d") |>
+  pluck(1) |>
+  as.numeric()
+
+sample_number <- pdf_data |>
+  unlist() |> 
+  keep_at(c(34:41, 101:107)) |> 
+  str_sub(5,15) |>
+  str_trim()
+
+sample_text <- pdf_data |>
+  unlist() |> 
+  keep_at(c(34:41, 101:107)) |> 
+  str_sub(19,90) |>
+  str_trim()
+
+sample_result <- pdf_data |>
+  unlist() |> 
+  keep_at(c(34:41, 101:107)) |> 
+  str_sub(90) |> 
+  str_trim()
+
+tbl <- tibble(number = sample_number,
+       text = sample_text,
+       result = sample_result) |> 
+  mutate(number = if_else(number == "", NA, number)) |>
+  fill(number, .direction = "down") |> 
+  group_by(number) |>
+  summarise(text = str_c(text, collapse = ""), result = first(result)) |>
+  select(text, result) |>
+  mutate(
+    site_id = str_extract(text, "[:upper:]{2,3}\\d{2}\\d?[AOI]?"),
+    sample_time = str_extract(text, "\\d{2}h\\d{2}") |> str_replace("h", ":"),
+    sample_date = sample_date,
+    analysis_completed = analysis_completed,
+    sample_temp_c = sample_temp_c,
+    filename = filename
+    ) |>
+  select(-text) |>
+  rename(enterococci_cfu_per_100ml = result) |>
+  mutate(site_id = case_when(
+    str_detect(site_id, "\\d{3}") & str_detect(site_id, "1$") ~ str_replace(site_id, "1$", "I"),
+    str_detect(site_id, "\\d{3}") & str_detect(site_id, "0$") ~ str_replace(site_id, "0$", "O"),
+    .default = site_id
+  )) |>
+  mutate(enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "None found", "ND"))
+
+copy_to(con, tbl, name = "coastal", overwrite = TRUE)
+```
+
+
+```{sql, connection = con}
+BEGIN;
+```
+
+```{sql, connection = con}
+WITH cte AS 
+(SELECT
+  site_id,
+  sample_date,
+  sample_time::time,
+  analysis_completed,
+  sample_temp_c,
+  enterococci_cfu_per_100ml,
+  filename
+FROM coastal)
+INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename)
+SELECT * FROM cte;
+```
+
+```{sql, connection = con}
+SELECT
+  *
+FROM coastal.results;
+```
+
+```{sql, connection = con}
+ROLLBACK;
+```
+
+```{sql, connection = con}
+COMMIT;
+```
+
+

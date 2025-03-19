@@ -1,0 +1,308 @@
+site,week,day,samplers
+1_Silverstroomstrand_Tidal_Pool_(XCN08),1,mon,ssb
+2_Silverstroomstrand_(XCN14),1,mon,ssb
+3_MelkbosStrand_(XCN07),1,mon,ssb
+4_Blouberg_Big_Bay_(XCN12),1,mon,ssb
+5_Blouberg_Big_Bay_near _STW_drain_(XCN13),1,mon,ssb
+Blouberg Small Bay (CN37),1,mon,ssb
+7_Tableview_(XCN06),1,mon,ssb
+8_Milnerton_Lighthouse_(XCN04),1,mon,ssb
+9_Lagoon_Beach_(CN22),1,mon,ssb
+11_Mouille_Point_Beach_(CN04),1,mon,ssb
+12_Green_Point_Pump_Station_(CN05),1,mon,ssb
+14_Three_Anchor_Bay_NW_Rocks_(CN06),1,mon,ssb
+Three Anchor Bay beach (CN36),1,mon,ssb
+17_Rocklands_Beach_(CN06C),1,mon,ssb
+18_Milton_Beach_Tidal_Pool_Inside_(CN18I),1,mon,ssb
+19_Milton_Beach_Tidal_Pool_Outside_(CN18O),1,mon,ssb
+20_Sunset_Beach_(CN08O),1,mon,ssb
+Queen's beach tidal pool (CN34),1,mon,ssb
+Queen's Beach gully (CN35),1,mon,ssb
+21_Saunders_Rocks_Sandy_Beach_(CN16A),1,mon,ssb
+22_Saunders_Rocks_Tidal_Pool_Inside_(CN16I),1,mon,ssb
+23_Saunders_Rocks_Tidal_Pool_Outside_(CN16O),1,mon,ssb
+Clifton 2nd CN42,1,tues,ssb
+24_Clifton_4th_Beach_(CN09),1,tues,ssb
+25_Maidens_Cove_West_Rocks_(CN10),1,tues,ssb
+26_Maidens_Cove_Tidal_Pool_1_Inside_(CN19I),1,tues,ssb
+27_Maidens_Cove_Tidal_Pool_1_Outside_(CN19O),1,tues,ssb
+28_Maidens_Cove_Tidal_Pool_2_Inside_(CN20I),1,tues,ssb
+"30_Glen_Beach-midway_point_along_the_beach,STW_pipe_close_by_(CN31)",1,tues,ssb
+32_Camps_Bay_Tidal_Pool_Inside_(CN12A),1,tues,ssb
+33_Camps_Bay_Pool_Outside_(CN12O),1,tues,ssb
+34_Northern_Camps_Bay-In_line_with_ablution_block_(CN30),1,tues,ssb
+Camps Bay central (CN41),1,tues,ssb
+35_Camps_Bay_Beach_(CN11),1,tues,ssb
+36_Horne_Bay_rocks_east_of_sandy_beach_(CN14),1,tues,ssb
+Beta Beach (CN40),1,tues,ssb
+38_Beta_Beach_Bakhoven_Beach_in_front_of_pump_station_(CN21),1,tues,ssb
+Cosy Bay (CN39),1,tues,ssb
+39_Oudekraal_Cosy_Bay_(XCN09),1,tues,ssb
+Logies Bay (CN38),1,tues,ssb
+40_Llandudno_(XCN03),1,tues,ssb
+Hout Bay Mariner's Wharf (HB13),1,tues,ssb
+41_Hout_Bay_(XCN10),1,tues,ssb
+68__Lifebox_23_(CS09),1,wed,ssb
+69__Sonwabe_Parking_Area_(CS10),1,wed,ssb
+70__Ribbon_Road_Parking_Area_(CS11),1,wed,ssb
+72__Strandfontein_Point_west_of_Tidal_Pool_(CS13),1,wed,ssb
+73_Strandfontein_Tidal_Pool_(CS17),1,wed,ssb
+_9 Miles Strandfontein Beach (CS45),1,wed,ssb
+74__Mitchells_Plain_WWED_(CS18),1,wed,ssb
+Blue Waters resort (CS46),1,wed,ssb
+75__Lukanon_Drive_nr_WW_Pump_Station_(CS14),1,wed,ssb
+76__MPSWD_West_(CS23W),1,wed,ssb
+77__MPSWD_East_(CS23E),1,wed,ssb
+80_Mnandi_Beach_West_of_Lifesaving_Tower_(CS15),1,wed,ssb
+81_Mnandi_Beach_East_of_Lifesaving_Box_69_(CS19),1,wed,ssb
+82_Monwabisi_Tidal_Pool_(XCS18),1,wed,ssb
+83_Monwabisi_Beach_(XCS30),1,wed,ssb
+84_Macassar_Beach_(XCS19),1,wed,cmb
+"85_Strand-Inside_MPA,_midway_btw_Lourens_River_and_Paardevlei_Footpath_(CS33)",1,wed,cmb
+"Strand ""Pipe"" surfing (XCS34)",1,wed,cmb
+87_Strand-Water_slide_on_Beach_Rd_(CS32),1,wed,cmb
+88_Strand_opp_Springbok_Cafe_(XCS27),1,wed,cmb
+89__Strand_opposite_Woltemade_Street_(XCS26),1,wed,cmb
+90_Strand-Beach_Rd_pedestrian_crossing_btw_Melkbaai_and_Da_gama_St._(CS31),1,wed,cmb
+91_Strand_Pavillion_Jetty_(XCS28),1,wed,cmb
+Strand indoor swimming pool (XCS35),1,wed,cmb
+92_Strand_Harmonie_Park_Jetty_(XCS29),1,wed,cmb
+93_Strand-STW_outlet_across_Beach_Rd_and_Murray_st_intersection_(CS30),1,wed,cmb
+94_Gordons_Bay_WWTW_(XCS01),1,wed,cmb
+95_Gordons_Bay_Harbour_Island_(XCS23),1,wed,cmb
+96_Gordons_Bay_Van_Riebeeck_Hotel_(XCS05),1,wed,cmb
+97_Gordons_Bay_Harbour_Center_(XCS07),1,wed,cmb
+98_Sir_Lowry's_Pass_River_(XCS04),1,wed,cmb
+99_Gordons_Bay_Bikini_Beach_(XCS08),1,wed,cmb
+100_Gordons_Bay-Rock_Area_across_ablution_area_and_Janine_St_intersection_(CS29),1,wed,cmb
+101_Kogel_Bay_Beach_(XCS09),1,wed,cmb
+Noordhoek beach (CS40),1,thurs,ssb
+42_Noordhoek-WWTW_Outflow_(CN29),1,thurs,ssb
+43_The_Kom_(XCN01),1,thurs,ssb
+Inner Kom (CS39),1,thurs,ssb
+44_Long_Beach_Kommetjie_(XCN02),1,thurs,ssb
+45_Scarborough_Beach_(XCN11),1,thurs,ssb
+46__Millers_Point_(XCS11),1,thurs,ssb
+Miller's Point tidal pool (CS37),1,thurs,ssb
+47_Franks Bay_Fishermans_Beach_(XCS12),1,thurs,ssb
+Windmill beach (CS36),1,thurs,ssb
+48_Seaforth_Beach_(XCS13),1,thurs,ssb
+49_Boulders_Beach_(XCS32),1,thurs,ssb
+50__Simons_Town_Diving_School_(XCS22),1,thurs,ssb
+51__Simons_Town_Harbour_(XCS21),1,thurs,ssb
+52__Simons__Town_Long_Beach_(XCS14),1,thurs,ssb
+Glencairn tidal pool (CS38),1,thurs,ssb
+53_Glencairn_Beach_(XCS15),1,thurs,ssb
+54_Clovelly_Beach_Silvermine_mouth_(XCS17),1,thurs,ssb
+Fish Hoek beach (CS41),1,thurs,ssb
+"56_Fish_Hoek-Corner_of_the_Beach,_at_Jager_Walk_(CS35)",1,thurs,ssb
+Woolley's tidal pool (CS42),1,fri,ssb
+58__Kalk_Bay_Harbour_Beach_(CS01A),1,fri,ssb
+59_Kalk_Bay_Tidal_Pool_Inside_(CS02),1,fri,ssb
+60_Dalebrook_Tidal_Pool_(CS03),1,fri,ssb
+Dangers beach (CS44),1,fri,ssb
+61_St_James_Tidal_Pool_(CS04),1,fri,ssb
+63_Muizenberg_Pavilion_(CS16),1,fri,ssb
+64_Muizenberg_Surfing_area-In_Line_with_Bathing_area_(CS34),1,fri,ssb
+65_Muizenberg_Station (CS06),1,fri,ssb
+66_Sunrise_Beach_Parking_Area_(CS07),1,fri,ssb
+1_Silverstroomstrand_Tidal_Pool_(XCN08),2,mon,ssb
+2_Silverstroomstrand_lifeguard_building_(XCN14),2,mon,ssb
+3_Melkbosstrand_10th_street_(XCN07),2,mon,ssb
+4_Blouberg_Big_Bay_lifeguard_building_(XCN12),2,mon,ssb
+6_Blouberg_Small_Bay_(XCN05),2,mon,ssb
+7_Tableview_Athens_road_(XCN06),2,mon,ssb
+8_Milnerton_Lighthouse_(XCN04),2,mon,ssb
+9_Lagoon_Beach_(CN22),2,mon,ssb
+12_Green_Point_Pump_Station_(CN05),2,mon,ssb
+Three_Anchor_Bay_beach_(CN36),2,mon,ssb
+18_Milton_Beach_Tidal_Pool_Inside_(CN18I),2,mon,ssb
+22_Saunders_Rocks_Tidal_Pool_Inside_(CN16I),2,mon,ssb
+23_Saunders_Rocks_Tidal_Pool_Outside_(CN16O),2,mon,ssb
+24_Clifton_4th_Beach_(CN09),2,tues,ssb
+25_Maidens_Cove_north_sandy_cove_(CN10),2,tues,ssb
+26_Maidens_Cove_Tidal_Pool_1_Inside_(CN19I),2,tues,ssb
+"30_Glen_Beach-midway_point_along_the_beach,STW_pipe_close_by_(CN31)",2,tues,ssb
+32_Camps_Bay_Tidal_Pool_Inside_(CN12A),2,tues,ssb
+33_Camps_Bay_Pool_Outside_(CN12O),2,tues,ssb
+34_Northern_Camps_Bay-In_line_with_ablution_block_(CN30),2,tues,ssb
+Camps Bay_Central_(CN41),2,tues,ssb
+35_Camps_Bay_South_(CN11),2,tues,ssb
+Beta_Beach_(CN40),2,tues,ssb
+38_Bakoven_Beach_(CN21),2,tues,ssb
+39_Oudekraal_(XCN09),2,tues,ssb
+40_Llandudno_(XCN03),2,tues,ssb
+Hout_Bay_Mariners_Wharf_(HB13),2,tues,ssb
+41_Hout_Bay_Chapmans_peak_(XCN10),2,tues,ssb
+73_Strandfontein_Tidal_Pool_(CS17),2,wed,ssb
+_9_Miles_Strandfontein_Beach_(CS45),2,wed,ssb
+81_Mnandi_Beach_East_of_Lifesaving_Box_69_(CS19),2,wed,ssb
+82_Monwabisi_Tidal_Pool_(XCS18),2,wed,ssb
+Strand_Pipe_surfing_(XCS34),2,wed,ssb
+87_Strand-Water_slide_on_Beach_Rd_(CS32),2,wed,ssb
+89__Strand_lifesaving_club_opposite_Woltemade_Street_(XCS26),2,wed,ssb
+90_Strand-Beach_Rd_pedestrian_crossing_btw_Melkbaai_and_Da_gama_St._(CS31),2,wed,ssb
+92_Strand_Harmonie_Park_Jetty_(XCS29),2,wed,ssb
+96_Gordons_Bay_Van_Riebeeck_Hotel_(XCS05),2,wed,ssb
+99_Gordons_Bay_Bikini_Beach_(XCS08),2,wed,ssb
+100_Gordons_Bay_opposite_130_Beach_road_(CS29),2,wed,ssb
+101_Kogel_Bay_Beach_(XCS09),2,wed,ssb
+44_Long_Beach_Kommetjie_(XCN02),2,thurs,ssb
+48_Seaforth_Beach_(XCS13),2,thurs,ssb
+52__Simons__Town_Long_Beach_(XCS14),2,thurs,ssb
+Glencairn_tidal_pool_(CS38),2,thurs,ssb
+53_Glencairn_Beach_(XCS15),2,thurs,ssb
+Fish Hoek beach lifesaving club (CS41),2,thurs,ssb
+"56_Fish_Hoek-Corner_of_the_Beach,_at_Jager_Walk_(CS35)",2,thurs,ssb
+59_Kalk_Bay_Tidal_Pool_Inside_(CS02),2,thurs,ssb
+60_Dalebrook_Tidal_Pool_(CS03),2,thurs,ssb
+Dangers_beach_(CS44),2,thurs,ssb
+61_St_James_Tidal_Pool_(CS04),2,thurs,ssb
+63_Muizenberg_Pavilion_(CS16),2,thurs,ssb
+64_Muizenberg_Surfers_Corner_(CS34),2,thurs,ssb
+1_Silverstroomstrand_Tidal_Pool_(XCN08),3,mon,ssb
+2_Silverstroomstrand_lifeguard_building_(XCN14),3,mon,ssb
+3_Melkbosstrand_10th_street_(XCN07),3,mon,ssb
+4_Blouberg_Big_Bay_lifeguard_building_(XCN12),3,mon,ssb
+Small_Bay_Beach_off_Popham_Street_Blouberg_(CN37),3,mon,ssb
+7_Tableview_Athens_road_(XCN06),3,mon,ssb
+8_Milnerton_Lighthouse_(XCN04),3,mon,ssb
+9_Lagoon_Beach_(CN22),3,mon,ssb
+11_Mouille_Point_Beach_(CN04),3,mon,ssb
+12_Green_Point_Pump_Station_(CN05),3,mon,ssb
+14_Three_Anchor_Bay_NW_Rocks_(CN06),3,mon,ssb
+Three_Anchor_Bay_beach_(CN36),3,mon,ssb
+17_Rocklands_Beach_(CN06C),3,mon,ssb
+18_Milton_Beach_Tidal_Pool_Inside_(CN18I),3,mon,ssb
+19_Milton_Beach_Tidal_Pool_Outside_(CN18O),3,mon,ssb
+20_Sunset_Beach_(CN08O),3,mon,ssb
+Queen's_beach_tidal_pool_(CN34),3,mon,ssb
+Queen's_Beach_gully_(CN35),3,mon,ssb
+21_Saunders_Rocks_Sandy_Beach_(CN16A),3,mon,ssb
+22_Saunders_Rocks_Tidal_Pool_Inside_(CN16I),3,mon,ssb
+23_Saunders_Rocks_Tidal_Pool_Outside_(CN16O),3,mon,ssb
+Clifton_2nd_(CN42),3,tues,ssb
+24_Clifton_4th_Beach_(CN09),3,tues,ssb
+25_Maidens_Cove_north_sandy_cove_(CN10),3,tues,ssb
+26_Maidens_Cove_Tidal_Pool_west_Inside_(CN19I),3,tues,ssb
+27_Maidens_Cove_Tidal_Pool_west_Outside_(CN19O),3,tues,ssb
+28_Maidens_Cove_Tidal_Pool_east_Inside_(CN20I),3,tues,ssb
+"30_Glen_Beach-midway_point_along_the_beach,STW_pipe_close_by_(CN31)",3,tues,ssb
+32_Camps_Bay_Tidal_Pool_Inside_(CN12A),3,tues,ssb
+33_Camps_Bay_Pool_Outside_(CN12O),3,tues,ssb
+34_Northern_Camps_Bay-In_line_with_ablution_block_(CN30),3,tues,ssb
+Camps Bay_Central_(CN41),3,tues,ssb
+35_Camps_Bay_South_(CN11),3,tues,ssb
+36_Barley_Bay_beach(CN14),3,tues,ssb
+Beta_Beach_(CN40),3,tues,ssb
+38_Bakoven_Beach_(CN21),3,tues,ssb
+Cosy_Bay_(CN30),3,tues,ssb
+39_Oudekraal_(XCN09),3,tues,ssb
+Logies_Bay_(CN38),3,tues,ssb
+40_Llandudno_(XCN03),3,tues,ssb
+Hout_Bay_Mariners_Wharf_(HB13),3,tues,ssb
+41_Hout_Bay_Chapmans_peak_(XCN10),3,tues,ssb
+70__Ribbon_Road_Parking_Area_(CS11),3,wed,ssb
+73_Strandfontein_Tidal_Pool_(CS17),3,wed,ssb
+_9_Miles_Strandfontein_Beach_(CS45),3,wed,ssb
+74__Mitchells_Plain_WWED_(CS18),3,wed,ssb
+Blue_Waters_resort_(CS46),3,wed,ssb
+75__Lukanon_Drive_nr_WW_Pump_Station_(CS14),3,wed,ssb
+76__MPSWD_West_(CS23W),3,wed,ssb
+77__MPSWD_East_(CS23E),3,wed,ssb
+80_Mnandi_Beach_West_of_Lifesaving_Tower_(CS15),3,wed,ssb
+81_Mnandi_Beach_East_of_Lifesaving_Box_69_(CS19),3,wed,ssb
+82_Monwabisi_Tidal_Pool_(XCS18),3,wed,ssb
+83_Monwabisi_Beach_(XCS30),3,wed,ssb
+84_Macassar_Beach_(XCS19),3,wed,cmb
+Strand_Pipe_surfing_(XCS34),3,wed,cmb
+87_Strand-Water_slide_on_Beach_Rd_(CS32),3,wed,cmb
+88_Strand_opp_Springbok_Cafe_(XCS27),3,wed,cmb
+89__Strand_lifesaving_club_opposite_Woltemade_Street_(XCS26),3,wed,cmb
+90_Strand-Beach_Rd_pedestrian_crossing_btw_Melkbaai_and_Da_gama_St._(CS31),3,wed,cmb
+92_Strand_Harmonie_Park_Jetty_(XCS29),3,wed,cmb
+96_Gordons_Bay_Van_Riebeeck_Hotel_(XCS05),3,wed,cmb
+98_Gordons_Bay_Beach_opposite Sir_Lowry_road_(XCS04),3,wed,cmb
+99_Gordons_Bay_Bikini_Beach_(XCS08),3,wed,cmb
+100_Gordons_Bay_opposite_130_Beach_road_(CS29),3,wed,cmb
+101_Kogel_Bay_Beach_(XCS09),3,wed,cmb
+Noordhoek_beach_north_(CS40),3,thurs,ssb
+43_The_Kom_(XCN01),3,thurs,ssb
+Inner_Kom_Nerina_avenue_(CS39),3,thurs,ssb
+44_Long_Beach_Kommetjie_(XCN02),3,thurs,ssb
+45_Scarborough_Beach_(XCN11),3,thurs,ssb
+46__Millers_Point_resort_(XCS11),3,thurs,ssb
+Millers_Point_tidal_pool_(CS37),3,thurs,ssb
+47_Fishermans_Beach_(XCS12),3,thurs,ssb
+Windmill_beach_(CS36),3,thurs,ssb
+48_Seaforth_Beach_(XCS13),3,thurs,ssb
+49_Boulders_Beach_(XCS32),3,thurs,ssb
+52__Simons__Town_Long_Beach_(XCS14),3,thurs,ssb
+Glencairn_tidal_pool_(CS38),3,thurs,ssb
+53_Glencairn_Beach_(XCS15),3,thurs,ssb
+54_Clovelly_Beach_Silvermine_mouth_(XCS17),3,thurs,ssb
+Fish_Hoek_beach_lifesaving_club_(CS41),3,thurs,ssb
+"56_Fish_Hoek-Corner_of_the_Beach,_at_Jager_Walk_(CS35)",3,thurs,ssb
+Woolleys_tidal_pool_(CS42),3,fri,ssb
+58__Kalk_Bay_Harbour_Beach_(CS01A),3,fri,ssb
+59_Kalk_Bay_Tidal_Pool_Inside_(CS02),3,fri,ssb
+60_Dalebrook_Tidal_Pool_(CS03),3,fri,ssb
+Dangers_beach_(CS44),3,fri,ssb
+61_St_James_Tidal_Pool_(CS04),3,fri,ssb
+63_Muizenberg_Pavilion_(CS16),3,fri,ssb
+64_Muizenberg_Surfers_Corner_(CS34),3,fri,ssb
+66_Sunrise_Beach_Parking_Area_(CS07),3,fri,ssb
+1_Silverstroomstrand_Tidal_Pool_(XCN08),4,mon,ssb
+2_Silverstroomstrand_lifeguard_building_(XCN14),4,mon,ssb
+3_Melkbosstrand_10th_street_(XCN07),4,mon,ssb
+4_Blouberg_Big_Bay_lifeguard_building_(XCN12),4,mon,ssb
+Small_Bay_Beach_off_Popham_Street_Blouberg_(CN37),4,mon,ssb
+7_Tableview_Athens_road_(XCN06),4,mon,ssb
+8_Milnerton_Lighthouse_(XCN04),4,mon,ssb
+9_Lagoon_Beach_(CN22),4,mon,ssb
+12_Green_Point_Pump_Station_(CN05),4,mon,ssb
+Three_Anchor_Bay_beach_(CN36),4,mon,ssb
+18_Milton_Beach_Tidal_Pool_Inside_(CN18I),4,mon,ssb
+22_Saunders_Rocks_Tidal_Pool_Inside_(CN16I),4,mon,ssb
+23_Saunders_Rocks_Tidal_Pool_Outside_(CN16O),4,mon,ssb
+24_Clifton_4th_Beach_(CN09),4,tues,ssb
+25_Maidens_Cove_north_sandy_cove_(CN10),4,tues,ssb
+26_Maidens_Cove_Tidal_Pool_west_Inside_(CN19I),4,tues,ssb
+"30_Glen_Beach-midway_point_along_the_beach,STW_pipe_close_by_(CN31)",4,tues,ssb
+32_Camps_Bay_Tidal_Pool_Inside_(CN12A),4,tues,ssb
+33_Camps_Bay_Pool_Outside_(CN12O),4,tues,ssb
+34_Northern_Camps_Bay-In_line_with_ablution_block_(CN30),4,tues,ssb
+Camps Bay_Central_(CN41),4,tues,ssb
+35_Camps_Bay_South_(CN11),4,tues,ssb
+Beta_Beach_(CN40),4,tues,ssb
+38_Bakoven_Beach_(CN21),4,tues,ssb
+39_Oudekraal_(XCN09),4,tues,ssb
+40_Llandudno_(XCN03),4,tues,ssb
+Hout_Bay_Mariners_Wharf_(HB13),4,tues,ssb
+41_Hout_Bay_Chapmans_peak_(XCN10),4,tues,ssb
+73_Strandfontein_Tidal_Pool_(CS17),4,wed,ssb
+_9_Miles_Strandfontein_Beach_(CS45),4,wed,ssb
+81_Mnandi_Beach_East_of_Lifesaving_Box_69_(CS19),4,wed,ssb
+82_Monwabisi_Tidal_Pool_(XCS18),4,wed,ssb
+Strand_Pipe_surfing_(XCS34),4,wed,ssb
+87_Strand-Water_slide_on_Beach_Rd_(CS32),4,wed,ssb
+89__Strand_lifesaving_club_opposite_Woltemade_Street_(XCS26),4,wed,ssb
+90_Strand-Beach_Rd_pedestrian_crossing_btw_Melkbaai_and_Da_gama_St._(CS31),4,wed,ssb
+92_Strand_Harmonie_Park_Jetty_(XCS29),4,wed,ssb
+96_Gordons_Bay_Van_Riebeeck_Hotel_(XCS05),4,wed,ssb
+99_Gordons_Bay_Bikini_Beach_(XCS08),4,wed,ssb
+100_Gordons_Bay_opposite_130_Beach_road_(CS29),4,wed,ssb
+101_Kogel_Bay_Beach_(XCS09),4,wed,ssb
+44_Long_Beach_Kommetjie_(XCN02),4,thurs,ssb
+48_Seaforth_Beach_(XCS13),4,thurs,ssb
+52__Simons__Town_Long_Beach_(XCS14),4,thurs,ssb
+Glencairn_tidal_pool_(CS38),4,thurs,ssb
+53_Glencairn_Beach_(XCS15),4,thurs,ssb
+Fish_Hoek_beach_lifesaving_club_(CS41),4,thurs,ssb
+Strand_Pipe_surfing_(XCS34),4,thurs,ssb
+59_Kalk_Bay_Tidal_Pool_Inside_(CS02),4,thurs,ssb
+60_Dalebrook_Tidal_Pool_(CS03),4,thurs,ssb
+Dangers_beach_(CS44),4,thurs,ssb
+61_St_James_Tidal_Pool_(CS04),4,thurs,ssb
+63_Muizenberg_Pavilion_(CS16),4,thurs,ssb
+64_Muizenberg_Surfers_Corner_(CS34),4,thurs,ssb

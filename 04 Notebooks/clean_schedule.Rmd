@@ -1,0 +1,138 @@
+---
+title: "Coastal Water Quality Cleaning"
+author: "Francois van Schalkwyk"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+# 0. Workspace Set Up
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+```{r load packages}
+# Load required packages
+library(tidyverse)
+```
+
+# 1. Data Import
+
+```{r read in data}
+# Read in the csv data
+a <- read_csv(
+  file = "01 Input Data/coastal_water_quality_sites_new.csv", col_names = T
+) %>%
+  mutate(
+    week = week %>% as.character() %>% as_factor(),
+    day = day %>% as_factor(),
+    samplers = samplers %>% as_factor()
+  )
+
+# Structure of the data
+glimpse(a)
+
+# Summary of the data
+summary(a)
+
+# Missing data
+a %>%
+  filter(if_any(everything(), is.na))
+
+# Raw data
+a
+```
+
+
+# 2. Data Cleaning
+
+```{r tidy=TRUE}
+# Split values into new columns with site_id and site_name
+a_clean <- a %>%
+  mutate(
+    site_id = str_extract(site, "[:upper:]{2,3}\\d{2}[:upper:]?"),
+    site_name = str_remove(site, "\\d+\\.") %>%
+      str_remove_all("[:upper:]{2,3}\\d{2}[:upper:]?") %>%
+      str_replace_all("2nd", "Second") %>%
+      str_replace_all("4th", "Fourth") %>%
+      str_remove_all("^\\d+") %>%
+      str_replace_all("_|,|-", " ") %>%
+      str_remove_all("\\(\\)") %>%
+      str_replace_all("\\snr\\s", " near ") %>%
+      str_replace_all("opp\\s", "opposite ") %>%
+      str_replace_all("btw", "between") %>%
+      str_to_upper() %>%
+      str_trim()
+  ) %>%
+  select(site_id, site_name, week, day, samplers)
+
+# Structure of the data
+a_clean %>%
+  select(site_id, site_name) %>%
+  # How many distinct site ids?
+
+  distinct(site_id) %>%
+  arrange(site_id) # 108
+
+# Find missing data
+a_clean %>% filter(if_any(everything(), is.na))
+
+# Head of data
+head(a_clean)
+
+# All data
+a_clean
+```
+
+```{r}
+# Group by site id to see if names match
+a_clean %>%
+  arrange(site_id)
+
+# Select the name that appears the most
+sites <- a_clean %>%
+  group_by(site_id) %>%
+  add_count(site_name) %>%
+  filter(n == max(n)) %>%
+  slice(1) %>%
+  select(site_id, site_name) %>%
+  ungroup()
+
+# Create a schedule table with only the site code, the week, the day and the samplers
+schedule <- a_clean %>%
+  select(site_id, week, day, samplers) %>%
+  mutate(
+    week = paste("Week", week),
+    day = case_when(
+      day == "mon" ~ "Monday",
+      day == "tues" ~ "Tuesday",
+      day == "wed" ~ "Wednesday",
+      day == "thurs" ~ "Thursday",
+      day == "fri" ~ "Friday"
+    ),
+    samplers = if_else(samplers == "ssb", "Scientific Services Branch", "Coastal Management Branch")
+  )
+
+# Print sites
+sites
+
+# Print schedule
+all_samples <- schedule %>%
+  inner_join(sites) %>%
+  mutate(
+    week = fct_inorder(week),
+    day = fct_inorder(day),
+    samplers = fct(samplers)
+  )
+
+# View all data
+all_samples
+```
+
+```{r print out the data}
+# Copy the data to Word document
+all_samples %>%
+  arrange(week, day, samplers, site_id) %>%
+  write_csv("02 Output Data/final_data.csv")
+```
