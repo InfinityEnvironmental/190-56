@@ -109,12 +109,11 @@ copy_to(con, tbl, name = "coastal", overwrite = TRUE)
 ```
 
 ```{r alternative method}
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_16(22.01.2025).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_18(27.01.2025).pdf"
+filename = str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 pdf_data <- pdf_text(path) |>
   str_split("\n")
-
-filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 sample_date <- pdf_data |>
   unlist() |> 
@@ -137,22 +136,30 @@ sample_temp_c <- pdf_data |>
   pluck(1) |>
   as.numeric()
 
-sample_number <- pdf_data |>
-  unlist() |> 
-  keep_at(c(34:41, 101:107)) |> 
+# Extract tabular data
+
+extract_table <- function(page){
+  page |>
+    unlist() |> 
+    head_while(~!str_detect(.x, "colony forming units")) |>
+    tail_while(~!str_detect(.x, "Sample number")) |>
+    discard(~.x == "") |>
+    unlist()
+}
+
+table <- map(pdf_data, ~extract_table(.x)) |>
+  unlist()
+  
+sample_number <- table |>
   str_sub(5,15) |>
   str_trim()
 
-sample_text <- pdf_data |>
-  unlist() |> 
-  keep_at(c(34:41, 101:107)) |> 
-  str_sub(19,90) |>
+sample_text <- table |>
+  str_sub(19,95) |>
   str_trim()
 
-sample_result <- pdf_data |>
-  unlist() |> 
-  keep_at(c(34:41, 101:107)) |> 
-  str_sub(90) |> 
+sample_result <- table |>
+  str_sub(100) |>
   str_trim()
 
 tbl <- tibble(number = sample_number,
@@ -164,8 +171,8 @@ tbl <- tibble(number = sample_number,
   summarise(text = str_c(text, collapse = ""), result = first(result)) |>
   select(text, result) |>
   mutate(
-    site_id = str_extract(text, "[:upper:]{2,3}\\d{2}\\d?[AOI]?"),
-    sample_time = str_extract(text, "\\d{2}h\\d{2}") |> str_replace("h", ":"),
+    site_id = str_extract(text, "[:upper:]{2,3}\\d{2}\\d?[AOIWETC]?") |> str_remove_all("\\s"),
+    sample_time = str_extract(text, "\\d{1,2}h\\d{2}") |> str_replace("h", ":"),
     sample_date = sample_date,
     analysis_completed = analysis_completed,
     sample_temp_c = sample_temp_c,
@@ -180,9 +187,9 @@ tbl <- tibble(number = sample_number,
   )) |>
   mutate(enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "None found", "ND"))
 
+# Copy to database
 copy_to(con, tbl, name = "coastal", overwrite = TRUE)
 ```
-
 
 ```{sql, connection = con}
 BEGIN;
@@ -205,8 +212,9 @@ SELECT * FROM cte;
 
 ```{sql, connection = con}
 SELECT
-  *
-FROM coastal.results;
+  site_id, sample_date, sample_time, enterococci_cfu_per_100ml
+FROM coastal.results
+WHERE sample_date = '2025-01-27'
 ```
 
 ```{sql, connection = con}
@@ -215,6 +223,36 @@ ROLLBACK;
 
 ```{sql, connection = con}
 COMMIT;
+```
+
+```{r find files not yet imported}
+# List of files in folder
+files_list <- list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/", pattern = "*.pdf")
+
+extract_sample_date <- function(filename){
+  sample_date <- pdf_text(paste("../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/", filename, sep = "")) |>
+    str_split("\\n") |>
+    unlist() |>
+    keep(~str_detect(.x, "Sample taken")) |>
+    str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+    pluck(1) |>
+    dmy()
+  
+  tibble(filename = filename, sample_date = sample_date)
+}
+
+# Map the function across the list of files in the directory
+files <- map_df(files_list, ~extract_sample_date(.x))
+
+# Retrieve a list of sample dates from the results table in database
+database <- tbl(con, I("coastal.results")) |>
+  distinct(sample_date) |>
+  collect()
+
+# Check which files are not yet in database
+files |>
+  left_join(database, by = c("sample_date" = "sample_date"), keep = TRUE) |>
+  filter(is.na(sample_date.y))
 ```
 
 
