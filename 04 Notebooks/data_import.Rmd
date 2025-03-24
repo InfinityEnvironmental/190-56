@@ -13,7 +13,9 @@ Make sure that you are working in the outfalls project, found in the working dir
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+knitr::opts_knit$set(
+  root.dir = rprojroot::find_rstudio_root_file()
+  )
 ```
 
 ## Load required packages
@@ -44,72 +46,42 @@ dbGetInfo(con)
 
 # Data Import
 
-```{r import data from pdf}
-filename <- "CWQ_15(21.01.2025).pdf"
+## Check which pdf files have not yet been imported
 
-pdf_data <- pdf_text(paste("../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/", filename, sep = "")) |>
-  str_split("\n") |>
-  unlist()
+```{r not-yet-imported}
+# List of files in folder
+files_list <- list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/", pattern = "*.pdf")
 
-sample_date <- pdf_data |>
-  keep(~str_detect(.x, "Sample taken")) |>
-  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
-  pluck(1) |>
-  dmy()
+extract_sample_date <- function(filename){
+  sample_date <- pdf_text(paste("../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/", filename, sep = "")) |>
+    str_split("\\n") |>
+    unlist() |>
+    keep(~str_detect(.x, "Sample taken")) |>
+    str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+    pluck(1) |>
+    dmy()
+  
+  tibble(filename = filename, sample_date = sample_date)
+}
 
-analysis_completed <- pdf_data |>
-  keep(~str_detect(.x, "Analysis completed")) |>
-  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
-  pluck(1) |>
-  dmy()
+# Map the function across the list of files in the directory
+files <- map_df(files_list, ~extract_sample_date(.x))
 
-sample_temp_c <- pdf_data |>
-  keep(~str_detect(.x, "Sample temperature:")) |>
-  str_extract("(?<=(Sample temperature:\\s))\\d{1,2}\\.\\d") |>
-  pluck(1) |>
-  as.numeric()
+# Retrieve a list of sample dates from the results table in database
+database <- tbl(con, I("coastal.results")) |>
+  distinct(sample_date) |>
+  collect()
 
-site_id <- pdf_data |>
-  str_extract_all("[:alpha:]{2,3}\\d{2}\\d?[IOA]?") |>
-  unlist() |>
-  str_trim()
-
-sample_time <- pdf_data |>
-  str_extract_all("\\d{2}h\\d{2}") |>
-  unlist() |>
-  str_replace("h", ":")
-
-enterococci_cfu_per_100ml <- pdf_data |>
-  keep(~str_detect(.x, "[:alpha:]{2,3}\\d{2}\\d?[IOA]?")) |>
-  str_extract("(\\d{1,5}|None found)$")
-
-tbl <- tibble(
-  filename = filename,
-  sample_date = sample_date,
-  analysis_completed = analysis_completed,
-  sample_temp_c = sample_temp_c,
-  site_id = site_id,
-  sample_time = sample_time,
-  enterococci_cfu_per_100ml = enterococci_cfu_per_100ml
-)
-
-tbl <- tbl |>
-  mutate(
-    enterococci_cfu_per_100ml = if_else(enterococci_cfu_per_100ml == "None found", "ND", enterococci_cfu_per_100ml)
-    ) |>
-  mutate(site_id = case_when(
-    str_detect(site_id, "\\d{2}1") ~ str_replace(site_id, "1$", "I"),
-    str_detect(site_id, "\\d{2}0") ~ str_replace(site_id, "0$", "O"),
-    .default = site_id
-  ), .after = site_id)
-
-tbl(con, I("coastal.sites"))
-
-copy_to(con, tbl, name = "coastal", overwrite = TRUE)
+# Check which files are not yet in database
+files |>
+  left_join(database, by = c("sample_date" = "sample_date"), keep = TRUE) |>
+  filter(is.na(sample_date.y))
 ```
 
-```{r alternative method}
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_18(27.01.2025).pdf"
+## Import data from pdf
+
+```{r import-from-pdf}
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_54(20.03.2025).pdf"
 filename = str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 pdf_data <- pdf_text(path) |>
@@ -171,7 +143,7 @@ tbl <- tibble(number = sample_number,
   summarise(text = str_c(text, collapse = ""), result = first(result)) |>
   select(text, result) |>
   mutate(
-    site_id = str_extract(text, "[:upper:]{2,3}\\d{2}\\d?[AOIWETC]?") |> str_remove_all("\\s"),
+    site_id = str_extract(text, "[:upper:]{2,3}\\s?\\d{2}\\d?[AOIWETC]?") |> str_remove_all("\\s"),
     sample_time = str_extract(text, "\\d{1,2}h\\d{2}") |> str_replace("h", ":"),
     sample_date = sample_date,
     analysis_completed = analysis_completed,
@@ -214,7 +186,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
-WHERE sample_date = '2025-01-27'
+WHERE sample_date = '2025-03-20'
 ```
 
 ```{sql, connection = con}
@@ -223,36 +195,6 @@ ROLLBACK;
 
 ```{sql, connection = con}
 COMMIT;
-```
-
-```{r find files not yet imported}
-# List of files in folder
-files_list <- list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/", pattern = "*.pdf")
-
-extract_sample_date <- function(filename){
-  sample_date <- pdf_text(paste("../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/", filename, sep = "")) |>
-    str_split("\\n") |>
-    unlist() |>
-    keep(~str_detect(.x, "Sample taken")) |>
-    str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
-    pluck(1) |>
-    dmy()
-  
-  tibble(filename = filename, sample_date = sample_date)
-}
-
-# Map the function across the list of files in the directory
-files <- map_df(files_list, ~extract_sample_date(.x))
-
-# Retrieve a list of sample dates from the results table in database
-database <- tbl(con, I("coastal.results")) |>
-  distinct(sample_date) |>
-  collect()
-
-# Check which files are not yet in database
-files |>
-  left_join(database, by = c("sample_date" = "sample_date"), keep = TRUE) |>
-  filter(is.na(sample_date.y))
 ```
 
 
