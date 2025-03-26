@@ -12,8 +12,8 @@ Make sure that you are working in the outfalls project, found in the working dir
 ## Set working directory for all code chunks to project root directory
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(
+knitr::opts_chunk$set(
+  echo = TRUE,
   root.dir = rprojroot::find_rstudio_root_file()
   )
 ```
@@ -25,6 +25,7 @@ library(tidyverse)
 library(dbplyr)
 library(DBI)
 library(pdftools)
+library(readxl)
 ```
 
 ## Database Connection
@@ -78,10 +79,10 @@ files |>
   filter(is.na(sample_date.y))
 ```
 
-## Import data from pdf
+## Extract data from pdf
 
-```{r import-from-pdf}
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_54(20.03.2025).pdf"
+```{r extract-pdf}
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_18(27.01.2025).pdf"
 filename = str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 pdf_data <- pdf_text(path) |>
@@ -163,6 +164,8 @@ tbl <- tibble(number = sample_number,
 copy_to(con, tbl, name = "coastal", overwrite = TRUE)
 ```
 
+## Upload to database
+
 ```{sql, connection = con}
 BEGIN;
 ```
@@ -197,4 +200,53 @@ ROLLBACK;
 COMMIT;
 ```
 
+# Read in Excel files for historical coastal water quality
 
+```{r read-excel}
+# List the files in the directory
+files <- list.files(path = "../01 Input Data/Coastal Water Quality Data/", pattern = "*.xls*")
+
+file <- "../../190-56/01 Input Data/Coastal Water Quality Data/1_Silverstroomstrand_Tidal_Pool_(XCN08).xlsm"
+path <- "../../190-56/01 Input Data/Coastal Water Quality Data/"
+filename <- file |> str_remove("../../190-56/01 Input Data/Coastal Water Quality Data/")
+
+# Create function for extracting data and populating table
+read_bacteria_data <- function(file){
+  # Extract filename
+  filename <- file |> str_remove("../../190-56/01 Input Data/Coastal Water Quality Data/")
+  # Read Ecoli data
+  ecoli <- read_excel(file, sheet = 2)
+  colnames(ecoli) <- c("date", "ecoli_cfu_per_100ml")
+  
+  # Read faecal streptococci data
+  faecal <-  read_excel(file, sheet = 3)
+  colnames(faecal) <- c("date", "faecal_streptococci_cfu_per_100ml")
+  
+  results <- ecoli |>
+    full_join(faecal, by = "date")
+  
+  results <- results |>
+    mutate(file = filename)
+  
+  return(results)
+}
+
+# Test the function
+results <- read_bacteria_data(file)
+
+# Test the function with multiple files
+combined <- str_c(path, files) |>
+  keep_at(1:10) |>
+  map_df(~read_bacteria_data(.x))
+
+# Clean up the file name to make a site_id and a site_description
+combined |>
+  mutate(
+    date = date(date),
+    site_id = str_extract(file, "[:upper:]{2,3}\\d{2}"),
+    description
+  )
+
+# Summary of data
+summary(results)
+```
