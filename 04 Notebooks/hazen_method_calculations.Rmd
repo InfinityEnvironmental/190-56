@@ -72,10 +72,19 @@ hazen_method(hout_bay)
 ```
 
 ```{r test-hazen-method}
+# Test the user-defined function
 data <- read_excel("../../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/02_Working Directory/01 Input Data/From CCT/Hout Bay Mariner's Wharf daily.xlsm",
            sheet = "Faecal streptococci")
 
 hazen_method(data)
+
+# Test the quantile function in R
+
+l <- data |> pull(2) |> sort()
+
+quantile(l, probs = 0.95, type = 5)
+quantile(l, probs = 0.90, type = 5)
+
 ```
 
 
