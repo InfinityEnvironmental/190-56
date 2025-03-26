@@ -206,19 +206,47 @@ COMMIT;
 # List the files in the directory
 files <- list.files(path = "../01 Input Data/Coastal Water Quality Data/", pattern = "*.xls*")
 
-filename = "../01 Input Data/Coastal Water Quality Data/1_Silverstroomstrand_Tidal_Pool_(XCN08).xlsm"
-read_excel(filename, sheet = 2) |>
-  mutate(
-    Date = date(Date),
-    Eco = as.integer(Eco)
-    ) |>
-  rename(date = Date, ecoli_cfu_per_100ml = Eco)
+file <- "../../190-56/01 Input Data/Coastal Water Quality Data/1_Silverstroomstrand_Tidal_Pool_(XCN08).xlsm"
+path <- "../../190-56/01 Input Data/Coastal Water Quality Data/"
+filename <- file |> str_remove("../../190-56/01 Input Data/Coastal Water Quality Data/")
 
-# Faecal indicator bacteria
-read_excel(filename, sheet = 2) |>
+# Create function for extracting data and populating table
+read_bacteria_data <- function(file){
+  # Extract filename
+  filename <- file |> str_remove("../../190-56/01 Input Data/Coastal Water Quality Data/")
+  # Read Ecoli data
+  ecoli <- read_excel(file, sheet = 2)
+  colnames(ecoli) <- c("date", "ecoli_cfu_per_100ml")
+  
+  # Read faecal streptococci data
+  faecal <-  read_excel(file, sheet = 3)
+  colnames(faecal) <- c("date", "faecal_streptococci_cfu_per_100ml")
+  
+  results <- ecoli |>
+    full_join(faecal, by = "date")
+  
+  results <- results |>
+    mutate(file = filename)
+  
+  return(results)
+}
+
+# Test the function
+results <- read_bacteria_data(file)
+
+# Test the function with multiple files
+combined <- str_c(path, files) |>
+  keep_at(1:10) |>
+  map_df(~read_bacteria_data(.x))
+
+# Clean up the file name to make a site_id and a site_description
+combined |>
   mutate(
-    Date = date(Date),
-    Eco = as.integer(Eco)
-    ) |>
-  rename(date = Date, ecoli_cfu_per_100ml = Eco)
+    date = date(date),
+    site_id = str_extract(file, "[:upper:]{2,3}\\d{2}"),
+    description
+  )
+
+# Summary of data
+summary(results)
 ```
