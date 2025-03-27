@@ -12,10 +12,8 @@ Make sure that you are working in the outfalls project, found in the working dir
 ## Set working directory for all code chunks to project root directory
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = TRUE,
-  root.dir = rprojroot::find_rstudio_root_file()
-  )
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 
 ## Load required packages
@@ -82,7 +80,7 @@ files |>
 ## Extract data from pdf
 
 ```{r extract-pdf}
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_18(27.01.2025).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_55(24.03.2025).pdf"
 filename = str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 pdf_data <- pdf_text(path) |>
@@ -189,7 +187,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
-WHERE sample_date = '2025-03-20'
+WHERE sample_date = '2025-03-24'
 ```
 
 ```{sql, connection = con}
@@ -204,49 +202,245 @@ COMMIT;
 
 ```{r read-excel}
 # List the files in the directory
-files <- list.files(path = "../01 Input Data/Coastal Water Quality Data/", pattern = "*.xls*")
-
-file <- "../../190-56/01 Input Data/Coastal Water Quality Data/1_Silverstroomstrand_Tidal_Pool_(XCN08).xlsm"
-path <- "../../190-56/01 Input Data/Coastal Water Quality Data/"
-filename <- file |> str_remove("../../190-56/01 Input Data/Coastal Water Quality Data/")
+path <- "01 Input Data/Coastal Water Quality Data/"
+files <- list.files(path = path, pattern = "*.xls*")
 
 # Create function for extracting data and populating table
 read_bacteria_data <- function(file){
   # Extract filename
-  filename <- file |> str_remove("../../190-56/01 Input Data/Coastal Water Quality Data/")
+  filename <- file |> str_remove("01 Input Data/Coastal Water Quality Data/")
+  
   # Read Ecoli data
-  ecoli <- read_excel(file, sheet = 2)
-  colnames(ecoli) <- c("date", "ecoli_cfu_per_100ml")
+  ecoli <- read_excel(file,
+                      range = "A1:B1000",
+                      sheet = 2,
+                      col_names = c("date", "ecoli_cfu_per_100ml"),
+                      col_types = c("date", "numeric"))
+  
+  ecoli <- ecoli |> 
+    group_by(date) |>
+    summarise(ecoli_cfu_per_100ml = max(ecoli_cfu_per_100ml))
   
   # Read faecal streptococci data
-  faecal <-  read_excel(file, sheet = 3)
-  colnames(faecal) <- c("date", "faecal_streptococci_cfu_per_100ml")
+  faecal <- read_excel(file,
+                       range = "A1:B1000",
+                       sheet = 3, 
+                       col_names = c("date", "faecal_streptococci_cfu_per_100ml"),
+                       col_types = c("date", "numeric"))
   
+  # If empty tibble, create new empty tibble
+  if (nrow(faecal) == 0) {
+    faecal <- tibble(date = date(), faecal_streptococci_cfu_per_100ml = numeric())
+    faecal <- add_case(faecal, date = NA, faecal_streptococci_cfu_per_100ml = NA) |>
+      mutate(date = date(date))
+  }
+  
+  # Group by date and select max value for each day
+  faecal <- faecal |> 
+    group_by(date) |>
+    summarise(faecal_streptococci_cfu_per_100ml = max(faecal_streptococci_cfu_per_100ml))
+  
+  # Join ecoli and faecal streptococci tibbles
   results <- ecoli |>
     full_join(faecal, by = "date")
   
   results <- results |>
-    mutate(file = filename)
+    mutate(
+      file = filename,
+      date = date(date)
+      ) |>
+    mutate(
+      site_id = file |> str_extract("[:upper:]{2,3}\\d{2}")
+    )
+  
+  results <- filter(results, !if_all(ecoli_cfu_per_100ml:faecal_streptococci_cfu_per_100ml, is.na))
   
   return(results)
 }
 
-# Test the function
-results <- read_bacteria_data(file)
+# Test function
+read_bacteria_data("01 Input Data/Coastal Water Quality Data/42_Noordhoek_beach_north_(CS40).xlsm")
+faecal <- read_excel("01 Input Data/Coastal Water Quality Data/72__Strandfontein_Point_west_of_Tidal_Pool_(CS13).xlsm",
+                     range = "A1:B500",
+                     sheet = 3,
+                     col_names = c("date", "faecal_streptococci_cfu_per_100ml"),
+                     col_types = c("date", "numeric"))
+
+read_excel("01 Input Data/Coastal Water Quality Data/72__Strandfontein_Point_west_of_Tidal_Pool_(CS13).xlsm", sheet = 3, col_types = c("date", "numeric"), col_names = c("date", "faecal"))
+
+if (nrow(faecal) == 0) {
+  faecal <- tibble(date = date(), faecal_streptococci_cfu_per_100ml = numeric())
+  faecal <- add_case(faecal, date = NA, faecal_streptococci_cfu_per_100ml = NA) |>
+    mutate(date = date(date))
+}
+
+faecal
 
 # Test the function with multiple files
 combined <- str_c(path, files) |>
-  keep_at(1:10) |>
   map_df(~read_bacteria_data(.x))
 
-# Clean up the file name to make a site_id and a site_description
-combined |>
-  mutate(
-    date = date(date),
-    site_id = str_extract(file, "[:upper:]{2,3}\\d{2}"),
-    description
-  )
-
 # Summary of data
-summary(results)
+summary(combined)
+
+# Correct dates that are mistakenly in the future
+combined |>
+  filter(date > "2025-03-31")
+
+# Create site name from the filename
+sites <- combined |>
+  distinct(file, site_id) |>
+  mutate(description = file |>
+           str_remove("^\\d{1,3}_{1,2}") |>
+           str_remove(".xlsm$") |>
+           str_remove("(SSB\\sand\\sCMB)|(CMB\\sand\\sSSB)") |>
+           str_remove("\\([:upper:]{2,3}\\d{2}[:upper:]?\\)") |>
+           str_replace_all("_", " ") |>
+           str_to_title() |>
+           str_trim()) |>
+  select(site_id, description)
+
+# Results table
+results <- combined |>
+  select(site_id, date, ecoli_cfu_per_100ml, faecal_streptococci_cfu_per_100ml)
 ```
+
+```{r check-sites-data}
+# Check sites table
+sites <- sites |>
+  distinct(site_id, description) |>
+  arrange(site_id) |>
+  mutate(description = case_when(
+    site_id == "XCS26" ~ "Strand Lifesaving Club Opposite Woltemade Street",
+    site_id == "XCN10" ~ "Hout Bay",
+    site_id == "XCN03" ~ "Llandudno",
+    site_id == "CS45" ~ "Strandfontein Beach East Of Tidal Pool",
+    site_id == "CN31" ~ "Glen Beach Midway Point Along The Beach",
+    site_id == "CN12" ~ "Camps Bay Tidal Pool Inside",
+    site_id == "CN06" ~ "Three Anchor Bay NW Rocks",
+    .default = description
+  ))
+```
+
+```{r check-results-data}
+# Check the number of samples per site
+results |>
+  group_by(site_id) |>
+  count() |>
+  arrange(n)
+
+# Check distribution of data
+results |>
+  summary()
+
+# Check site with many 1's
+results_summary <- results |>
+  group_by(year = year(date)) |>
+  summarise(
+    min_date = min(date),
+    max_date = max(date),
+    n_ecoli = sum(!is.na(ecoli_cfu_per_100ml)),
+    min_ecoli = min(ecoli_cfu_per_100ml, na.rm = TRUE),
+    max_ecoli = max(ecoli_cfu_per_100ml, na.rm = TRUE),
+    mean_ecoli = mean(ecoli_cfu_per_100ml, na.rm = TRUE),
+    n_faecal = sum(!is.na(faecal_streptococci_cfu_per_100ml)),
+    min_faecal = min(faecal_streptococci_cfu_per_100ml, na.rm = TRUE),
+    max_faecal = max(faecal_streptococci_cfu_per_100ml, na.rm = TRUE),
+    mean_faecal = mean(faecal_streptococci_cfu_per_100ml, na.rm = TRUE)
+    )
+
+# Plot summary results
+results_summary |>
+  ggplot(aes(x = year)) +
+  labs(x = "Year", y = "Total samples") +
+  geom_col(aes(y = n_ecoli, fill = "E. coli")) +
+  geom_col(aes(y = n_faecal, fill = "Faecal streptococci")) +
+  scale_fill_brewer(name = "Indicator Organism", type = "qual", palette = 3) +
+  theme(legend.position = "bottom")
+
+# Clean the ecoli values
+results <- results |>
+  mutate(ecoli_cfu_per_100ml = if_else(date >= "2024-02-22" & site_id == "CS02", NA, ecoli_cfu_per_100ml)) |>
+  filter(!if_all(ecoli_cfu_per_100ml:faecal_streptococci_cfu_per_100ml, is.na))
+
+results |>
+  arrange(desc(date))
+```
+
+```{r test-hazen}
+hazen_annual <- results |>
+  group_by(year = year(date)) |>
+  summarise(
+    min_date = min(date),
+    max_date = max(date),
+    n_ecoli = sum(!is.na(ecoli_cfu_per_100ml)),
+    hazen95_ecoli = quantile(ecoli_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
+    hazen90_ecoli = quantile(ecoli_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
+    hazen_category_ecoli = case_when(
+      n_ecoli < 10 ~ "Not enough samples",
+      hazen95_ecoli <= 100 ~ "Excellent",
+      hazen95_ecoli <= 200 ~ "Good",
+      hazen95_ecoli > 200 & hazen90_ecoli > 185 ~ "Poor",
+      hazen95_ecoli > 200 & hazen90_ecoli < 185 ~ "Sufficient"
+  ),
+    n_faecal = sum(!is.na(faecal_streptococci_cfu_per_100ml)),
+    hazen95_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
+    hazen90_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
+  hazen_category_faecal = case_when(
+      n_faecal < 10 ~ "Not enough samples",
+      hazen95_faecal <= 100 ~ "Excellent",
+      hazen95_faecal <= 200 ~ "Good",
+      hazen95_faecal > 200 & hazen90_faecal > 185 ~ "Poor",
+      hazen95_faecal > 200 & hazen90_faecal < 185 ~ "Sufficient"
+  )
+  ) |>
+  mutate(hazen_category_ecoli = fct(hazen_category_ecoli, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent"))) |>
+  mutate(hazen_category_faecal = fct(hazen_category_faecal, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent")))
+```
+
+```{r test-hazen}
+hazen_annual_site <- results |>
+  group_by(year = year(date), site_id) |>
+  summarise(
+    min_date = min(date),
+    max_date = max(date),
+    n_ecoli = sum(!is.na(ecoli_cfu_per_100ml)),
+    hazen95_ecoli = quantile(ecoli_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
+    hazen90_ecoli = quantile(ecoli_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
+    hazen_category_ecoli = case_when(
+      n_ecoli < 10 ~ "Not enough samples",
+      hazen95_ecoli <= 100 ~ "Excellent",
+      hazen95_ecoli <= 200 ~ "Good",
+      hazen95_ecoli > 200 & hazen90_ecoli > 185 ~ "Poor",
+      hazen95_ecoli > 200 & hazen90_ecoli < 185 ~ "Sufficient"
+  ),
+    n_faecal = sum(!is.na(faecal_streptococci_cfu_per_100ml)),
+    hazen95_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
+    hazen90_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
+  hazen_category_faecal = case_when(
+      n_faecal < 10 ~ "Not enough samples",
+      hazen95_faecal <= 100 ~ "Excellent",
+      hazen95_faecal <= 200 ~ "Good",
+      hazen95_faecal > 200 & hazen90_faecal > 185 ~ "Poor",
+      hazen95_faecal > 200 & hazen90_faecal < 185 ~ "Sufficient"
+  )
+  ) |>
+  mutate(hazen_category_ecoli = fct(hazen_category_ecoli, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent"))) |>
+  mutate(hazen_category_faecal = fct(hazen_category_faecal, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent")))
+```
+
+```{r plot-hazen}
+hazen_annual |>
+  ggplot(aes(x = year)) +
+  labs(x = "Year") +
+  geom_tile(aes(fill = hazen_category_ecoli)) +
+  scale_fill_brewer(name = "Water Quality Category", type = "div", palette = "RdYlGn")
+
+RColorBrewer::display.brewer.all()
+```
+
+```{r}
+sites |>
+  inner_join(hazen_annual)
+```
+
