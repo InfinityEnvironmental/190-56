@@ -69,7 +69,8 @@ files <- map_df(files_list, ~extract_sample_date(.x))
 # Retrieve a list of sample dates from the results table in database
 database <- tbl(con, I("coastal.results")) |>
   distinct(sample_date) |>
-  collect()
+  collect() |>
+  arrange(desc(sample_date))
 
 # Check which files are not yet in database
 files |>
