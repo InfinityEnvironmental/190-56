@@ -207,7 +207,7 @@ ROLLBACK;
 COMMIT;
 ```
 
-# Read in Excel files for historical coastal water quality
+# Historical Data
 
 ```{r read-excel}
 # List the files in the directory
@@ -277,13 +277,13 @@ faecal <- read_excel("01 Input Data/Coastal Water Quality Data/72__Strandfontein
 
 read_excel("01 Input Data/Coastal Water Quality Data/72__Strandfontein_Point_west_of_Tidal_Pool_(CS13).xlsm", sheet = 3, col_types = c("date", "numeric"), col_names = c("date", "faecal"))
 
+# If the sheet is
 if (nrow(faecal) == 0) {
   faecal <- tibble(date = date(), faecal_streptococci_cfu_per_100ml = numeric())
   faecal <- add_case(faecal, date = NA, faecal_streptococci_cfu_per_100ml = NA) |>
     mutate(date = date(date))
 }
 
-faecal
 
 # Test the function with multiple files
 combined <- str_c(path, files) |>
