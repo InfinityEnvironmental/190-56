@@ -209,11 +209,14 @@ COMMIT;
 
 # Historical Data
 
-```{r read-excel}
+```{r list-files}
 # List the files in the directory
 path <- "01 Input Data/Coastal Water Quality Data/"
 files <- list.files(path = path, pattern = "*.xls*")
+full_path <- paste(path, files, sep = "")
+```
 
+```{r read-excel-function}
 # Create function for extracting data and populating table
 read_bacteria_data <- function(file){
   # Extract filename
@@ -245,7 +248,7 @@ read_bacteria_data <- function(file){
   }
   
   # Group by date and select max value for each day
-  faecal <- faecal |> 
+  faecal <- faecal |>
     group_by(date) |>
     summarise(faecal_streptococci_cfu_per_100ml = max(faecal_streptococci_cfu_per_100ml))
   
@@ -257,62 +260,257 @@ read_bacteria_data <- function(file){
     mutate(
       file = filename,
       date = date(date)
-      ) |>
-    mutate(
-      site_id = file |> str_extract("[:upper:]{2,3}\\d{2}")
-    )
+      )
   
   results <- filter(results, !if_all(ecoli_cfu_per_100ml:faecal_streptococci_cfu_per_100ml, is.na))
   
   return(results)
 }
+```
 
-# Test function
-read_bacteria_data("01 Input Data/Coastal Water Quality Data/42_Noordhoek_beach_north_(CS40).xlsm")
-faecal <- read_excel("01 Input Data/Coastal Water Quality Data/72__Strandfontein_Point_west_of_Tidal_Pool_(CS13).xlsm",
-                     range = "A1:B500",
-                     sheet = 3,
-                     col_names = c("date", "faecal_streptococci_cfu_per_100ml"),
-                     col_types = c("date", "numeric"))
+```{r read-excel-function-copy}
+# Create function for extracting data and populating table
+read_bacteria_data <- function(file, sheet){
+  # Extract filename
+  filename <- file |> str_remove("01 Input Data/Coastal Water Quality Data/")
+  
+  # Read Ecoli data
+  data <- read_excel(file,
+                      range = "A1:B1000",
+                      sheet = sheet,
+                      col_names = c("date", "value_cfu_per_100ml"),
+                      col_types = c("date", "numeric"))
+  
+  # If empty tibble, create new empty tibble
+  if (nrow(data) == 0) {
+    data <- tibble(date = date(), value_cfu_per_100ml = numeric())
+    data <- add_case(data, date = NA, value_cfu_per_100ml = NA) |>
+      mutate(date = date(date))
+  }
+  
+  results <- data |>
+    slice(-1) |>
+    filter(!is.na(value_cfu_per_100ml)) |>
+    mutate(
+      date = date(date),
+      file = filename
+      )
 
-read_excel("01 Input Data/Coastal Water Quality Data/72__Strandfontein_Point_west_of_Tidal_Pool_(CS13).xlsm", sheet = 3, col_types = c("date", "numeric"), col_names = c("date", "faecal"))
-
-# If the sheet is
-if (nrow(faecal) == 0) {
-  faecal <- tibble(date = date(), faecal_streptococci_cfu_per_100ml = numeric())
-  faecal <- add_case(faecal, date = NA, faecal_streptococci_cfu_per_100ml = NA) |>
-    mutate(date = date(date))
+  return(results)
 }
+```
 
+```{r run-function}
+# Run the function with one file
+read_bacteria_data("01 Input Data/Coastal Water Quality Data/60_Dalebrook_Tidal_Pool_(CS03).xlsm", 2)
 
-# Test the function with multiple files
-combined <- str_c(path, files) |>
-  map_df(~read_bacteria_data(.x))
+# Run the function with all files for E. coli
+ecoli <- str_c(path, files) |>
+  map_df(~read_bacteria_data(.x, 2))
 
-# Summary of data
-summary(combined)
+# Run the function for faecal streptococci
+faecal <- str_c(path, files) |>
+  map_df(~read_bacteria_data(.x, 3))
+```
 
-# Correct dates that are mistakenly in the future
-combined |>
-  filter(date > "2025-03-31")
+```{r summary-statistics}
+# Check summary statistics for ecoli
+ecoli |>
+  group_by(file) |>
+  arrange(file) |>
+  summarise(
+    min_date = min(date),
+    max_date = max(date),
+    n = sum(!is.na(value_cfu_per_100ml)),
+    min = min(value_cfu_per_100ml, na.rm = TRUE),
+    max = max(value_cfu_per_100ml, na.rm = TRUE)
+    )
 
+# Check summary statistics for faecal streptococci
+faecal |>
+  group_by(file) |>
+  arrange(file) |>
+  summarise(
+    min_date = min(date),
+    max_date = max(date),
+    n = sum(!is.na(value_cfu_per_100ml)),
+    min = min(value_cfu_per_100ml, na.rm = TRUE),
+    max = max(value_cfu_per_100ml, na.rm = TRUE)
+    )
+```
+
+```{r intensive-cleaning}
+# For each file, calculate the gap between the most recent and next most recent file. If the value is 1, remove that record
+ecoli |>
+  group_by(file) |>
+  mutate(gap = date - lag(date)) |>
+  filter(!(gap > "100 days" & value_cfu_per_100ml == 1) & file != "64_Muizenberg_Sufing_area-In_Line_with_Bathing_area_(CS34) SSB and CMB.xlsm") |>
+  ggplot(aes(x = date, y = value_cfu_per_100ml, colour = file)) +
+  geom_point() +
+  theme(legend.position = "none") +
+  coord_cartesian(xlim = c(ymd("2024-01-01"), ymd("2025-07-01")), ylim = c(0, 250))
+
+# Clean data
+ecoli <- ecoli |>
+  group_by(file) |>
+  mutate(gap = date - lag(date)) |>
+  filter(!(gap > "100 days" & value_cfu_per_100ml == 1)) |>
+  filter(!(file == "56_Fish_Hoek-Corner_of_the_Beach,_at_Jager_Walk_(CS35) CMB and SSB.xlsm" & date > "2024-02-21" & value_cfu_per_100ml == 1)) |> 
+  filter(!(file == "56_Fish_Hoek-Corner_of_the_Beach,_at_Jager_Walk_(CS35).xlsm" & date > "2024-02-21" & value_cfu_per_100ml == 1)) |>
+  filter(!(file == "56_Fish_Hoek_lifesaving_club_(CS41).xlsm" & date > "2024-02-21" & value_cfu_per_100ml == 1)) |>
+  filter(!(file == "57_Woolleys_Tidal_Pool_(CS42).xlsm" & date >= "2024-02-07" & round(value_cfu_per_100ml, 2) == 3.33)) |>
+  filter(!(file == "59_Kalk_Bay_Tidal_Pool_Inside_(CS02).xlsm" & date > "2024-02-21" & value_cfu_per_100ml == 1)) |>
+  filter(!(file == "63_Muizenberg_Pavilion_(CS16).xlsm" & date >= "2024-02-21" & value_cfu_per_100ml == 31)) |>
+  filter(!(file == "64_Muizenberg_Sufing_area-In_Line_with_Bathing_area_(CS34) SSB and CMB.xlsm" & date >= "2024-04-01" & value_cfu_per_100ml == 88)) |>
+  filter(!(file == "64_Muizenberg_Sufing_area-In_Line_with_Bathing_area_(CS34).xlsm" & date >= "2024-04-01" & value_cfu_per_100ml == 88)) |>
+  filter(!(file == "39_Cosy_Bay_(CN39).xlsm" & date >= "2024-10-31")) |>
+  filter(!(file == "39_Oudekraal_(XCN09).xlsm" & date >= "2024-10-31")) |>
+  filter(!(file == "466__Millers_Point_tidal_pool_(CS37).xlsm")) |>
+  select(-gap)
+```
+
+```{r plot-data}
+# Plot the data
+ecoli |>
+  ggplot(aes(x = date, y = value_cfu_per_100ml, colour = file)) +
+  geom_point() +
+  theme(legend.position = "none") +
+  coord_cartesian(xlim = c(ymd("2022-01-01"), ymd("2025-06-01")), ylim = c(0, 250))
+```
+
+```{r faecal-plot}
+faecal |>
+  ggplot(aes(x = date, y = value_cfu_per_100ml, colour = file)) +
+  geom_point() +
+  theme(legend.position = "none") +
+  coord_cartesian(xlim = c(ymd("2023-01-01"), ymd("2025-06-01")), ylim = c(0, 1000))
+```
+
+```{r remove-duplicates}
+# Remove duplicate values
+ecoli <- ecoli |>
+  mutate(
+    site_id = str_extract(file, "[:upper:]{2,3}\\d{2}[:upper:]?"),
+    full = str_detect(file, "SSB|CMB")
+  ) |>
+  group_by(site_id, date, full, value_cfu_per_100ml) |>
+  slice_head(n = 1) |>
+  ungroup()
+
+faecal <- faecal |>
+  mutate(
+    site_id = str_extract(file, "[:upper:]{2,3}\\d{2}[:upper:]?"),
+    full = str_detect(file, "SSB|CMB")
+  ) |>
+  group_by(site_id, date, value_cfu_per_100ml, full) |>
+  slice_head(n = 1) |>
+  ungroup()
+```
+
+```{r ssb-values}
+ecoli <- ecoli |>
+  group_by(date, site_id, value_cfu_per_100ml) |>
+  slice_head(n = 1)
+
+faecal <- faecal |>
+  group_by(date, site_id, value_cfu_per_100ml) |>
+  slice_head(n = 1)
+```
+
+# Replace numeric values with censored equivalents
+
+```{r censored-values}
+ecoli |>
+  ungroup() |>
+  arrange(value_cfu_per_100ml)
+
+ecoli |>
+  filter(value_cfu_per_100ml < 15 & value_cfu_per_100ml != 1/3 & value_cfu_per_100ml != 10/3) |> 
+  ggplot(aes(x = date, y = value_cfu_per_100ml, colour = site_id)) +
+  geom_point() +
+  scale_y_continuous(breaks = seq(0, 20, 0.5)) +
+  scale_x_date(date_breaks = "6 months") +
+  theme(legend.position = "none", axis.text.x = element_text(angle = 90))
+
+ecoli <- ecoli |>
+  ungroup() |> 
+  mutate(censored_value = case_when(
+    round(value_cfu_per_100ml, 2) == 0.67 ~ "<2",
+    round(value_cfu_per_100ml, 2) == 0.33 | value_cfu_per_100ml == 0.3 ~ "<1",
+    round(value_cfu_per_100ml, 2) == 0.12 ~ "0",
+    round(value_cfu_per_100ml, 2) == 0.22 ~ "0",
+    round(value_cfu_per_100ml, 2) == 3.33 ~ "<10",
+    round(value_cfu_per_100ml, 2) == 16.67 ~ "<50",
+    round(value_cfu_per_100ml, 2) == 33.33 ~ "<100",
+    round(value_cfu_per_100ml, 2) == 806.67 ~ ">2420",
+    round(value_cfu_per_100ml, 2) == 3.48 ~ "4",
+    round(value_cfu_per_100ml, 2) == 4.18 ~ "4",
+    .default = as.character(value_cfu_per_100ml)
+    ))
+
+faecal <- faecal |>
+  ungroup() |> 
+  mutate(censored_value = case_when(
+    round(value_cfu_per_100ml, 2) == 0.67 ~ "<2",
+    round(value_cfu_per_100ml, 2) == 0.33 | value_cfu_per_100ml == 0.3 ~ "<1",
+    round(value_cfu_per_100ml, 3) == 0.033 ~ "<1",
+    round(value_cfu_per_100ml, 2) == 0.12 ~ "0",
+    round(value_cfu_per_100ml, 2) == 0.22 ~ "0",
+    round(value_cfu_per_100ml, 2) == 3.33 ~ "<10",
+    round(value_cfu_per_100ml, 2) == 16.67 ~ "<50",
+    round(value_cfu_per_100ml, 2) == 33.33 ~ "<100",
+    round(value_cfu_per_100ml, 2) == 806.67 ~ ">2420",
+    round(value_cfu_per_100ml, 2) == 3.48 ~ "4",
+    round(value_cfu_per_100ml, 2) == 4.18 ~ "4",
+    round(value_cfu_per_100ml, 2) == 2.48 ~ "2",
+    value_cfu_per_100ml == 1.3 ~ "1",
+    .default = as.character(value_cfu_per_100ml)
+    ))
+```
+
+```{r check-sites}
 # Create site name from the filename
-sites <- combined |>
+sites <- ecoli |>
   distinct(file, site_id) |>
   mutate(description = file |>
            str_remove("^\\d{1,3}_{1,2}") |>
            str_remove(".xlsm$") |>
-           str_remove("(SSB\\sand\\sCMB)|(CMB\\sand\\sSSB)") |>
+           # str_remove("(SSB\\sand\\sCMB)|(CMB\\sand\\sSSB)") |>
            str_remove("\\([:upper:]{2,3}\\d{2}[:upper:]?\\)") |>
            str_replace_all("_", " ") |>
-           str_to_title() |>
+           str_to_upper() |>
            str_trim()) |>
-  select(site_id, description)
+  select(site_id, description) |>
+  arrange(site_id)
+
+sites <- faecal |>
+  distinct(file, site_id) |>
+  mutate(description = file |>
+           str_remove("^\\d{1,3}_{1,2}") |>
+           str_remove(".xlsm$") |>
+           # str_remove("(SSB\\sand\\sCMB)|(CMB\\sand\\sSSB)") |>
+           str_remove("\\([:upper:]{2,3}\\d{2}[:upper:]?\\)") |>
+           str_replace_all("_", " ") |>
+           str_to_upper() |>
+           str_trim()) |>
+  select(site_id, description) |>
+  arrange(site_id)
+
+# Check which sites are still unique
+sites |>
+  distinct(site_id, description)
 
 # Results table
-results <- combined |>
-  select(site_id, date, ecoli_cfu_per_100ml, faecal_streptococci_cfu_per_100ml)
+ecoli <- ecoli |>
+  select(date, site_id, value_cfu_per_100ml, censored_value)
 ```
+
+## Check differences between CMB and SSB data
+
+```{r check-ssb-cmb}
+combined
+```
+
 
 ```{r check-sites-data}
 # Check sites table
@@ -326,7 +524,6 @@ sites <- sites |>
     site_id == "CS45" ~ "Strandfontein Beach East Of Tidal Pool",
     site_id == "CN31" ~ "Glen Beach Midway Point Along The Beach",
     site_id == "CN12" ~ "Camps Bay Tidal Pool Inside",
-    site_id == "CN06" ~ "Three Anchor Bay NW Rocks",
     .default = description
   ))
 ```
@@ -375,6 +572,8 @@ results <- results |>
 results |>
   arrange(desc(date))
 ```
+
+# Hazen Method
 
 ```{r test-hazen}
 hazen_annual <- results |>
