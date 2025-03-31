@@ -334,7 +334,7 @@ faecal |>
   ggplot(aes(x = date, y = value_cfu_per_100ml, colour = file)) +
   geom_point() +
   theme(legend.position = "none") +
-  coord_cartesian(xlim = c(ymd("2023-01-01"), ymd("2025-06-01")), ylim = c(0, 5000))
+  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-06-01")))
 ```
 
 The faecal streptococci data don't seem to have the same solid lines that the E. coli data had. There are also some streaks but these streaks occur at frequencies that can be reasonably expected from weekly sampling. These are also likely to be due to censored values, which will be dealt with in due course. 
@@ -501,13 +501,13 @@ ecoli |>
   mutate(censored = str_detect(censored_value, "<|>")) |>
   ggplot(aes(x = date, y = value_cfu_per_100ml, colour = censored)) +
     geom_point() +
-  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-01-01")), ylim = c(0, 100))
+  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-01-01")), ylim = c(0, 80000))
 
 faecal |>
   mutate(censored = str_detect(censored_value, "<|>")) |>
   ggplot(aes(x = date, y = value_cfu_per_100ml, colour = censored)) +
     geom_point() +
-  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-01-01")), ylim = c(0, 15))
+  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-01-01")), ylim = c(0, 80000))
 
 ```
 
@@ -594,7 +594,7 @@ current |>
 IN 2023/2024 data samples were collected with sample codes that don't match any other sample codes in the monitoring programme. I want to see how well our data corresponds to City of Cape Town data.
 
 ```{r read-sabs}
-sabs <- read_excel("../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/07_Cleaned Data/Coastal WQ Weekly 2023-24_cleaned.xlsx",
+sabs <- read_excel("../../Infinity/Infinity Projects - 190-56 Coastal WQ/07_Cleaned Data/Coastal WQ Weekly 2023-24_cleaned.xlsx",
            col_names = c(
              "site_description",
              "cct_code",
@@ -658,6 +658,11 @@ faec2023 |>
 nrow(sabs) # 1549
 nrow(faec2023) # 1877
 
+# Combine the two data sets
+faec2023 |> mutate(dataset = "CCT") |>
+  bind_rows(sabs |> mutate(dataset = "SABS")) |>
+  arrange(sample_date, site_id, dataset, enterococci_cfu_per_100ml)
+
 # Handle censored values the same way
 sabs <- sabs |>
   mutate(numeric = case_when(
@@ -667,9 +672,6 @@ sabs <- sabs |>
     .default = as.numeric(enterococci_cfu_per_100ml)
   ),
   sample_date = date(sample_date))
-
-sabs |>
-  filter
 
 faec2023 <- faec2023 |>
   mutate(numeric = case_when(
