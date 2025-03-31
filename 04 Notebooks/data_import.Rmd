@@ -249,9 +249,6 @@ read_bacteria_data <- function(file, sheet){
 ```
 
 ```{r run-function}
-# Run the function with one file
-read_bacteria_data("01 Input Data/Coastal Water Quality Data/60_Dalebrook_Tidal_Pool_(CS03).xlsm", 2)
-
 # Run the function with all files for E. coli
 ecoli <- str_c(path, files) |>
   map_df(~read_bacteria_data(.x, 2))
@@ -337,7 +334,7 @@ faecal |>
   ggplot(aes(x = date, y = value_cfu_per_100ml, colour = file)) +
   geom_point() +
   theme(legend.position = "none") +
-  coord_cartesian(xlim = c(ymd("2023-01-01"), ymd("2025-06-01")), ylim = c(0, 1000))
+  coord_cartesian(xlim = c(ymd("2023-01-01"), ymd("2025-06-01")), ylim = c(0, 5000))
 ```
 
 The faecal streptococci data don't seem to have the same solid lines that the E. coli data had. There are also some streaks but these streaks occur at frequencies that can be reasonably expected from weekly sampling. These are also likely to be due to censored values, which will be dealt with in due course. 
@@ -349,8 +346,11 @@ ecoli <- ecoli |>
     site_id = str_extract(file, "[:upper:]{2,3}\\d{2}[:upper:]?"),
     full = str_detect(file, "SSB|CMB")
   ) |>
-  group_by(site_id, date, full, value_cfu_per_100ml) |>
-  slice_head(n = 1) |>
+  group_by(date, site_id, full, value_cfu_per_100ml) |>
+  slice(1) |> 
+  arrange(full, .by_group = TRUE) |>
+  ungroup(full) |> 
+  slice_tail(n = 1) |>
   ungroup()
 
 faecal <- faecal |>
@@ -358,20 +358,12 @@ faecal <- faecal |>
     site_id = str_extract(file, "[:upper:]{2,3}\\d{2}[:upper:]?"),
     full = str_detect(file, "SSB|CMB")
   ) |>
-  group_by(site_id, date, value_cfu_per_100ml, full) |>
-  slice_head(n = 1) |>
+  group_by(date, site_id, full, value_cfu_per_100ml) |>
+  slice(1) |>
+  arrange(full, .by_group = TRUE) |>
+  ungroup(full) |>
+  slice_tail(n = 1) |>
   ungroup()
-```
-
-```{r ssb-values}
-# Remove duplicates that exist due to duplicate values on SSB and CMB sheets
-ecoli <- ecoli |>
-  group_by(date, site_id, value_cfu_per_100ml) |>
-  slice_head(n = 1)
-
-faecal <- faecal |>
-  group_by(date, site_id, value_cfu_per_100ml) |>
-  slice_head(n = 1)
 ```
 
 There seem to be some duplicate values in the data. Some of these values naturally duplicated because of the duplication of data in the CMB and SSB duplicate sheets. Values that overlap simply because they appear in both sheets can reasonably be removed. Other values that have the same result for the same site on the same day can reasonably be removed only if there is no precedent for multiple samples on the same day. There are instances where multiple samples are taken on the same day, and therefore this needs to be done carefully so that results are not removed that simply happen to have the same value on the same day for the same site. 
@@ -408,7 +400,8 @@ ecoli <- ecoli |>
     round(value_cfu_per_100ml, 2) == 4.18 ~ "4",
     round(value_cfu_per_100ml, 4) == 2.7789 ~ "3",
     .default = as.character(value_cfu_per_100ml)
-    ))
+    )) |>
+  mutate(censored_value = if_else(censored_value == "0", "ND", censored_value))
 
 ecoli |>
   filter(date > "2024-01-01")
@@ -431,7 +424,8 @@ faecal <- faecal |>
     round(value_cfu_per_100ml, 2) == 2.48 ~ "2",
     value_cfu_per_100ml == 1.3 ~ "1",
     .default = as.character(value_cfu_per_100ml)
-    ))
+    )) |>
+  mutate(censored_value = if_else(censored_value == "0", "ND", censored_value))
 
 faecal |>
   filter(date > "2024-07-01")
@@ -519,9 +513,35 @@ faecal |>
 
 ```
 
+```{r summary-statistics}
+# Check summary statistics for ecoli
+ecoli |>
+  group_by(file) |>
+  arrange(file) |>
+  summarise(
+    min_date = min(date),
+    max_date = max(date),
+    n = sum(!is.na(value_cfu_per_100ml)),
+    min = min(value_cfu_per_100ml, na.rm = TRUE),
+    max = max(value_cfu_per_100ml, na.rm = TRUE)
+    )
+
+# Check summary statistics for faecal streptococci
+faecal |>
+  group_by(file) |>
+  arrange(file) |>
+  summarise(
+    min_date = min(date),
+    max_date = max(date),
+    n = sum(!is.na(value_cfu_per_100ml)),
+    min = min(value_cfu_per_100ml, na.rm = TRUE),
+    max = max(value_cfu_per_100ml, na.rm = TRUE)
+    )
+```
+
 ```{r check-sites}
 # Create site name from the filename
-sites <- ecoli |>
+sites_ecoli <- ecoli |>
   distinct(file, site_id) |>
   mutate(description = file |>
            str_remove("^\\d{1,3}_{1,2}") |>
@@ -534,7 +554,7 @@ sites <- ecoli |>
   select(site_id, description) |>
   arrange(site_id)
 
-sites <- faecal |>
+sites_faecal <- faecal |>
   distinct(file, site_id) |>
   mutate(description = file |>
            str_remove("^\\d{1,3}_{1,2}") |>
@@ -548,79 +568,25 @@ sites <- faecal |>
   arrange(site_id)
 
 # Check which sites are still unique
-sites |>
+sites_ecoli |>
   distinct(site_id, description)
 
-# Results table
-ecoli <- ecoli |>
-  select(date, site_id, value_cfu_per_100ml, censored_value)
-```
+sites_faecal |>
+  distinct(site_id, description)
 
-## Check differences between CMB and SSB data
+# Get current sites
+current <- tbl(con, I("coastal.sites")) |>
+  collect()
 
-```{r check-ssb-cmb}
-combined
-```
+current |>
+  full_join(sites_ecoli) |>
+  select(site_id, site_description, description) |>
+  rename(description_current = site_description, description_ecoli = description)
 
-```{r check-sites-data}
-# Check sites table
-sites <- sites |>
-  distinct(site_id, description) |>
-  arrange(site_id) |>
-  mutate(description = case_when(
-    site_id == "XCS26" ~ "Strand Lifesaving Club Opposite Woltemade Street",
-    site_id == "XCN10" ~ "Hout Bay",
-    site_id == "XCN03" ~ "Llandudno",
-    site_id == "CS45" ~ "Strandfontein Beach East Of Tidal Pool",
-    site_id == "CN31" ~ "Glen Beach Midway Point Along The Beach",
-    site_id == "CN12" ~ "Camps Bay Tidal Pool Inside",
-    .default = description
-  ))
-```
-
-```{r check-results-data}
-# Check the number of samples per site
-results |>
-  group_by(site_id) |>
-  count() |>
-  arrange(n)
-
-# Check distribution of data
-results |>
-  summary()
-
-# Check site with many 1's
-results_summary <- results |>
-  group_by(year = year(date)) |>
-  summarise(
-    min_date = min(date),
-    max_date = max(date),
-    n_ecoli = sum(!is.na(ecoli_cfu_per_100ml)),
-    min_ecoli = min(ecoli_cfu_per_100ml, na.rm = TRUE),
-    max_ecoli = max(ecoli_cfu_per_100ml, na.rm = TRUE),
-    mean_ecoli = mean(ecoli_cfu_per_100ml, na.rm = TRUE),
-    n_faecal = sum(!is.na(faecal_streptococci_cfu_per_100ml)),
-    min_faecal = min(faecal_streptococci_cfu_per_100ml, na.rm = TRUE),
-    max_faecal = max(faecal_streptococci_cfu_per_100ml, na.rm = TRUE),
-    mean_faecal = mean(faecal_streptococci_cfu_per_100ml, na.rm = TRUE)
-    )
-
-# Plot summary results
-results_summary |>
-  ggplot(aes(x = year)) +
-  labs(x = "Year", y = "Total samples") +
-  geom_col(aes(y = n_ecoli, fill = "E. coli")) +
-  geom_col(aes(y = n_faecal, fill = "Faecal streptococci")) +
-  scale_fill_brewer(name = "Indicator Organism", type = "qual", palette = 3) +
-  theme(legend.position = "bottom")
-
-# Clean the ecoli values
-results <- results |>
-  mutate(ecoli_cfu_per_100ml = if_else(date >= "2024-02-22" & site_id == "CS02", NA, ecoli_cfu_per_100ml)) |>
-  filter(!if_all(ecoli_cfu_per_100ml:faecal_streptococci_cfu_per_100ml, is.na))
-
-results |>
-  arrange(desc(date))
+current |>
+  full_join(sites_faecal) |>
+  select(site_id, site_description, description) |>
+  rename(description_current = site_description, description_ecoli = description)
 ```
 
 # Hazen Method
