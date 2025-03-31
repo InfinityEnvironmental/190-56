@@ -30,24 +30,6 @@ hout_bay <- read_excel("../../../Infinity/Infinity Projects - Files/190-56 Coast
 ```{r}
 hazen_method <- function(data){
   # Summarise start and end date
-<<<<<<< HEAD
-  start_date <- data |>
-  arrange(1) |>
-  slice_head(n = 1) |>
-  pull(1)
-  
-  # Summarise end date
-  end_date <- data |>
-  arrange(1) |>
-  slice_tail(n = 1) |>
-  pull(1)
-  
-  # Extract FIB data
-  l <- data |> pull(2) |> sort()
-  
-  # Extract sample size
-  n <- data |> pull(2) |> length()
-=======
   start_date <- hout_bay |>
   arrange(date) |>
   slice_head(n = 1) |>

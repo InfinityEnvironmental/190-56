@@ -368,8 +368,6 @@ faecal <- faecal |>
 
 There seem to be some duplicate values in the data. Some of these values naturally duplicated because of the duplication of data in the CMB and SSB duplicate sheets. Values that overlap simply because they appear in both sheets can reasonably be removed. Other values that have the same result for the same site on the same day can reasonably be removed only if there is no precedent for multiple samples on the same day. There are instances where multiple samples are taken on the same day, and therefore this needs to be done carefully so that results are not removed that simply happen to have the same value on the same day for the same site. 
 
-# Replace numeric values with censored equivalents
-
 ```{r censored-values}
 ecoli |>
   ungroup() |>
@@ -578,16 +576,131 @@ sites_faecal |>
 current <- tbl(con, I("coastal.sites")) |>
   collect()
 
+# Compare current sites to previous sites
 current |>
   full_join(sites_ecoli) |>
   select(site_id, site_description, description) |>
   rename(description_current = site_description, description_ecoli = description)
 
+# Compare current sites to previous sites
 current |>
   full_join(sites_faecal) |>
   select(site_id, site_description, description) |>
   rename(description_current = site_description, description_ecoli = description)
 ```
+
+# Compare 2023 data between City of Cape Town and Infinity
+
+IN 2023/2024 data samples were collected with sample codes that don't match any other sample codes in the monitoring programme. I want to see how well our data corresponds to City of Cape Town data.
+
+```{r read-sabs}
+sabs <- read_excel("../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/07_Cleaned Data/Coastal WQ Weekly 2023-24_cleaned.xlsx",
+           col_names = c(
+             "site_description",
+             "cct_code",
+             "cct_code_updated",
+             "updated",
+             "coords",
+             "area",
+             "week",
+             "sample_date",
+             "temp_c",
+             "sabs_code",
+             "enterococci_cfu_per_100ml",
+             "enterococci_cfu_per_100ml_numeric",
+             "sabs_sheet",
+             "issues_flagged",
+             "comments"
+           ), col_types = c(
+             "text",
+             "text",
+             "text",
+             "text",
+             "text",
+             "text",
+             "numeric",
+             "date",
+             "numeric",
+             "text",
+             "text",
+             "numeric",
+             "text",
+             "text",
+             "text"
+           ), 
+           skip = 1)
+```
+
+```{r join-data}
+sabs <- sabs |>
+  select(cct_code_updated, sample_date, enterococci_cfu_per_100ml, enterococci_cfu_per_100ml_numeric, week) |>
+  mutate(cct_code_updated = fct(cct_code_updated)) |>
+  filter(!is.na(sample_date)) |>
+  rename(site_id = cct_code_updated) |>
+  select(1, 2, 3)
+
+# How many records for each site?
+filter(sabs)
+
+faec2023 <- faecal |>
+  filter(date >= "2023-10-03" & date <= "2024-11-06") |>
+  rename(sample_date = date, enterococci_cfu_per_100ml = censored_value) |>
+  select(site_id, sample_date, enterococci_cfu_per_100ml)
+
+# How many sites for each?
+sabs |>
+  distinct(site_id) # 36 sites
+
+faec2023 |>
+  distinct(site_id) # 62 sites
+
+# Number of records
+nrow(sabs) # 1549
+nrow(faec2023) # 1877
+
+# Handle censored values the same way
+sabs <- sabs |>
+  mutate(numeric = case_when(
+    str_detect(enterococci_cfu_per_100ml, "<") ~ 0,
+    str_detect(enterococci_cfu_per_100ml, ">") ~ as.numeric(str_remove(enterococci_cfu_per_100ml, ">")) * 3,
+    str_detect(enterococci_cfu_per_100ml, "ND") ~ 0,
+    .default = as.numeric(enterococci_cfu_per_100ml)
+  ),
+  sample_date = date(sample_date))
+
+sabs |>
+  filter
+
+faec2023 <- faec2023 |>
+  mutate(numeric = case_when(
+    str_detect(enterococci_cfu_per_100ml, "<") ~ 0,
+    str_detect(enterococci_cfu_per_100ml, ">") ~ as.numeric(str_remove(enterococci_cfu_per_100ml, ">")) * 3,
+    str_detect(enterococci_cfu_per_100ml, "ND") ~ 0,
+    .default = as.numeric(enterococci_cfu_per_100ml)
+  ))
+
+ggplot() +
+  geom_point(data = sabs, aes(x = sample_date, y = numeric, colour = "SABS Data")) +
+  geom_point(data = faec2023, aes(x = sample_date, y = numeric, colour = "CCT Data")) +
+  theme(
+    legend.position = "none"
+  )
+
+sabs |>
+  full_join(faec2023, by = c("sample_date" = "date", "cct_code_updated" = "site_id"), keep = TRUE) |>
+  select(cct_code_updated, sample_date, site_id, date, enterococci_cfu_per_100ml, value_cfu_per_100ml) |>
+  filter(!if_any(c(cct_code_updated, site_id), is.na))
+
+faecal |>
+  filter(value_cfu_per_100ml > 60000)
+
+filter(faecal, date == "2024-10-09" & site_id == "CN22")
+
+```
+
+The data set from Infinity has 1565 records, and for the same period, the CCT data set has 1877 records.
+There are 569 combinations of site and date that exist in both data sets. There is some agreement between the values - many of the values of 3.33333 or 0 are ND values in the Infinity data. Some values do not agree between 
+SABS data has 1565 records
 
 # Hazen Method
 
@@ -667,4 +780,3 @@ RColorBrewer::display.brewer.all()
 sites |>
   inner_join(hazen_annual)
 ```
-
