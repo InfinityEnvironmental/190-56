@@ -234,7 +234,94 @@ for (p in plot_list) {
   print(p)
 }
 
+#######################################################################################
 
+#Seasonal variability for each site across all years
+
+# Define Southern Hemisphere seasons
+get_season <- function(date) {
+  month <- month(date)
+  if (month %in% c(12, 1, 2)) {
+    return("Summer")
+  } else if (month %in% c(3, 4, 5)) {
+    return("Autumn")
+  } else if (month %in% c(6, 7, 8)) {
+    return("Winter")
+  } else {
+    return("Spring")
+  }
+}
+
+# Add season column
+seasonal_data <- lims_filtered %>%
+  mutate(Season = sapply(SAMPLED_DATE, get_season))
+
+# Get unique sites
+unique_sites <- unique(seasonal_data$SAMPLING_POINT)
+
+# Group sites into sets of 10-12
+site_groups <- split(unique_sites, ceiling(seq_along(unique_sites) / 10))
+
+# Create plots for each group (boxplots)
+plot_list_box <- lapply(site_groups, function(group) {
+  group_data <- seasonal_data %>% filter(SAMPLING_POINT %in% group)
+  
+  ggplot(group_data, aes(x = Season, y = `RESULT/100ML`, fill = SAMPLING_POINT)) +
+    geom_boxplot() +
+    facet_wrap(~SAMPLING_POINT, scales = "free_y", ncol = 2) +
+    labs(title = paste("Sites:", paste(group, collapse = ", ")),
+         x = "Season",
+         y = "Enterococci Concentration (Per 100 ml)") +
+    theme_minimal() +
+    theme(legend.position = "none",
+          panel.background = element_rect(fill = "white"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          axis.line = element_line(colour = "black"))
+})
+
+# Display boxplots
+for (p in plot_list_box) {
+  print(p)
+}
+
+##################################################################################
+
+# Create seasonal climatology line graphs for each site (with standard deviation)
+
+# Calculate seasonal statistics
+seasonal_stats <- seasonal_data %>%
+  group_by(SAMPLING_POINT, Season) %>%
+  summarise(
+    Mean = mean(`RESULT/100ML`, na.rm = TRUE),
+    StdDev = sd(`RESULT/100ML`, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Create plots for each group (line graphs)
+plot_list_line <- lapply(site_groups, function(group) {
+  group_data <- seasonal_stats %>% filter(SAMPLING_POINT %in% group)
+  
+  ggplot(group_data, aes(x = Season, y = Mean, color = SAMPLING_POINT, group = SAMPLING_POINT)) +
+    geom_line() +
+    geom_smooth(aes(ymin = Mean - StdDev, ymax = Mean + StdDev, fill = SAMPLING_POINT),
+                stat = "identity", alpha = 0.2, color = NA) +
+    facet_wrap(~SAMPLING_POINT, scales = "free_y", ncol = 2) +
+    labs(title = paste("Sites:", paste(group, collapse = ", ")),
+         x = "Season",
+         y = "Enterococci Concentration (Per 100 ml)") +
+    theme_minimal() +
+    theme(legend.position = "none",
+          panel.background = element_rect(fill = "white"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          axis.line = element_line(colour = "black"))
+})
+
+# Display line graphs
+for (p in plot_list_line) {
+  print(p)
+}
 
 
 
