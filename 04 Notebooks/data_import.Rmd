@@ -81,8 +81,8 @@ files |>
 ## Extract data from pdf
 
 ```{r extract-pdf}
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_55(24.03.2025).pdf"
-filename = str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_57(26.03.2025).pdf"
+filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 pdf_data <- pdf_text(path) |>
   str_split("\n")
@@ -159,6 +159,9 @@ tbl <- tibble(number = sample_number,
   )) |>
   mutate(enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "None found", "ND"))
 
+# Check data
+tbl
+
 # Copy to database
 copy_to(con, tbl, name = "coastal", overwrite = TRUE)
 ```
@@ -188,7 +191,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
-WHERE sample_date = '2025-03-24'
+WHERE sample_date = '2025-03-26'
 ```
 
 ```{sql, connection = con}
