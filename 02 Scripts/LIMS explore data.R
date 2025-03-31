@@ -42,3 +42,77 @@ missing_site_list <- missing_sites %>%
 # Print the list of unique missing site IDs
 print(missing_site_list)
 
+#################################################################################################
+
+#Create bar graph indicating number of samples for each site (to display sampling effort)
+
+# Group by 'SAMPLING_POINT' and count the number of samples
+sample_counts_site <- lims %>%
+  group_by(SAMPLING_POINT) %>%
+  summarise(SAMPLE_COUNT = n(), .groups = "drop")
+
+# Split the sampling points into two groups (adjust as needed)
+unique_sites <- unique(sample_counts_site$SAMPLING_POINT)
+mid_point <- ceiling(length(unique_sites) / 2)
+sites_group1 <- unique_sites[1:mid_point]
+sites_group2 <- unique_sites[(mid_point + 1):length(unique_sites)]
+
+# Filter the data for each group
+group1_data <- sample_counts_site %>% filter(SAMPLING_POINT %in% sites_group1)
+group2_data <- sample_counts_site %>% filter(SAMPLING_POINT %in% sites_group2)
+
+# Create the two bar plots
+plot1 <- ggplot(group1_data, aes(x = SAMPLING_POINT, y = SAMPLE_COUNT, fill = SAMPLING_POINT)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Number of Samples per Sampling Point (Group 1)",
+       x = "Sampling Point",
+       y = "Number of Samples") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
+
+plot2 <- ggplot(group2_data, aes(x = SAMPLING_POINT, y = SAMPLE_COUNT, fill = SAMPLING_POINT)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Number of Samples per Sampling Point (Group 2)",
+       x = "Sampling Point",
+       y = "Number of Samples") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
+
+# Arrange the plots vertically
+library(gridExtra)
+grid.arrange(plot1, plot2, nrow = 2)
+
+##########################################################################################
+#Create summary tables for each site
+
+# Clean the 'RESULT/100ML' column
+lims$`RESULT/100ML` <- gsub("[<>]", "", lims$`RESULT/100ML`) # Remove '<' and '>' characters
+lims$`RESULT/100ML` <- as.numeric(gsub("[^0-9.]", "", lims$`RESULT/100ML`)) # Remove non-numeric characters and convert to numeric
+
+# Filter out NA values from the 'RESULT/100ML' column
+lims_filtered <- lims %>%
+  filter(!is.na(`RESULT/100ML`))
+view(lims_filtered)
+
+# Group by 'SAMPLING_POINT' and calculate summary statistics
+summary_tables <- lims_filtered %>%
+  group_by(SAMPLING_POINT) %>%
+  summarise(
+    Max = max(`RESULT/100ML`, na.rm = TRUE),
+    Min = min(`RESULT/100ML`, na.rm = TRUE),
+    Average = mean(`RESULT/100ML`, na.rm = TRUE),
+    Sample_Count = n()  # Add the sample count
+  )
+
+# Print the summary tables
+print(summary_tables)
+view(summary_tables)
+
+
+
+
+
+
+
+
+
