@@ -108,6 +108,57 @@ summary_tables <- lims_filtered %>%
 print(summary_tables)
 view(summary_tables)
 
+############################################################################################
+
+#Creating time series for bateria results for each site (Yearly)
+
+# Convert SAMPLED_DATE to Date object
+lims_filtered$SAMPLED_DATE <- as.Date(lims_filtered$SAMPLED_DATE)
+
+# Create individual plots for each site
+# Calculate yearly averages
+yearly_averages <- lims_filtered %>%
+  mutate(Year = format(SAMPLED_DATE, "%Y")) %>% # Extract year
+  group_by(SAMPLING_POINT, Year) %>%
+  summarise(Yearly_Average = mean(`RESULT/100ML`), .groups = "drop")
+
+# Get unique sites
+unique_sites <- unique(yearly_averages$SAMPLING_POINT)
+
+# Group sites into sets of 10-12
+site_groups <- split(unique_sites, ceiling(seq_along(unique_sites) / 10))
+
+# Create plots for each group
+plot_list <- lapply(site_groups, function(group) {
+  group_data <- yearly_averages %>% filter(SAMPLING_POINT %in% group)
+  
+  ggplot(group_data, aes(x = Year, y = Yearly_Average, fill = SAMPLING_POINT)) +
+    geom_bar(stat = "identity") +
+    facet_wrap(~SAMPLING_POINT, scales = "free_y", ncol = 2) +
+    labs(title = paste("Sites:", paste(group, collapse = ", ")),
+         x = "Year",
+         y = "Yearly Average Bacteria Level") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          legend.position = "none",
+          panel.background = element_rect(fill = "white"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          axis.line = element_line(colour = "black"))
+})
+
+# Display plots
+for (p in plot_list) {
+  print(p)
+}
+
+######################################################################################
+
+
+
+
+
+
 
 
 
