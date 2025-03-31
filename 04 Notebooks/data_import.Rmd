@@ -81,8 +81,8 @@ files |>
 ## Extract data from pdf
 
 ```{r extract-pdf}
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_55(24.03.2025).pdf"
-filename = str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_57(26.03.2025).pdf"
+filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 pdf_data <- pdf_text(path) |>
   str_split("\n")
