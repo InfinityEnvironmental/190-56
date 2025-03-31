@@ -137,7 +137,7 @@ plot_list <- lapply(site_groups, function(group) {
     facet_wrap(~SAMPLING_POINT, scales = "free_y", ncol = 2) +
     labs(title = paste("Sites:", paste(group, collapse = ", ")),
          x = "Year",
-         y = "Yearly Average Bacteria Level") +
+         y = "Yearly Average Bacteria Concentration (per 100 ml)") +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1),
           legend.position = "none",
@@ -154,8 +154,40 @@ for (p in plot_list) {
 
 ######################################################################################
 
+#Create a monthly climatology of bacteria concentration boxplots for each site
 
+# Extract month
+seasonal_data <- lims_filtered %>%
+  mutate(Month = month(SAMPLED_DATE, label = TRUE))
 
+# Get unique sites
+unique_sites <- unique(seasonal_data$SAMPLING_POINT)
+
+# Group sites into sets of 10-12
+site_groups <- split(unique_sites, ceiling(seq_along(unique_sites) / 10))
+
+# Create plots for each group
+plot_list <- lapply(site_groups, function(group) {
+  group_data <- seasonal_data %>% filter(SAMPLING_POINT %in% group)
+  
+  ggplot(group_data, aes(x = Month, y = `RESULT/100ML`, group = Month, fill = SAMPLING_POINT)) + # Fill by site
+    geom_boxplot() +
+    facet_wrap(~SAMPLING_POINT, scales = "free_y", ncol = 2) +
+    labs(title = paste("Sites:", paste(group, collapse = ", ")),
+         x = "Month",
+         y = "Bacteria Concentration (Per 100 ml)") +
+    theme_minimal() +
+    theme(legend.position = "none",
+          panel.background = element_rect(fill = "white"), # Remove grey background
+          panel.grid.major = element_blank(), # Remove major grid lines
+          panel.grid.minor = element_blank(), # Remove minor grid lines
+          axis.line = element_line(colour = "black")) # Add axis borders
+})
+
+# Display plots
+for (p in plot_list) {
+  print(p)
+}
 
 
 
