@@ -110,7 +110,7 @@ view(summary_tables)
 
 ############################################################################################
 
-#Creating time series for bateria results for each site (Yearly)
+#Creating time series for Enterococci results for each site (Yearly)
 
 # Convert SAMPLED_DATE to Date object
 lims_filtered$SAMPLED_DATE <- as.Date(lims_filtered$SAMPLED_DATE)
@@ -137,7 +137,7 @@ plot_list <- lapply(site_groups, function(group) {
     facet_wrap(~SAMPLING_POINT, scales = "free_y", ncol = 2) +
     labs(title = paste("Sites:", paste(group, collapse = ", ")),
          x = "Year",
-         y = "Yearly Average Bacteria Concentration (per 100 ml)") +
+         y = "Yearly Average Enterococci Concentration (per 100 ml)") +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1),
           legend.position = "none",
@@ -154,7 +154,7 @@ for (p in plot_list) {
 
 ######################################################################################
 
-#Create a monthly climatology of bacteria concentration boxplots for each site
+#Create a monthly climatology of Enterococci concentration boxplots for each site
 
 # Extract month
 seasonal_data <- lims_filtered %>%
@@ -175,7 +175,7 @@ plot_list <- lapply(site_groups, function(group) {
     facet_wrap(~SAMPLING_POINT, scales = "free_y", ncol = 2) +
     labs(title = paste("Sites:", paste(group, collapse = ", ")),
          x = "Month",
-         y = "Bacteria Concentration (Per 100 ml)") +
+         y = "Enterococci Concentration (Per 100 ml)") +
     theme_minimal() +
     theme(legend.position = "none",
           panel.background = element_rect(fill = "white"), # Remove grey background
@@ -189,8 +189,50 @@ for (p in plot_list) {
   print(p)
 }
 
+##################################################################################
 
+#Create monthly climatology for Enterococci concentration line graphs for each site (with standard deviation)
 
+# Calculate monthly statistics
+monthly_stats <- lims_filtered %>%
+  mutate(Month = month(SAMPLED_DATE, label = TRUE)) %>%
+  group_by(SAMPLING_POINT, Month) %>%
+  summarise(
+    Mean = mean(`RESULT/100ML`, na.rm = TRUE),
+    StdDev = sd(`RESULT/100ML`, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Get unique sites
+unique_sites <- unique(monthly_stats$SAMPLING_POINT)
+
+# Group sites into sets of 10-12
+site_groups <- split(unique_sites, ceiling(seq_along(unique_sites) / 10))
+
+# Create plots for each group
+plot_list <- lapply(site_groups, function(group) {
+  group_data <- monthly_stats %>% filter(SAMPLING_POINT %in% group)
+  
+  ggplot(group_data, aes(x = Month, y = Mean, color = SAMPLING_POINT, group = SAMPLING_POINT)) +
+    geom_line() +
+    geom_smooth(aes(ymin = Mean - StdDev, ymax = Mean + StdDev, fill = SAMPLING_POINT), 
+                stat = "identity", alpha = 0.2, color = NA) + # Smoothed standard deviation
+    facet_wrap(~SAMPLING_POINT, scales = "free_y", ncol = 2) +
+    labs(title = paste("Sites:", paste(group, collapse = ", ")),
+         x = "Month",
+         y = "Enterococci Concentration (Per 100 ml)") +
+    theme_minimal() +
+    theme(legend.position = "none",
+          panel.background = element_rect(fill = "white"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          axis.line = element_line(colour = "black"))
+})
+
+# Display plots
+for (p in plot_list) {
+  print(p)
+}
 
 
 
