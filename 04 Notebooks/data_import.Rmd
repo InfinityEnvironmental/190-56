@@ -337,7 +337,9 @@ faecal |>
   coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-06-01")))
 ```
 
-The faecal streptococci data don't seem to have the same solid lines that the E. coli data had. There are also some streaks but these streaks occur at frequencies that can be reasonably expected from weekly sampling. These are also likely to be due to censored values, which will be dealt with in due course. 
+The faecal streptococci data don't seem to have the same solid lines that the E. coli data had. There are also some streaks but these streaks occur at frequencies that can be reasonably expected from weekly sampling. These are also likely to be due to censored values, which will be dealt with in due course.
+
+I want to investigate the source of the values greater than 70000, and the points around 24000.
 
 ```{r remove-duplicates}
 # Remove duplicate values
@@ -438,7 +440,8 @@ ecoli |>
   theme(
     legend.position = "none"
   ) +
-  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-01-01")))
+  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-01-01"))) +
+  scale_x_date(minor_breaks = "1 year")
 
 # Upper limits above 60000 cfu per 100 ml
 ecoli |>
@@ -524,6 +527,9 @@ ecoli |>
     max = max(value_cfu_per_100ml, na.rm = TRUE)
     )
 
+ecoli |>
+  filter(value_cfu_per_100ml > 20000)
+
 # Check summary statistics for faecal streptococci
 faecal |>
   group_by(file) |>
@@ -532,9 +538,18 @@ faecal |>
     min_date = min(date),
     max_date = max(date),
     n = sum(!is.na(value_cfu_per_100ml)),
-    min = min(value_cfu_per_100ml, na.rm = TRUE),
-    max = max(value_cfu_per_100ml, na.rm = TRUE)
+    min = min(value_cfu_per_100ml, na.rm = TRUE) |> as.integer(),
+    max = max(value_cfu_per_100ml, na.rm = TRUE) |> as.integer()
     )
+
+# Plot by site
+faecal |>
+  filter(site_id == "CN22") |>
+  ggplot(aes(x = date, y = value_cfu_per_100ml)) +
+  geom_point()
+
+faecal |>
+  filter(value_cfu_per_100ml > 20000)
 ```
 
 ```{r check-sites}
@@ -591,10 +606,11 @@ current |>
 
 # Compare 2023 data between City of Cape Town and Infinity
 
-IN 2023/2024 data samples were collected with sample codes that don't match any other sample codes in the monitoring programme. I want to see how well our data corresponds to City of Cape Town data.
+In 2023/2024 data samples were collected with sample codes that don't match any other sample codes in the monitoring programme. I want to see how well our data corresponds to City of Cape Town data.
 
 ```{r read-sabs}
-sabs <- read_excel("../../Infinity/Infinity Projects - 190-56 Coastal WQ/07_Cleaned Data/Coastal WQ Weekly 2023-24_cleaned.xlsx",
+# Read in SABS data from Infinity
+sabs <- read_excel("../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/07_Cleaned Data/Coastal WQ Weekly 2023-24_cleaned.xlsx",
            col_names = c(
              "site_description",
              "cct_code",
@@ -629,10 +645,27 @@ sabs <- read_excel("../../Infinity/Infinity Projects - 190-56 Coastal WQ/07_Clea
              "text"
            ), 
            skip = 1)
+
+# Unique sites and descriptions
+sabs |>
+  distinct(cct_code, cct_code_updated, site_description) |>
+  arrange(cct_code)
+
+# Summarise data
+sabs |>
+  summary()
+
+# Upload data to database
+
+
+# Check when coastal data end
+tbl(con, I("coastal.results")) |>
+  arrange(sample_date)
 ```
 
 ```{r join-data}
-sabs <- sabs |>
+# Create simple table for SABS data that aligns with CCT data
+sabs2023 <- sabs |>
   select(cct_code_updated, sample_date, enterococci_cfu_per_100ml, enterococci_cfu_per_100ml_numeric, week) |>
   mutate(cct_code_updated = fct(cct_code_updated)) |>
   filter(!is.na(sample_date)) |>
@@ -640,28 +673,51 @@ sabs <- sabs |>
   select(1, 2, 3)
 
 # How many records for each site?
-filter(sabs)
+filter(sabs2023) |>
+  group_by(site_id) |>
+  count() |>
+  arrange(-n)
 
-faec2023 <- faecal |>
-  filter(date >= "2023-10-03" & date <= "2024-11-06") |>
+# Create a table with data for the same period as the SABS data
+faec2023_full <- faecal |>
+  filter(date >= "2023-10-03" & date <= "2024-11-06" & full) |>
   rename(sample_date = date, enterococci_cfu_per_100ml = censored_value) |>
-  select(site_id, sample_date, enterococci_cfu_per_100ml)
+  select(site_id, sample_date, enterococci_cfu_per_100ml) |>
+  mutate(enterococci_cfu_per_100ml = if_else(enterococci_cfu_per_100ml == "<1", "ND", enterococci_cfu_per_100ml))
+
+faec2023_ssb <- faecal |>
+  filter(date >= "2023-10-03" & date <= "2024-11-06" & !full) |>
+  rename(sample_date = date, enterococci_cfu_per_100ml = censored_value) |>
+  select(site_id, sample_date, enterococci_cfu_per_100ml) |>
+  mutate(enterococci_cfu_per_100ml = if_else(enterococci_cfu_per_100ml == "<1", "ND", enterococci_cfu_per_100ml))
 
 # How many sites for each?
-sabs |>
+sabs2023 |>
   distinct(site_id) # 36 sites
 
-faec2023 |>
+faec2023_full |>
+  distinct(site_id) # 20 sites
+
+faec2023_ssb |>
   distinct(site_id) # 62 sites
 
+# Find sites that do not have a combined spreadsheet
+sites_not_combined <- setdiff(distinct(faec2023_ssb, site_id), distinct(faec2023_full, site_id)) |> pull(1)
+
 # Number of records
-nrow(sabs) # 1549
+nrow(sabs2023) # 1549
 nrow(faec2023) # 1877
 
-# Combine the two data sets
-faec2023 |> mutate(dataset = "CCT") |>
-  bind_rows(sabs |> mutate(dataset = "SABS")) |>
-  arrange(sample_date, site_id, dataset, enterococci_cfu_per_100ml)
+# Combine the three data sets
+faec2023_full |> mutate(dataset = "SSB + CMB") |>
+  bind_rows(sabs2023 |> mutate(dataset = "SABS")) |>
+  bind_rows(faec2023_ssb |> mutate(dataset = "SSB")) |>
+  arrange(sample_date, site_id, dataset, enterococci_cfu_per_100ml) |>
+  filter(!(site_id %in% sites_not_combined & dataset == "SSB"))
+
+sabs |>
+  distinct(cct_code, cct_code_updated, site_description) |>
+  arrange(cct_code)
 
 # Handle censored values the same way
 sabs <- sabs |>
@@ -699,6 +755,14 @@ faecal |>
 filter(faecal, date == "2024-10-09" & site_id == "CN22")
 
 ```
+
+Possible scenarios:
+1. Exists in CCT SSB + CMB data + not in CCT SSB data + not in SABS data (SSB data that is not the SABS data)(sample date wrong in Excel)
+2. Exists in CCT SSB + CMB data + not in CCT SSB data + exists in SABS data (SSB data that is from SABS data)(ideal)
+3. No SSB + CMB sheet + not in CCT SSB + exists in SABS (No sheet for weekly samples)
+4. No sheet in CCT + exists in SABS (site code not part of larger monitoring programme, doesn't correspond to current site code)
+5. Not in CCT SSB + CMB + not in CCT SSB data + exists in SABS data (not captured)(not ideal)
+6. Exists in CCT SSB + CMB + exists in CCT SSB + not in SABS data (SSB Data)(ideal)
 
 The data set from Infinity has 1565 records, and for the same period, the CCT data set has 1877 records.
 There are 569 combinations of site and date that exist in both data sets. There is some agreement between the values - many of the values of 3.33333 or 0 are ND values in the Infinity data. Some values do not agree between 
