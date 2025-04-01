@@ -250,28 +250,12 @@ read_bacteria_data <- function(file, sheet){
 ```
 
 ```{r run-function}
-# Run the function with all files for E. coli
-ecoli <- str_c(path, files) |>
-  map_df(~read_bacteria_data(.x, 2))
-
 # Run the function for faecal streptococci
 faecal <- str_c(path, files) |>
   map_df(~read_bacteria_data(.x, 3))
 ```
 
 ```{r summary-statistics}
-# Check summary statistics for ecoli
-ecoli |>
-  group_by(file) |>
-  arrange(file) |>
-  summarise(
-    min_date = min(date),
-    max_date = max(date),
-    n = sum(!is.na(value_cfu_per_100ml)),
-    min = min(value_cfu_per_100ml, na.rm = TRUE),
-    max = max(value_cfu_per_100ml, na.rm = TRUE)
-    )
-
 # Check summary statistics for faecal streptococci
 faecal |>
   group_by(file) |>
@@ -285,50 +269,9 @@ faecal |>
     )
 ```
 
-```{r intensive-cleaning}
-# For each file, calculate the gap between the most recent and next most recent file. If the value is 1, remove that record
-ecoli |>
-  group_by(file) |>
-  mutate(gap = date - lag(date)) |>
-  filter(!(gap > "100 days" & value_cfu_per_100ml == 1) & file != "64_Muizenberg_Sufing_area-In_Line_with_Bathing_area_(CS34) SSB and CMB.xlsm") |>
-  ggplot(aes(x = date, y = value_cfu_per_100ml, colour = file)) +
-  geom_point() +
-  theme(legend.position = "none") +
-  coord_cartesian(xlim = c(ymd("2024-01-01"), ymd("2025-07-01")), ylim = c(0, 250))
-
-# Clean data
-ecoli <- ecoli |>
-  group_by(file) |>
-  mutate(gap = date - lag(date)) |>
-  filter(!(gap > "100 days" & value_cfu_per_100ml == 1)) |>
-  filter(!(file == "56_Fish_Hoek-Corner_of_the_Beach,_at_Jager_Walk_(CS35) CMB and SSB.xlsm" & date > "2024-02-21" & value_cfu_per_100ml == 1)) |> 
-  filter(!(file == "56_Fish_Hoek-Corner_of_the_Beach,_at_Jager_Walk_(CS35).xlsm" & date > "2024-02-21" & value_cfu_per_100ml == 1)) |>
-  filter(!(file == "56_Fish_Hoek_lifesaving_club_(CS41).xlsm" & date > "2024-02-21" & value_cfu_per_100ml == 1)) |>
-  filter(!(file == "57_Woolleys_Tidal_Pool_(CS42).xlsm" & date >= "2024-02-07" & round(value_cfu_per_100ml, 2) == 3.33)) |>
-  filter(!(file == "59_Kalk_Bay_Tidal_Pool_Inside_(CS02).xlsm" & date > "2024-02-21" & value_cfu_per_100ml == 1)) |>
-  filter(!(file == "63_Muizenberg_Pavilion_(CS16).xlsm" & date >= "2024-02-21" & value_cfu_per_100ml == 31)) |>
-  filter(!(file == "64_Muizenberg_Sufing_area-In_Line_with_Bathing_area_(CS34) SSB and CMB.xlsm" & date >= "2024-04-01" & value_cfu_per_100ml == 88)) |>
-  filter(!(file == "64_Muizenberg_Sufing_area-In_Line_with_Bathing_area_(CS34).xlsm" & date >= "2024-04-01" & value_cfu_per_100ml == 88)) |>
-  filter(!(file == "39_Cosy_Bay_(CN39).xlsm" & date >= "2024-10-31")) |>
-  filter(!(file == "39_Oudekraal_(XCN09).xlsm" & date >= "2024-10-31")) |>
-  filter(!(file == "466__Millers_Point_tidal_pool_(CS37).xlsm")) |>
-  select(-gap)
-```
-
-Plotting the data for ecoli shows that there are many horizontal solid lines which show data that are exactly the same at a very high frequency. Having a look at the data shows that there are some sheets where a single value is repeated daily for a long time. Since the values in the rest of the data sheet are often weekly and vary, as can be seen by the random scatter on the plots, these data are certainly not indicative of true data and need to be removed. 
-
-The removal of these data should result in a random scatter of points on the plot.
-
-```{r plot-data}
-# Plot the data
-ecoli |>
-  ggplot(aes(x = date, y = value_cfu_per_100ml, colour = file)) +
-  geom_point() +
-  theme(legend.position = "none") +
-  coord_cartesian(xlim = c(ymd("2022-01-01"), ymd("2025-06-01")))
-```
-
-After the removal of the lines in the data, there are still some streaks but at much lower frequencies. These are likely to represent censored values and will be dealt with later.
+*Faecal streptococci:*
+Some clear threshold values: 2419, 7257, 15000, 4500, 24196, 450, 72588
+Some clear divided data: 0.033, 0.33 and then some strange decimal data but very consistent: 0.1249387
 
 ```{r faecal-plot}
 faecal |>
@@ -340,82 +283,51 @@ faecal |>
 
 The faecal streptococci data don't seem to have the same solid lines that the E. coli data had. There are also some streaks but these streaks occur at frequencies that can be reasonably expected from weekly sampling. These are also likely to be due to censored values, which will be dealt with in due course.
 
-I want to investigate the source of the values greater than 70000, and the points around 24000.
+The values greater than 70000 come from Enterolert values that were diluted and still exceeded the threshold. The threshold value of 2419 was exceeded, the value was diluted 10 times, and it still exceeded the 24190 value. This was multiplied by 3 to get 72000.
 
-```{r remove-duplicates}
-# Remove duplicate values
-ecoli <- ecoli |>
-  mutate(
-    site_id = str_extract(file, "[:upper:]{2,3}\\d{2}[:upper:]?"),
-    full = str_detect(file, "SSB|CMB")
-  ) |>
-  group_by(date, site_id, full, value_cfu_per_100ml) |>
-  slice(1) |> 
-  arrange(full, .by_group = TRUE) |>
-  ungroup(full) |> 
-  slice_tail(n = 1) |>
-  ungroup()
+I want to separate out the data that are in one sheet but not in another. 
+Let me start with one file and see how it goes.
 
+```{r added-data}
 faecal <- faecal |>
   mutate(
     site_id = str_extract(file, "[:upper:]{2,3}\\d{2}[:upper:]?"),
-    full = str_detect(file, "SSB|CMB")
+    added = str_detect(file, "SSB|CMB")
+      ) |>
+  select(-file)
+
+# Which records have been added to the spreadsheets and are not in the SSB spreadsheets?
+added <- dplyr::setdiff(
+  faecal |> filter(added) |> select(-added),
+  faecal |> filter(!added) |> select(-added)
   ) |>
-  group_by(date, site_id, full, value_cfu_per_100ml) |>
-  slice(1) |>
-  arrange(full, .by_group = TRUE) |>
-  ungroup(full) |>
-  slice_tail(n = 1) |>
-  ungroup()
+  arrange(date, site_id)
+
+# Combine all the data and remove the duplicates
+all <- dplyr::union(
+  faecal |> filter(added) |> select(-added),
+  faecal |> filter(!added) |> select(-added)
+)
+
+# Keep only the SSB data
+only_ssb <- dplyr::setdiff(all, added)
+
+# Combine the data sets again
+faecal <- bind_rows(
+  added |> mutate(source = "CMB"),
+  only_ssb |> mutate(source = "SSB")
+)
 ```
 
-There seem to be some duplicate values in the data. Some of these values naturally duplicated because of the duplication of data in the CMB and SSB duplicate sheets. Values that overlap simply because they appear in both sheets can reasonably be removed. Other values that have the same result for the same site on the same day can reasonably be removed only if there is no precedent for multiple samples on the same day. There are instances where multiple samples are taken on the same day, and therefore this needs to be done carefully so that results are not removed that simply happen to have the same value on the same day for the same site. 
-
 ```{r censored-values}
-ecoli |>
-  ungroup() |>
-  arrange(value_cfu_per_100ml)
-
-# Plot the data to see where streaks occur that may indicate the presence of censored values
-ecoli |>
-  filter(value_cfu_per_100ml < 15 & value_cfu_per_100ml != 1/3 & value_cfu_per_100ml != 10/3) |> 
-  ggplot(aes(x = date, y = value_cfu_per_100ml, colour = site_id)) +
-  geom_point() +
-  scale_y_continuous(breaks = seq(0, 20, 0.5)) +
-  scale_x_date(date_breaks = "6 months") +
-  theme(legend.position = "none", axis.text.x = element_text(angle = 90))
-
-# Replace the censored values with a character value including the < operator
-ecoli <- ecoli |>
-  ungroup() |> 
-  mutate(censored_value = case_when(
-    round(value_cfu_per_100ml, 2) == 0.67 ~ "<2",
-    (round(value_cfu_per_100ml, 2) == 0.33 | value_cfu_per_100ml == 0.3) ~ "<1",
-    round(value_cfu_per_100ml, 2) == 0.12 ~ "0",
-    round(value_cfu_per_100ml, 2) == 0.22 ~ "0",
-    round(value_cfu_per_100ml, 2) == 3.33 ~ "<10",
-    round(value_cfu_per_100ml, 2) == 16.67 ~ "<50",
-    round(value_cfu_per_100ml, 2) == 33.33 ~ "<100",
-    round(value_cfu_per_100ml, 2) == 806.67 ~ ">2420",
-    round(value_cfu_per_100ml, 2) == 3.48 ~ "4",
-    round(value_cfu_per_100ml, 2) == 4.18 ~ "4",
-    round(value_cfu_per_100ml, 4) == 2.7789 ~ "3",
-    .default = as.character(value_cfu_per_100ml)
-    )) |>
-  mutate(censored_value = if_else(censored_value == "0", "ND", censored_value))
-
-ecoli |>
-  filter(date > "2024-01-01")
-
 # Replace censored values with character value including < operator
 faecal <- faecal |>
-  ungroup() |> 
   mutate(censored_value = case_when(
     round(value_cfu_per_100ml, 2) == 0.67 ~ "<2",
     (round(value_cfu_per_100ml, 2) == 0.33 | value_cfu_per_100ml == 0.3) ~ "<1",
     round(value_cfu_per_100ml, 3) == 0.033 ~ "<1",
-    round(value_cfu_per_100ml, 2) == 0.12 ~ "0",
-    round(value_cfu_per_100ml, 2) == 0.22 ~ "0",
+    round(value_cfu_per_100ml, 2) == 0.12 ~ "<1",
+    round(value_cfu_per_100ml, 2) == 0.22 ~ "<1",
     round(value_cfu_per_100ml, 2) == 3.33 ~ "<10",
     round(value_cfu_per_100ml, 2) == 16.67 ~ "<50",
     round(value_cfu_per_100ml, 2) == 33.33 ~ "<100",
@@ -423,66 +335,34 @@ faecal <- faecal |>
     round(value_cfu_per_100ml, 2) == 3.48 ~ "4",
     round(value_cfu_per_100ml, 2) == 4.18 ~ "4",
     round(value_cfu_per_100ml, 2) == 2.48 ~ "2",
-    value_cfu_per_100ml == 1.3 ~ "1",
+    value_cfu_per_100ml == 450 ~ ">150",
+    value_cfu_per_100ml == 4500 ~ ">1500",
+    value_cfu_per_100ml == 15000 ~ ">5000",
+    value_cfu_per_100ml == 7257 ~ ">2419",
+    value_cfu_per_100ml == 1.3 ~ "ND",
+    value_cfu_per_100ml == 72588 ~ ">24196",
+    value_cfu_per_100ml == 24196 ~ ">24196",
+    value_cfu_per_100ml == 15000 ~ ">5000",
+    value_cfu_per_100ml == 1500 & date > "2023-08-01" ~ ">1500",
+    value_cfu_per_100ml == 7257 ~ ">2419",
+    value_cfu_per_100ml == 450 & date > "2023-08-01" & date < "2024-11-01" ~ ">150",
     .default = as.character(value_cfu_per_100ml)
     )) |>
   mutate(censored_value = if_else(censored_value == "0", "ND", censored_value))
-
-faecal |>
-  filter(date > "2024-07-01")
 ```
 
 Censored values can be found both at the lower detection limits and at the upper detection limits. Streaks at the upper limits can also indicate censored values
 
-```{r upper-censored-values-ecoli}
-ecoli |>
-  ggplot(aes(x = date, y = value_cfu_per_100ml, colour = file)) +
-  geom_point() +
-  theme(
-    legend.position = "none"
-  ) +
-  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-01-01"))) +
-  scale_x_date(minor_breaks = "1 year")
-
-# Upper limits above 60000 cfu per 100 ml
-ecoli |>
-  filter(value_cfu_per_100ml > 480, value_cfu_per_100ml < 750, date > "2020-07-01", date < "2022-01-01")
-
-ecoli <- ecoli |>
-  mutate(censored_value = case_when(
-    value_cfu_per_100ml == 72588 ~ ">24196",
-    value_cfu_per_100ml == 72570 ~ ">24190",
-    value_cfu_per_100ml == 15000 ~ ">5000",
-    value_cfu_per_100ml == 7260 ~ ">2420",
-    value_cfu_per_100ml == 600 & date > "2020-04-01" & date < "2021-11-01" ~ ">200",
-    .default = censored_value
-  ))
-```
-
 ```{r upper-censored-values-faecal}
 faecal |>
-  ggplot(aes(x = date, y = value_cfu_per_100ml, colour = file)) +
-  geom_point() +
+  ggplot(aes(x = date, y = value_cfu_per_100ml)) +
+  geom_point(alpha = 0.5) +
   theme(
     legend.position = "none"
   ) +
-  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2024-11-01")), ylim = c(0, 20000)) +
-  scale_x_date(minor_breaks = "1 year")
-
-# Upper limits above 60000 cfu per 100 ml
-faecal |>
-  filter(value_cfu_per_100ml == 4500)
-
-faecal <- faecal |>
-  mutate(censored_value = case_when(
-    value_cfu_per_100ml == 72588 ~ ">24196",
-    value_cfu_per_100ml == 24196 ~ ">24196",
-    value_cfu_per_100ml == 15000 ~ ">5000",
-    value_cfu_per_100ml == 7257 ~ ">2419",
-    value_cfu_per_100ml == 450 & date > "2023-08-01" & date < "2024-11-01" ~ ">150",
-    value_cfu_per_100ml == 4500 ~ ">1500",
-    .default = censored_value
-  ))
+  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2024-11-01"))) +
+  scale_x_date(minor_breaks = "1 year") +
+  facet_grid(cols = vars(source))
 ```
 
 The obvious streaks that were divisible by 3 were divided by three and preceded by the > operator. Other streaks were visible in the 2023 period that are not a consistent value and cannot be easily divided by 3, and are not therefore obvious censored values. These values are of concern, as the frequency indicates a non-random distribution.
@@ -491,52 +371,25 @@ Values are quite commonly distributed along 50 unit intervals. From mid-2020 to 
 For faecal streptococci, similar censored values were replaced with their character equivalents.
 
 ```{r check-censored}
-ecoli |>
-  distinct(censored_value) |> 
-  arrange(censored_value)
-
 faecal |>
   distinct(censored_value) |>
   arrange(censored_value)
 ```
 
 ```{r plot-censored}
-ecoli |>
-  mutate(censored = str_detect(censored_value, "<|>")) |>
-  ggplot(aes(x = date, y = value_cfu_per_100ml, colour = censored)) +
-    geom_point() +
-  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-01-01")), ylim = c(0, 80000)) +
-  scale_x_date(minor_breaks = "1 year")
-
 faecal |>
   mutate(censored = str_detect(censored_value, "<|>")) |>
   ggplot(aes(x = date, y = value_cfu_per_100ml, colour = censored)) +
     geom_point() +
   coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-01-01")), ylim = c(0, 80000)) +
   scale_x_date(minor_breaks = "1 year")
-
 ```
 
 ```{r summary-statistics}
-# Check summary statistics for ecoli
-ecoli |>
-  group_by(file) |>
-  arrange(file) |>
-  summarise(
-    min_date = min(date),
-    max_date = max(date),
-    n = sum(!is.na(value_cfu_per_100ml)),
-    min = min(value_cfu_per_100ml, na.rm = TRUE),
-    max = max(value_cfu_per_100ml, na.rm = TRUE)
-    )
-
-ecoli |>
-  filter(value_cfu_per_100ml > 20000)
-
 # Check summary statistics for faecal streptococci
 faecal |>
-  group_by(file) |>
-  arrange(file) |>
+  group_by(site_id) |>
+  arrange(site_id) |>
   summarise(
     min_date = min(date),
     max_date = max(date),
@@ -547,65 +400,17 @@ faecal |>
 
 # Plot by site
 faecal |>
-  filter(site_id == "CN22") |>
-  ggplot(aes(x = date, y = value_cfu_per_100ml)) +
-  geom_point()
+  mutate(month = floor_date(date, unit = "months")) |>
+  ggplot(aes(x = month, y = value_cfu_per_100ml)) +
+  geom_col() +
+  scale_x_date(minor_breaks = "1 year")
+```
 
+```{r save-data}
 faecal |>
-  filter(value_cfu_per_100ml > 20000)
+  write_csv("02 Output Data/01 CSV/faecal_streptococci_data_clean.csv")
 ```
 
-```{r check-sites}
-# Create site name from the filename
-sites_ecoli <- ecoli |>
-  distinct(file, site_id) |>
-  mutate(description = file |>
-           str_remove("^\\d{1,3}_{1,2}") |>
-           str_remove(".xlsm$") |>
-           # str_remove("(SSB\\sand\\sCMB)|(CMB\\sand\\sSSB)") |>
-           str_remove("\\([:upper:]{2,3}\\d{2}[:upper:]?\\)") |>
-           str_replace_all("_", " ") |>
-           str_to_upper() |>
-           str_trim()) |>
-  select(site_id, description) |>
-  arrange(site_id)
-
-sites_faecal <- faecal |>
-  distinct(file, site_id) |>
-  mutate(description = file |>
-           str_remove("^\\d{1,3}_{1,2}") |>
-           str_remove(".xlsm$") |>
-           # str_remove("(SSB\\sand\\sCMB)|(CMB\\sand\\sSSB)") |>
-           str_remove("\\([:upper:]{2,3}\\d{2}[:upper:]?\\)") |>
-           str_replace_all("_", " ") |>
-           str_to_upper() |>
-           str_trim()) |>
-  select(site_id, description) |>
-  arrange(site_id)
-
-# Check which sites are still unique
-sites_ecoli |>
-  distinct(site_id, description)
-
-sites_faecal |>
-  distinct(site_id, description)
-
-# Get current sites
-current <- tbl(con, I("coastal.sites")) |>
-  collect()
-
-# Compare current sites to previous sites
-current |>
-  full_join(sites_ecoli) |>
-  select(site_id, site_description, description) |>
-  rename(description_current = site_description, description_ecoli = description)
-
-# Compare current sites to previous sites
-current |>
-  full_join(sites_faecal) |>
-  select(site_id, site_description, description) |>
-  rename(description_current = site_description, description_ecoli = description)
-```
 
 # Compare 2023 data between City of Cape Town and Infinity
 
@@ -859,23 +664,80 @@ lims <- read_excel("01 Input Data/Coastal Water Quality Data/LIMS Data/LIMS Data
            col_types = c("date", "text", "text", "text", "text", "numeric"),
            skip = 1)
 
-lims |>
-  filter(str_detect(enterococci_cfu_per_100ml, "<")) |>
-  distinct(enterococci_cfu_per_100ml)
-
-lims |>
-  filter(str_detect(enterococci_cfu_per_100ml, ">")) |>
-  distinct(enterococci_cfu_per_100ml)
-
-lims |>
-  filter(str_detect(enterococci_cfu_per_100ml, "2419")) |>
-  ggplot(aes(x = sample_date)) +
-  geom_density()
-
-lims |>
-  mutate(sample_date = date(sample_date),
-         enterococci_cfu_per_100ml_numeric = case_when(
-           str_detect(enterococci_cfu_per_100ml, "<")
-         ))
+# Have a look at the data
+glimpse(lims)
+summary(lims)
+head(lims)
+tail(lims)
+slice_sample(lims, n = 50)
 ```
 
+```{r clean-data}
+# Which sites in the LIMS data are not in the database or in the Excel data?
+sites_not_in <- dplyr::setdiff(
+  lims |> mutate(site_id = str_to_upper(site_id)) |> distinct(site_id),
+  tbl(con, I("coastal.sites")) |> collect() |> distinct(site_id)
+) |> pull()
+
+# Current sites
+tbl(con, I("coastal.sites")) |> collect()
+
+# Filter LIMS data for only sites that are currently being monitored
+lims |>
+  filter((site_id %in% sites_not_in)) |>
+  group_by(site_id) |>
+  summarise(
+    min_date = min(sample_date),
+    max_date = max(sample_date),
+    sample_size = n(),
+    min_value = min(enterococci_cfu_per_100ml),
+    max_value = max(enterococci_cfu_per_100ml)
+            ) |>
+  filter(sample_size > 30)
+
+# Which of these have been running for a long time?
+# If we confirm that we want to include these data, I will need a mapping
+# For now, I exclude the sites that are not currently monitored
+
+lims |>
+  distinct(enterococci_cfu_per_100ml)
+
+lims <- lims |>
+  mutate(enterococci_cfu_per_100ml = case_when(
+    enterococci_cfu_per_100ml == 450 ~ ">150",
+    enterococci_cfu_per_100ml == 2419 ~ ">2419",
+    enterococci_cfu_per_100ml == 4500 ~ ">1500",
+    enterococci_cfu_per_100ml == 24196 ~ ">24196",
+    enterococci_cfu_per_100ml |> str_detect("nr|og") ~ NA,
+    .default = enterococci_cfu_per_100ml
+  )) |>
+  filter(!is.na(enterococci_cfu_per_100ml))
+  
+# Create new numeric value from character data
+lims <- lims |>
+  filter(!is.na(enterococci_cfu_per_100ml)) |>
+  mutate(enterococci_cfu_per_100ml_numeric = case_when(
+    str_detect(enterococci_cfu_per_100ml, "<") ~ str_remove(enterococci_cfu_per_100ml, "<") |> as.numeric() / 3,
+    str_detect(enterococci_cfu_per_100ml, ">") ~ str_remove(enterococci_cfu_per_100ml, ">") |> as.numeric() * 3,
+    .default = as.numeric(enterococci_cfu_per_100ml)
+  ))
+
+# Write to csv
+lims |>
+  mutate(sample_date = date(sample_date)) |>
+  select(sample_date, site_id, lab_owner, analysis, enterococci_cfu_per_100ml, enterococci_cfu_per_100ml_numeric, sample_number) |>
+  write_csv("02 Output Data/01 CSV/lims_data_clean.csv")
+```
+
+Can CN05A be connected to CN05 (Green Point Pump Station)?
+Can CN06A be connected to CN06 Three Anchor Bay NW Rocks or CN06C Rocklands Beach?
+CN12B can be connected to CN12A because they are combined in the spreadsheets
+CN15?
+CN20O Maiden's Cove Tidal Pool Outside?
+CS01 connected to CS01A Kalk Bay Harbour Beach?
+CS05 connected to what?
+CS08 connected to what?
+CS12 connected to what?
+CS24E and CS24W connected to what?
+XCS16
+XCS33
