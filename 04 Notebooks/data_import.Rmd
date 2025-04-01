@@ -81,8 +81,8 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_56(25.03.2025).pdf"
-filename = str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_59(28.03.2025).pdf"
+filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 # Extract the pdf data
 pdf_data <- pdf_text(path) |>
@@ -186,9 +186,10 @@ WITH cte AS
   analysis_completed,
   sample_temp_c,
   enterococci_cfu_per_100ml,
-  filename
+  filename,
+  'WLAB'::coastal.lab AS lab_code
 FROM coastal)
-INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename)
+INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code)
 SELECT * FROM cte;
 ```
 
@@ -196,7 +197,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
-WHERE sample_date = '2025-03-25'
+WHERE sample_date = '2025-03-28';
 ```
 
 ```{sql, connection = con}
@@ -504,13 +505,15 @@ ecoli |>
   mutate(censored = str_detect(censored_value, "<|>")) |>
   ggplot(aes(x = date, y = value_cfu_per_100ml, colour = censored)) +
     geom_point() +
-  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-01-01")), ylim = c(0, 80000))
+  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-01-01")), ylim = c(0, 80000)) +
+  scale_x_date(minor_breaks = "1 year")
 
 faecal |>
   mutate(censored = str_detect(censored_value, "<|>")) |>
   ggplot(aes(x = date, y = value_cfu_per_100ml, colour = censored)) +
     geom_point() +
-  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-01-01")), ylim = c(0, 80000))
+  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-01-01")), ylim = c(0, 80000)) +
+  scale_x_date(minor_breaks = "1 year")
 
 ```
 
@@ -660,6 +663,7 @@ sabs |>
 
 # Check when coastal data end
 tbl(con, I("coastal.results")) |>
+  arrange(sample_date) |>
   arrange(sample_date)
 ```
 
@@ -846,3 +850,32 @@ RColorBrewer::display.brewer.all()
 sites |>
   inner_join(hazen_annual)
 ```
+
+# LIMS Data
+
+```{r read-lims-data}
+lims <- read_excel("01 Input Data/Coastal Water Quality Data/LIMS Data/LIMS Data.xlsm",
+           col_names = c("sample_date", "site_id", "lab_owner", "analysis", "enterococci_cfu_per_100ml", "sample_number"),
+           col_types = c("date", "text", "text", "text", "text", "numeric"),
+           skip = 1)
+
+lims |>
+  filter(str_detect(enterococci_cfu_per_100ml, "<")) |>
+  distinct(enterococci_cfu_per_100ml)
+
+lims |>
+  filter(str_detect(enterococci_cfu_per_100ml, ">")) |>
+  distinct(enterococci_cfu_per_100ml)
+
+lims |>
+  filter(str_detect(enterococci_cfu_per_100ml, "2419")) |>
+  ggplot(aes(x = sample_date)) +
+  geom_density()
+
+lims |>
+  mutate(sample_date = date(sample_date),
+         enterococci_cfu_per_100ml_numeric = case_when(
+           str_detect(enterococci_cfu_per_100ml, "<")
+         ))
+```
+
