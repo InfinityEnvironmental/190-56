@@ -81,7 +81,7 @@ files |>
 ## Extract data from pdf
 
 ```{r extract-pdf}
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_57(26.03.2025).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_60(31.03.2025).pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 pdf_data <- pdf_text(path) |>
@@ -181,9 +181,10 @@ WITH cte AS
   analysis_completed,
   sample_temp_c,
   enterococci_cfu_per_100ml,
-  filename
+  filename,
+  'WLAB'::coastal.lab AS lab_code
 FROM coastal)
-INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename)
+INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code)
 SELECT * FROM cte;
 ```
 
@@ -191,7 +192,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
-WHERE sample_date = '2025-03-26'
+WHERE sample_date = '2025-03-31';
 ```
 
 ```{sql, connection = con}
