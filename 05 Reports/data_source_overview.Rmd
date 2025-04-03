@@ -3,11 +3,9 @@ title: "Overview of Data Sources for Coastal Water Quality"
 author: "Francois van Schalkwyk"
 date: "`r Sys.Date()`"
 output:
-  word_document:
+  bookdown::word_document2:
     reference_docx: "data_source_overview_style_template.docx"
 ---
-
-Make sure that you are working in the outfalls project, found in the working directory.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -40,7 +38,8 @@ con <- dbConnect(RPostgres::Postgres(),
 
 ```{r load-data}
 cct <- read_csv("02 Output Data/01 CSV/faecal_streptococci_data_clean.csv") |>
-  mutate(dataset = 'cct')
+  mutate(dataset = 'cct') |>
+  rename(sample_date = date)
 sabs <- read_csv("02 Output Data/01 CSV/sabs_data_clean.csv") |>
   mutate(dataset = 'sabs')
 lims <- read_csv("02 Output Data/01 CSV/lims_data_clean.csv") |>
@@ -49,126 +48,17 @@ walab <- tbl(con, I("coastal.results")) |> collect() |>
   mutate(dataset = "walab")
 ```
 
-# Sites
-
-```{r sites-differences}
-cct_sites <- cct |>
-  distinct(site_id) |>
-  arrange(site_id)
-
-sabs_sites <- sabs |>
-  distinct(site_id) |>
-  arrange(site_id)
-
-lims_sites <- lims |>
-  distinct(site_id) |>
-  arrange(site_id)
-
-walab_sites <- walab |>
-  distinct(site_id) |>
-  arrange(site_id)
-```
-
-```{r sites-discrepancies, include = TRUE, echo = TRUE}
-# CCT and SABS
-dplyr::setdiff(cct_sites, sabs_sites) # 2 sites
-dplyr::setdiff(sabs_sites, cct_sites) # 11 sites
-
-# CCT and WALAB
-dplyr::setdiff(cct_sites, walab_sites) # 2 sites
-dplyr::setdiff(walab_sites, cct_sites) # 33 sites
-
-# SABS and LIMS
-dplyr::setdiff(sabs_sites, lims_sites) # 11 sites
-dplyr::setdiff(lims_sites, sabs_sites) # 79 sites
-
-# LIMS and WALAB
-dplyr::setdiff(lims_sites, walab_sites) # 19 sites
-dplyr::setdiff(walab_sites, lims_sites) # 23 sites
-
-# CCT and LIMS
-dplyr::setdiff(lims_sites, cct_sites) # 44 sites
-dplyr::setdiff(cct_sites, lims_sites) # 17 sites
-
-# SABS and WALAB
-dplyr::setdiff(sabs_sites, walab_sites) # 7 sites
-dplyr::setdiff(walab_sites, sabs_sites) # 79 sites
-```
-
-
-```{r sites-overlap, fig.cap = "Sites present in different data sets", fig.width = 7, fig.height = 9.2, include = TRUE, echo = FALSE}
-sites_overlap <- dplyr::union(cct_sites, sabs_sites) |>
-  dplyr::union(lims_sites) |>
-  dplyr::union(walab_sites) |>
-  arrange(site_id) |>
-  mutate(
-    cct = site_id %in% pull(cct_sites),
-    sabs = site_id %in% pull(sabs_sites),
-    lims = site_id %in% pull(lims_sites),
-    walab = site_id %in% pull(walab_sites)
-    ) |>
-  pivot_longer(cols = cct:walab, names_to = "dataset", values_to = "present") |>
-  mutate(site_prefix = str_extract(site_id, "ICS|CN|CS|XCN|XCS|HB"), dataset = str_to_upper(dataset))
-```
-
-```{r plot-overlaps-cn, fig.cap = "Site overlap between data sets for CN sites", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
-sites_overlap |>
-  filter(site_prefix == "CN") |>
-  ggplot(aes(x = dataset, y = site_id, fill = present)) +
-  labs(x = "Dataset", y = "Site") +
-  geom_tile() +
-  theme(legend.position = "bottom",
-        text = element_text(family = "Century Gothic"))
-```
-```{r plot-overlaps-cs, fig.cap = "Site overlap between data sets for CS sites", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
-sites_overlap |>
-  filter(site_prefix == "CS") |>
-  ggplot(aes(x = dataset, y = site_id, fill = present)) +
-  labs(x = "Dataset", y = "Site") +
-  geom_tile() +
-  theme(legend.position = "bottom",
-        text = element_text(family = "Century Gothic"))
-```
-```{r plot-overlaps-ics, fig.cap = "Site overlap between data sets for CS sites", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
-sites_overlap |>
-  filter(site_prefix == "ICS") |>
-  ggplot(aes(x = dataset, y = site_id, fill = present)) +
-  labs(x = "Dataset", y = "Site") +
-  geom_tile() +
-  theme(legend.position = "bottom",
-        text = element_text(family = "Century Gothic"))
-```
-
-```{r plot-overlaps-xcn, fig.cap = "Site overlap between data sets for XCN sites", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
-sites_overlap |>
-  filter(str_detect(site_id, "XCN|HB")) |>
-  ggplot(aes(x = dataset, y = site_id, fill = present)) +
-  labs(x = "Dataset", y = "Site") +
-  geom_tile() +
-  theme(legend.position = "bottom",
-        text = element_text(family = "Century Gothic"))
-```
-
-```{r plot-overlaps-xcs, fig.cap = "Site overlap between data sets for XCS sites", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
-sites_overlap |>
-  filter(site_prefix |> str_detect("XCS")) |>
-  ggplot(aes(x = dataset, y = site_id, fill = present)) +
-  labs(x = "Dataset", y = "Site") +
-  geom_tile() +
-  theme(legend.position = "bottom",
-        text = element_text(family = "Century Gothic"))
-```
-
 # Sample Frequency
 
-```{r plot-frequency, fig.cap = "Number of samples received per month from data received from Coastal Management Branch", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+## Coastal Management Branch Excel Spreadsheets
+
+```{r plot-frequency, fig.cap = "Number of samples received per month from data received from Coastal Management Branch", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
 cct |>
-  mutate(year = year(date), month = month(date, label = TRUE)) |>
+  mutate(year = year(sample_date), month = month(sample_date, label = TRUE)) |>
   group_by(year, month) |>
   count() |>
   ggplot(aes(x = month, y = n)) +
-  labs(title = "Sample frequency according to CMB dataset",
-       x = "Month", y = "Number of samples") +
+  labs(x = "Month", y = "Number of samples") +
   geom_col(position = position_dodge(preserve = "single")) +
   facet_wrap(facets = vars(year)) +
   theme(
@@ -176,15 +66,14 @@ cct |>
     axis.text.x = element_text(angle = 90)
   )
 ```
-```{r plot-received-with-source, fig.cap = "Number of samples received per month from data received from Coastal Management Branch", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+
+```{r plot-received-with-source, fig.cap = "Number of samples received per month from data received from Coastal Management Branch", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
 cct |>
-  mutate(year = year(date), month = month(date, label = TRUE)) |>
+  mutate(year = year(sample_date), month = month(sample_date, label = TRUE)) |>
   group_by(year, month, source) |>
   count() |>
   ggplot(aes(x = month, y = n, fill = source)) +
-  labs(title = "Sample frequency according to CMB dataset",
-       subtitle = "Data added by CMB vs received from SSB",
-       x = "Month", y = "Number of samples") +
+  labs(x = "Month", y = "Number of samples") +
   geom_col() +
   facet_wrap(facets = vars(year)) +
   theme(
@@ -193,18 +82,20 @@ cct |>
   )
 ```
 
+Key points to note:
 
+1. The data labelled "CMB" are data that are present in the combined spreadsheets but not in the original Excel spreadsheets
+2. Majority of the data that was added to the spreadsheets are from Sep 2023 through Jan 2025
 
-```{r plot-lims-data, fig.cap = "Number of samples received per month from 2005 to 2024 according to the LIMS dataset", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+## Data received from LIMS dataset
+
+```{r plot-lims-data, fig.cap = "Number of samples received per month from 2005 to 2024 according to the LIMS dataset", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
 lims |>
   mutate(year = year(sample_date), month = month(sample_date, label = TRUE)) |>
   group_by(year, month) |>
   count() |>
   ggplot(aes(x = month, y = n)) +
-  labs(title = "Sample frequency according to WALAB dataset",
-       x = "Month", y = "Number of samples") +
-  labs(title = "Sample frequency according to LIMS dataset",
-       x = "Month", y = "Number of samples") +
+  labs(x = "Month", y = "Number of samples") +
   geom_col() +
   facet_wrap(facets = vars(year)) +
   theme(
@@ -213,23 +104,136 @@ lims |>
   )
 ```
 
-```{r plot-walab}
-walab |>
-  mutate(month = floor_date(sample_date, "month")) |>
-  group_by(month) |>
+```{r calculate-frequency}
+median_frequency <- lims |>
+  group_by(site_id) |>
+  arrange(sample_date, .by_group = TRUE) |>
+  mutate(time_since_previous_sample = sample_date - lag(sample_date)) |>
+  summarise(average_frequency = mean(time_since_previous_sample, na.rm = TRUE)) |>
+  summarise(median_frequency = median(average_frequency, na.rm = TRUE)) |>
+  pull()
+```
+
+The average frequency of the samples for every site in the LIMS dataset is roughly two weeks (median = `r median_frequency`).
+
+## Overlap between CMB and LIMS datasets
+
+```{r frequency-overlap-cct-lims}
+cct_lims_both <- dplyr::intersect(
+  cct |> select(sample_date, site_id, censored_value, numeric_value),
+  lims |> select(sample_date, site_id, censored_value, numeric_value)
+) |>
+  mutate(subset = "CMB & LIMS")
+
+cct_only <- dplyr::setdiff(
+  cct |> select(sample_date, site_id, censored_value, numeric_value),
+  lims |> select(sample_date, site_id, censored_value, numeric_value)
+) |>
+  mutate(subset = "CMB")
+
+lims_only <- dplyr::setdiff(
+  lims |> select(sample_date, site_id, censored_value, numeric_value),
+  cct |> select(sample_date, site_id, censored_value, numeric_value)
+) |>
+  mutate(subset = "LIMS")
+
+cct_lims <- bind_rows(
+  cct_lims_both,
+  cct_only,
+  lims_only
+)
+```
+
+```{r plot-cct-lims-overlap, fig.cap = "Overlap of data between CMB and LIMS datasets", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
+cct_lims |>
+  mutate(
+    year = year(sample_date),
+    month = month(sample_date, label = TRUE)
+  ) |>
+  group_by(year, month, subset) |>
   count() |>
-  ggplot(aes(x = month, y = n)) +
-  labs(title = "Sample frequency according to WALAB dataset",
-       x = "Month", y = "Number of samples") +
+  ggplot(aes(x = month, y = n, fill = subset)) +
   geom_col() +
+  labs(x = "Date",
+    y = "Number of samples",
+    fill = "Subset of data"
+  ) +
+  facet_wrap(facets = vars(year)) +
   theme(
-    text = element_text(family = "Century Gothic"),
-    axis.text.x = element_text(angle = 90)
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 90),
+    text = element_text(family = "Century Gothic")
   )
 ```
+
+Key points to note:
+
+1. There are data in the LIMS dataset that are not in the CMB spreadsheets throughout the range of the data
+2. There is also a small amount of data in the Excel spreadsheets that are not in the LIMS data, and this increases from 2023 onwards as the SABS data were populated into the Excel spreadsheets
+3. There are more sites in the LIMS data than in the CMB spreadsheets, accounting for the higher number of samples per month
+
+
+## Overlap between LIMS data and SABS data
+
+```{r frequency-overlap-sabs-lims}
+sabs_lims_both <- dplyr::intersect(
+  sabs |> select(sample_date, site_id, censored_value, numeric_value),
+  lims |> select(sample_date, site_id, censored_value, numeric_value)
+) |>
+  mutate(subset = "SABS & LIMS")
+
+sabs_only <- dplyr::setdiff(
+  sabs |> select(sample_date, site_id, censored_value, numeric_value),
+  lims |> select(sample_date, site_id, censored_value, numeric_value)
+) |>
+  mutate(subset = "SABS")
+
+lims_only <- dplyr::setdiff(
+  lims |> select(sample_date, site_id, censored_value, numeric_value),
+  sabs |> select(sample_date, site_id, censored_value, numeric_value)
+) |>
+  mutate(subset = "LIMS")
+
+sabs_lims <- bind_rows(
+  sabs_lims_both,
+  sabs_only,
+  lims_only
+)
+```
+
+```{r plot-sabs-lims-overlap, fig.cap = "Overlap of data between CMB and LIMS datasets", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
+sabs_lims |>
+  mutate(
+    year = year(sample_date),
+    month = month(sample_date, label = TRUE)
+  ) |>
+  group_by(year, month, subset) |>
+  count() |>
+  ggplot(aes(x = month, y = n, fill = subset)) +
+  geom_col() +
+  labs(x = "Date",
+    y = "Number of samples",
+    fill = "Subset of data"
+  ) +
+  facet_wrap(facets = vars(year)) +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 90),
+    text = element_text(family = "Century Gothic")
+  )
+```
+
+Key points to note:
+
+1. There is no overlap in data between the SABS data from 2024 and 2025, and the LIMS data
+2. The LIMS data in 2024 and 2025 are therefore completely made up of SSB data, and the results are typical of Enterolert data
+3. This makes it highly likely that these data come from Enterolert results from within the SSB
+
+## All data sources shown together
+
 ```{r plot-all-data}
 cct_counts <- cct |>
-  mutate(year = year(date), month = month(date, label = TRUE)) |>
+  mutate(year = year(sample_date), month = month(sample_date, label = TRUE)) |>
   group_by(year, month) |>
   count() |>
   mutate(dataset = "CMB")
@@ -255,11 +259,12 @@ walab_counts <- walab |>
 all_counts <- bind_rows(cct_counts, lims_counts, sabs_counts, walab_counts)
 ```
 
-```{r plot-all-counts, fig.cap = "Number of samples per month for all datasets", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+### All data sources from 2005 to 2025
+
+```{r plot-all-counts, fig.cap = "Number of samples per month for all datasets", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
 all_counts |>
   ggplot(aes(x = month, y = n, fill = dataset)) +
   labs(
-    title = "Number of samples per month from all datasets",
     x = "Month",
     y = "Number of samples"
   ) +
@@ -273,13 +278,17 @@ all_counts |>
   scale_fill_brewer(name = "Dataset", type = "qual", palette = 3)
 ```
 
-```{r plot-all-counts-subset, fig.cap = "Number of samples per month for all datasets, for the last five years", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+Key points to note:
+
+1. There is consistently more data in the LIMS dataset than in the Excel spreadsheets - this is almost exclusively due to the fact that there are more sites sampled in the LIMS dataset than in the CMB spreadsheets
+
+### All data sources from 2020 to 2025
+
+```{r plot-all-counts-subset, fig.cap = "Number of samples per month for all datasets, for the last five years", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
 all_counts |>
   filter(year >= 2020) |>
   ggplot(aes(x = month, y = n, fill = dataset)) +
   labs(
-    title = "Number of samples per month from all datasets",
-    subtitle = "Past 5 years",
     x = "Month",
     y = "Number of samples"
   ) +
@@ -292,13 +301,18 @@ all_counts |>
   ) +
   scale_fill_brewer(name = "Dataset", type = "qual", palette = 3)
 ```
+
+Key points to note:
+
+1. Note the sparsity of the data in 2022 and 2023, with the AL Abbot data situated in the middle of this period
+2. There are differences between CMB spreadsheets and SABS data in 2023 and 2025
+3. There are differences between CMB spreadsheets and WALAB data in 2024 and 2025
 
 # Results
 
 ```{r combine-data}
 cct_results <- cct |>
-  select(date, site_id, censored_value, numeric_value, dataset) |>
-  rename(sample_date = date)
+  select(sample_date, site_id, censored_value, numeric_value, dataset)
 
 lims_results <- lims |>
   select(sample_date, site_id, censored_value, numeric_value, dataset)
@@ -321,17 +335,19 @@ all_results <- bind_rows(
   lims_results,
   sabs_results,
   walab_results
-)
+) |>
+  mutate(sample_date = date(sample_date))
 ```
 
-```{r plot-all-results, fig.cap = "Results for all datasets", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+## Results for all datasets
+
+```{r plot-all-results, fig.cap = "Results for all datasets", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
 all_results |>
   mutate(dataset = str_to_upper(dataset),
          sample_date = date(sample_date)) |>
   ggplot(aes(x = sample_date, y = numeric_value, colour = dataset)) +
   geom_point() +
   labs(
-    title = "Enterococci results for all datasets",
     x = "Date",
     y = "Enterococci (cfu per 100 mL)"
   ) +
@@ -343,32 +359,51 @@ all_results |>
   scale_x_date(minor_breaks = "1 year")
 ```
 
-```{r investigate-streak, fig.cap = "Outlier data in August 2024 from the LIMS data set", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+Key points to note:
+
+1. The horizontal streak from 2005 to 2022 is a typical exceedance of 5000 cfu per 100 mL (multiplied by 3 for the Hazen method). This is typical of the SSB membrane filtration method
+2. The outliers in 2024 near the 75000 cfu per 100 mL line are exceedances of >24196 cfu per 100 mL typical of the Enterolert method, which was used by Scientific Services during this period
+
+## Outlier data in August 2024 from LIMS data using Enterolert
+
+```{r investigate-streak, fig.cap = "Outlier data in August 2024 from the LIMS data set", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
 all_results |>
-  filter(between(sample_date, ymd("2024-08-01"), ymd("2024-09-01"))) |>
+  filter(dataset == "lims") |>
   group_by(sample_date, numeric_value) |>
   mutate(count = n()) |>
   ggplot(aes(x = sample_date, y = numeric_value, size = count, label = count)) +
-  labs(title = "High values for all sites on 21 August 2024",
-       x = "Date",
+  labs(x = "Date",
        y = "Enterococci (cfu per 100 mL)",
        size = "Frequency observed") +
   geom_point() +
   theme(
     legend.position = "bottom",
     text = element_text(family = "Century Gothic")
-  )
+  ) +
+  scale_x_date(breaks = "1 month", date_labels = "%B") +
+  coord_cartesian(xlim = c(ymd("2024-06-01"), ymd("2024-12-01")))
 ```
 
+```{r detect-sites, include = TRUE, echo = FALSE}
+lims |>
+  filter(sample_date == "2024-08-21", numeric_value > 70000) |>
+  select(sample_date, site_id, censored_value, numeric_value) |>
+  rename(
+    "Sample Date" = sample_date,
+    "Site ID" = site_id,
+    "Censored Value (cfu per 100 mL)" = censored_value,
+    "Numeric Value (cfu per 100 mL)" = numeric_value
+  ) |>
+  knitr::kable(caption = "Very high values according to LIMS dataset on 21 August 2024")
+```
 
-```{r plot-all-results-year, fig.cap = "Results for all datasets excluding outlier values", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+```{r plot-all-results-year, fig.cap = "Results for all datasets excluding outlier values", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
 all_results |>
   mutate(dataset = str_to_upper(dataset),
          sample_date = date(sample_date)) |>
   ggplot(aes(x = sample_date, y = numeric_value, colour = dataset)) +
   geom_point() +
   labs(
-    title = "Enterococci results for all datasets",
     x = "Date",
     y = "Enterococci (cfu per 100 mL)"
   ) +
@@ -382,7 +417,7 @@ all_results |>
   coord_cartesian(ylim = c(0, 10000))
 ```
 
-```{r plot-all-results-2020, fig.cap = "Results for all datasets from 2020 to 2025", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+```{r plot-all-results-2020, fig.cap = "Results for all datasets from 2020 to 2025", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
 all_results |>
   mutate(dataset = str_to_upper(dataset),
          sample_date = date(sample_date)) |>
@@ -390,7 +425,6 @@ all_results |>
   geom_point() +
   facet_grid(rows = vars(dataset)) +
   labs(
-    title = "Enterococci results for all datasets",
     x = "Date",
     y = "Enterococci (cfu per 100 mL)"
   ) +
@@ -403,14 +437,14 @@ all_results |>
   scale_y_continuous(breaks = seq(0, 10000, 1000)) +
   coord_cartesian(ylim = c(0, 10000), xlim = c(ymd("2020-01-01"), ymd("2025-04-01")))
 ```
-```{r zoom-al-abbot, fig.cap = "Results for AL Abbot data between 2022 and 2023", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+
+```{r zoom-al-abbot, fig.cap = "Results for AL Abbot data between 2022 and 2023", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
 all_results |>
   mutate(dataset = str_to_upper(dataset)) |>
   filter(between(sample_date, ymd("2022-10-01"), ymd("2023-06-01"))) |>
   ggplot(aes(x = sample_date, y = numeric_value, colour = dataset)) +
   geom_point() +
   labs(
-    title = "Enterococci results from AL Abbot in 2022 and 2023",
     x = "Date",
     y = "Enterococci (cfu per 100 mL)"
   ) +
@@ -422,3 +456,107 @@ all_results |>
   
 ```
 
+# Sites
+
+```{r sites-differences}
+cct_sites <- cct |>
+  distinct(site_id) |>
+  arrange(site_id)
+
+sabs_sites <- sabs |>
+  distinct(site_id) |>
+  arrange(site_id)
+
+lims_sites <- lims |>
+  distinct(site_id) |>
+  arrange(site_id)
+
+walab_sites <- walab |>
+  distinct(site_id) |>
+  arrange(site_id)
+```
+
+```{r sites-discrepancies}
+# CCT and SABS
+dplyr::setdiff(cct_sites, sabs_sites) # 52 sites
+dplyr::setdiff(sabs_sites, cct_sites) # 11 sites
+
+# CCT and WALAB
+dplyr::setdiff(cct_sites, walab_sites) # 2 sites
+dplyr::setdiff(walab_sites, cct_sites) # 33 sites
+
+# SABS and LIMS
+dplyr::setdiff(sabs_sites, lims_sites) # 11 sites
+dplyr::setdiff(lims_sites, sabs_sites) # 79 sites
+
+# LIMS and WALAB
+dplyr::setdiff(lims_sites, walab_sites) # 19 sites
+dplyr::setdiff(walab_sites, lims_sites) # 23 sites
+
+# CCT and LIMS
+dplyr::setdiff(lims_sites, cct_sites) # 44 sites
+dplyr::setdiff(cct_sites, lims_sites) # 17 sites
+
+# SABS and WALAB
+dplyr::setdiff(sabs_sites, walab_sites) # 7 sites
+dplyr::setdiff(walab_sites, sabs_sites) # 79 sites
+```
+
+
+```{r sites-overlap-plot-setup, fig.cap = "Overlap of sites between datasets", fig.width = 7, fig.height = 9}
+# Create a matrix of site overlaps
+sites_overlap_wider <- dplyr::union(cct_sites, sabs_sites) |>
+  dplyr::union(lims_sites) |>
+  dplyr::union(walab_sites) |>
+  arrange(site_id) |>
+  mutate(
+    cct = site_id %in% pull(cct_sites),
+    sabs = site_id %in% pull(sabs_sites),
+    lims = site_id %in% pull(lims_sites),
+    walab = site_id %in% pull(walab_sites)
+    ) |>
+  arrange(-cct, -lims, -sabs, -walab)
+
+# Create plot function
+plot_site_overlap <- function(data){
+data |>
+    mutate(site_id = fct_inorder(site_id)) |>
+    pivot_longer(cols = cct:walab, names_to = "dataset", values_to = "present") |>
+    mutate(
+      dataset = str_to_upper(dataset)
+      ) |>
+    ggplot(aes(x = .data$dataset, y = .data$site_id, fill = .data$present)) +
+      geom_tile() +
+      labs(x = "Dataset", y = "Site ID", fill = "Sites Present in Dataset") +
+      theme(
+        legend.position = "bottom",
+        text = element_text(family = "Century Gothic")
+      )
+}
+
+plot_site_overlap(sites_overlap_wider)
+```
+
+```{r in-cct, fig.cap = "Sites that are present in CCT dataset", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
+sites_overlap_wider |>
+  filter(cct) |>
+  plot_site_overlap()
+```
+
+```{r in-sabs, fig.cap = "Sites that are present in SABS dataset", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
+sites_overlap_wider |>
+  filter(sabs) |>
+  plot_site_overlap()
+```
+
+```{r in-lims, fig.cap = "Sites that are present in LIMS dataset", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+sites_overlap_wider |>
+  filter(lims) |>
+  plot_site_overlap()
+```
+
+```{r in-walab, fig.cap = "Sites that are present in WALAB dataset", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+sites_overlap_wider |>
+  filter(walab) |>
+  plot_site_overlap()
+```
