@@ -1,0 +1,424 @@
+---
+title: "Overview of Data Sources for Coastal Water Quality"
+author: "Francois van Schalkwyk"
+date: "`r Sys.Date()`"
+output:
+  word_document:
+    reference_docx: "data_source_overview_style_template.docx"
+---
+
+Make sure that you are working in the outfalls project, found in the working directory.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  include = FALSE,
+  dpi = 600
+  )
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+```{r load-packages}
+library(tidyverse)
+library(dbplyr)
+library(DBI)
+library(pdftools)
+library(readxl)
+library(extrafont)
+```
+
+```{r db-connection}
+# Connect to the Postgres database
+con <- dbConnect(RPostgres::Postgres(),
+  host = "infinity.cdmqm0mu0qf8.eu-north-1.rds.amazonaws.com",
+  port = 5432,
+  user = rstudioapi::askForPassword(prompt = "Username: "),
+  password = rstudioapi::askForPassword(),
+  dbname = "infinity"
+)
+```
+
+```{r load-data}
+cct <- read_csv("02 Output Data/01 CSV/faecal_streptococci_data_clean.csv") |>
+  mutate(dataset = 'cct')
+sabs <- read_csv("02 Output Data/01 CSV/sabs_data_clean.csv") |>
+  mutate(dataset = 'sabs')
+lims <- read_csv("02 Output Data/01 CSV/lims_data_clean.csv") |>
+  mutate(dataset = 'lims')
+walab <- tbl(con, I("coastal.results")) |> collect() |>
+  mutate(dataset = "walab")
+```
+
+# Sites
+
+```{r sites-differences}
+cct_sites <- cct |>
+  distinct(site_id) |>
+  arrange(site_id)
+
+sabs_sites <- sabs |>
+  distinct(site_id) |>
+  arrange(site_id)
+
+lims_sites <- lims |>
+  distinct(site_id) |>
+  arrange(site_id)
+
+walab_sites <- walab |>
+  distinct(site_id) |>
+  arrange(site_id)
+```
+
+```{r sites-discrepancies, include = TRUE, echo = TRUE}
+# CCT and SABS
+dplyr::setdiff(cct_sites, sabs_sites) # 2 sites
+dplyr::setdiff(sabs_sites, cct_sites) # 11 sites
+
+# CCT and WALAB
+dplyr::setdiff(cct_sites, walab_sites) # 2 sites
+dplyr::setdiff(walab_sites, cct_sites) # 33 sites
+
+# SABS and LIMS
+dplyr::setdiff(sabs_sites, lims_sites) # 11 sites
+dplyr::setdiff(lims_sites, sabs_sites) # 79 sites
+
+# LIMS and WALAB
+dplyr::setdiff(lims_sites, walab_sites) # 19 sites
+dplyr::setdiff(walab_sites, lims_sites) # 23 sites
+
+# CCT and LIMS
+dplyr::setdiff(lims_sites, cct_sites) # 44 sites
+dplyr::setdiff(cct_sites, lims_sites) # 17 sites
+
+# SABS and WALAB
+dplyr::setdiff(sabs_sites, walab_sites) # 7 sites
+dplyr::setdiff(walab_sites, sabs_sites) # 79 sites
+```
+
+
+```{r sites-overlap, fig.cap = "Sites present in different data sets", fig.width = 7, fig.height = 9.2, include = TRUE, echo = FALSE}
+sites_overlap <- dplyr::union(cct_sites, sabs_sites) |>
+  dplyr::union(lims_sites) |>
+  dplyr::union(walab_sites) |>
+  arrange(site_id) |>
+  mutate(
+    cct = site_id %in% pull(cct_sites),
+    sabs = site_id %in% pull(sabs_sites),
+    lims = site_id %in% pull(lims_sites),
+    walab = site_id %in% pull(walab_sites)
+    ) |>
+  pivot_longer(cols = cct:walab, names_to = "dataset", values_to = "present") |>
+  mutate(site_prefix = str_extract(site_id, "ICS|CN|CS|XCN|XCS|HB"), dataset = str_to_upper(dataset))
+```
+
+```{r plot-overlaps-cn, fig.cap = "Site overlap between data sets for CN sites", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+sites_overlap |>
+  filter(site_prefix == "CN") |>
+  ggplot(aes(x = dataset, y = site_id, fill = present)) +
+  labs(x = "Dataset", y = "Site") +
+  geom_tile() +
+  theme(legend.position = "bottom",
+        text = element_text(family = "Century Gothic"))
+```
+```{r plot-overlaps-cs, fig.cap = "Site overlap between data sets for CS sites", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+sites_overlap |>
+  filter(site_prefix == "CS") |>
+  ggplot(aes(x = dataset, y = site_id, fill = present)) +
+  labs(x = "Dataset", y = "Site") +
+  geom_tile() +
+  theme(legend.position = "bottom",
+        text = element_text(family = "Century Gothic"))
+```
+```{r plot-overlaps-ics, fig.cap = "Site overlap between data sets for CS sites", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+sites_overlap |>
+  filter(site_prefix == "ICS") |>
+  ggplot(aes(x = dataset, y = site_id, fill = present)) +
+  labs(x = "Dataset", y = "Site") +
+  geom_tile() +
+  theme(legend.position = "bottom",
+        text = element_text(family = "Century Gothic"))
+```
+
+```{r plot-overlaps-xcn, fig.cap = "Site overlap between data sets for XCN sites", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+sites_overlap |>
+  filter(str_detect(site_id, "XCN|HB")) |>
+  ggplot(aes(x = dataset, y = site_id, fill = present)) +
+  labs(x = "Dataset", y = "Site") +
+  geom_tile() +
+  theme(legend.position = "bottom",
+        text = element_text(family = "Century Gothic"))
+```
+
+```{r plot-overlaps-xcs, fig.cap = "Site overlap between data sets for XCS sites", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+sites_overlap |>
+  filter(site_prefix |> str_detect("XCS")) |>
+  ggplot(aes(x = dataset, y = site_id, fill = present)) +
+  labs(x = "Dataset", y = "Site") +
+  geom_tile() +
+  theme(legend.position = "bottom",
+        text = element_text(family = "Century Gothic"))
+```
+
+# Sample Frequency
+
+```{r plot-frequency, fig.cap = "Number of samples received per month from data received from Coastal Management Branch", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+cct |>
+  mutate(year = year(date), month = month(date, label = TRUE)) |>
+  group_by(year, month) |>
+  count() |>
+  ggplot(aes(x = month, y = n)) +
+  labs(title = "Sample frequency according to CMB dataset",
+       x = "Month", y = "Number of samples") +
+  geom_col(position = position_dodge(preserve = "single")) +
+  facet_wrap(facets = vars(year)) +
+  theme(
+    text = element_text(family = "Century Gothic"),
+    axis.text.x = element_text(angle = 90)
+  )
+```
+```{r plot-received-with-source, fig.cap = "Number of samples received per month from data received from Coastal Management Branch", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+cct |>
+  mutate(year = year(date), month = month(date, label = TRUE)) |>
+  group_by(year, month, source) |>
+  count() |>
+  ggplot(aes(x = month, y = n, fill = source)) +
+  labs(title = "Sample frequency according to CMB dataset",
+       subtitle = "Data added by CMB vs received from SSB",
+       x = "Month", y = "Number of samples") +
+  geom_col() +
+  facet_wrap(facets = vars(year)) +
+  theme(
+    text = element_text(family = "Century Gothic"),
+    axis.text.x = element_text(angle = 90)
+  )
+```
+
+
+
+```{r plot-lims-data, fig.cap = "Number of samples received per month from 2005 to 2024 according to the LIMS dataset", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+lims |>
+  mutate(year = year(sample_date), month = month(sample_date, label = TRUE)) |>
+  group_by(year, month) |>
+  count() |>
+  ggplot(aes(x = month, y = n)) +
+  labs(title = "Sample frequency according to WALAB dataset",
+       x = "Month", y = "Number of samples") +
+  labs(title = "Sample frequency according to LIMS dataset",
+       x = "Month", y = "Number of samples") +
+  geom_col() +
+  facet_wrap(facets = vars(year)) +
+  theme(
+    text = element_text(family = "Century Gothic"),
+    axis.text.x = element_text(angle = 90)
+  )
+```
+
+```{r plot-walab}
+walab |>
+  mutate(month = floor_date(sample_date, "month")) |>
+  group_by(month) |>
+  count() |>
+  ggplot(aes(x = month, y = n)) +
+  labs(title = "Sample frequency according to WALAB dataset",
+       x = "Month", y = "Number of samples") +
+  geom_col() +
+  theme(
+    text = element_text(family = "Century Gothic"),
+    axis.text.x = element_text(angle = 90)
+  )
+```
+```{r plot-all-data}
+cct_counts <- cct |>
+  mutate(year = year(date), month = month(date, label = TRUE)) |>
+  group_by(year, month) |>
+  count() |>
+  mutate(dataset = "CMB")
+
+lims_counts <- lims |>
+  mutate(year = year(sample_date), month = month(sample_date, label = TRUE)) |>
+  group_by(year, month) |>
+  count() |>
+  mutate(dataset = "LIMS")
+
+sabs_counts <- sabs |>
+  mutate(year = year(sample_date), month = month(sample_date, label = TRUE)) |>
+  group_by(year, month) |>
+  count() |>
+  mutate(dataset = "SABS")
+
+walab_counts <- walab |>
+  mutate(year = year(sample_date), month = month(sample_date, label = TRUE)) |>
+  group_by(year, month) |>
+  count() |>
+  mutate(dataset = "WALAB")
+
+all_counts <- bind_rows(cct_counts, lims_counts, sabs_counts, walab_counts)
+```
+
+```{r plot-all-counts, fig.cap = "Number of samples per month for all datasets", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+all_counts |>
+  ggplot(aes(x = month, y = n, fill = dataset)) +
+  labs(
+    title = "Number of samples per month from all datasets",
+    x = "Month",
+    y = "Number of samples"
+  ) +
+  geom_col(position = position_dodge(preserve = "single")) +
+  facet_grid(rows = vars(year)) +
+  theme(
+    legend.position = "bottom",
+    text = element_text(family = "Century Gothic"),
+    axis.text.x = element_text(angle = 90)
+  ) +
+  scale_fill_brewer(name = "Dataset", type = "qual", palette = 3)
+```
+
+```{r plot-all-counts-subset, fig.cap = "Number of samples per month for all datasets, for the last five years", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+all_counts |>
+  filter(year >= 2020) |>
+  ggplot(aes(x = month, y = n, fill = dataset)) +
+  labs(
+    title = "Number of samples per month from all datasets",
+    subtitle = "Past 5 years",
+    x = "Month",
+    y = "Number of samples"
+  ) +
+  geom_col(position = position_dodge(preserve = "single")) +
+  facet_grid(rows = vars(year)) +
+  theme(
+    legend.position = "bottom",
+    text = element_text(family = "Century Gothic"),
+    axis.text.x = element_text(angle = 90)
+  ) +
+  scale_fill_brewer(name = "Dataset", type = "qual", palette = 3)
+```
+
+# Results
+
+```{r combine-data}
+cct_results <- cct |>
+  select(date, site_id, censored_value, numeric_value, dataset) |>
+  rename(sample_date = date)
+
+lims_results <- lims |>
+  select(sample_date, site_id, censored_value, numeric_value, dataset)
+
+sabs_results <- sabs |>
+  select(sample_date, site_id, censored_value, numeric_value, dataset)
+
+walab_results <- walab |>
+  mutate(numeric_value = case_when(
+    str_detect(enterococci_cfu_per_100ml, "<") ~ str_remove(enterococci_cfu_per_100ml, "<") |> as.numeric() / 3,
+    str_detect(enterococci_cfu_per_100ml, ">") ~ str_remove(enterococci_cfu_per_100ml, ">") |> as.numeric() * 3,
+    str_detect(enterococci_cfu_per_100ml, "ND") ~ 0,
+    .default = as.numeric(enterococci_cfu_per_100ml |> str_remove("\\s"))
+  )) |>
+  rename(censored_value = enterococci_cfu_per_100ml) |>
+  select(sample_date, site_id, censored_value, numeric_value, dataset)
+
+all_results <- bind_rows(
+  cct_results,
+  lims_results,
+  sabs_results,
+  walab_results
+)
+```
+
+```{r plot-all-results, fig.cap = "Results for all datasets", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+all_results |>
+  mutate(dataset = str_to_upper(dataset),
+         sample_date = date(sample_date)) |>
+  ggplot(aes(x = sample_date, y = numeric_value, colour = dataset)) +
+  geom_point() +
+  labs(
+    title = "Enterococci results for all datasets",
+    x = "Date",
+    y = "Enterococci (cfu per 100 mL)"
+  ) +
+  theme(
+    legend.position = "bottom",
+    text = element_text(family = "Century Gothic")
+  ) +
+  scale_colour_brewer(name = "Dataset", type = "qual", palette = 3) +
+  scale_x_date(minor_breaks = "1 year")
+```
+
+```{r investigate-streak, fig.cap = "Outlier data in August 2024 from the LIMS data set", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+all_results |>
+  filter(between(sample_date, ymd("2024-08-01"), ymd("2024-09-01"))) |>
+  group_by(sample_date, numeric_value) |>
+  mutate(count = n()) |>
+  ggplot(aes(x = sample_date, y = numeric_value, size = count, label = count)) +
+  labs(title = "High values for all sites on 21 August 2024",
+       x = "Date",
+       y = "Enterococci (cfu per 100 mL)",
+       size = "Frequency observed") +
+  geom_point() +
+  theme(
+    legend.position = "bottom",
+    text = element_text(family = "Century Gothic")
+  )
+```
+
+
+```{r plot-all-results-year, fig.cap = "Results for all datasets excluding outlier values", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+all_results |>
+  mutate(dataset = str_to_upper(dataset),
+         sample_date = date(sample_date)) |>
+  ggplot(aes(x = sample_date, y = numeric_value, colour = dataset)) +
+  geom_point() +
+  labs(
+    title = "Enterococci results for all datasets",
+    x = "Date",
+    y = "Enterococci (cfu per 100 mL)"
+  ) +
+  theme(
+    legend.position = "bottom",
+    text = element_text(family = "Century Gothic")
+  ) +
+  scale_colour_brewer(name = "Dataset", type = "qual", palette = 3) +
+  scale_x_date(minor_breaks = "1 year") +
+  scale_y_continuous(breaks = seq(0, 10000, 1000)) +
+  coord_cartesian(ylim = c(0, 10000))
+```
+
+```{r plot-all-results-2020, fig.cap = "Results for all datasets from 2020 to 2025", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+all_results |>
+  mutate(dataset = str_to_upper(dataset),
+         sample_date = date(sample_date)) |>
+  ggplot(aes(x = sample_date, y = numeric_value, colour = dataset)) +
+  geom_point() +
+  facet_grid(rows = vars(dataset)) +
+  labs(
+    title = "Enterococci results for all datasets",
+    x = "Date",
+    y = "Enterococci (cfu per 100 mL)"
+  ) +
+  theme(
+    legend.position = "bottom",
+    text = element_text(family = "Century Gothic")
+  ) +
+  scale_colour_brewer(name = "Dataset", type = "qual", palette = 3) +
+  scale_x_date(minor_breaks = "1 year") +
+  scale_y_continuous(breaks = seq(0, 10000, 1000)) +
+  coord_cartesian(ylim = c(0, 10000), xlim = c(ymd("2020-01-01"), ymd("2025-04-01")))
+```
+```{r zoom-al-abbot, fig.cap = "Results for AL Abbot data between 2022 and 2023", fig.width = 7, fig.height = 10, include = TRUE, echo = FALSE}
+all_results |>
+  mutate(dataset = str_to_upper(dataset)) |>
+  filter(between(sample_date, ymd("2022-10-01"), ymd("2023-06-01"))) |>
+  ggplot(aes(x = sample_date, y = numeric_value, colour = dataset)) +
+  geom_point() +
+  labs(
+    title = "Enterococci results from AL Abbot in 2022 and 2023",
+    x = "Date",
+    y = "Enterococci (cfu per 100 mL)"
+  ) +
+  theme(
+    legend.position = "bottom",
+    text = element_text(family = "Century Gothic")
+  ) +
+  scale_colour_brewer(name = "Dataset", type = "qual", palette = 3)
+  
+```
+
