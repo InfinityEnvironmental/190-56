@@ -48,9 +48,9 @@ hazen_method <- function(data){
   n <- hout_bay$faecal_streptococci_cfu_per_100ml |> length()
   
   # Hazen method
-  r_hazen95 = 0.5 + (0.95 * n)
+  r_hazen95 <- 0.5 + (0.95 * n)
   rf95 <- r_hazen95 - floor(r_hazen95)
-  hazen95 <- pluck(l, floor(r_hazen95)) * (1 - rf95) + pluck(l, floor(r_hazen95 + 1)) * rf95
+  hazen95 <- pluck(l, floor(r_hazen95)) * (1 - rf95) + pluck(l, ceiling(r_hazen95)) * rf95
   
   r_hazen90 <- 0.5 + (0.9 * n)
   rf90 <- r_hazen90 - floor(r_hazen90)

@@ -408,6 +408,12 @@ faecal |>
 
 ```{r save-data}
 faecal |>
+  mutate(numeric_value = case_when(
+    censored_value |> str_detect("<") ~ censored_value |> str_remove("<|\\s") |> as.numeric() / 3,
+    censored_value |> str_detect(">") ~ censored_value |> str_remove(">|\\s") |> as.numeric() * 3,
+    censored_value |> str_detect("ND") ~ 0,
+    .default = censored_value |> as.numeric()
+  )) |>
   write_csv("02 Output Data/01 CSV/faecal_streptococci_data_clean.csv")
 ```
 
@@ -463,13 +469,25 @@ sabs |>
 sabs |>
   summary()
 
-# Upload data to database
-
-
 # Check when coastal data end
 tbl(con, I("coastal.results")) |>
   arrange(sample_date) |>
   arrange(sample_date)
+
+# Export clean data to file
+sabs |>
+  select(cct_code_updated, sample_date, enterococci_cfu_per_100ml, enterococci_cfu_per_100ml_numeric, week) |>
+  mutate(cct_code_updated = fct(cct_code_updated)) |>
+  filter(!is.na(sample_date)) |>
+  rename(site_id = cct_code_updated, censored_value = enterococci_cfu_per_100ml) |>
+  mutate(numeric_value = case_when(
+    censored_value |> str_detect("<") ~ censored_value |> str_remove("<|\\s") |> as.numeric() / 3,
+    censored_value |> str_detect(">") ~ censored_value |> str_remove(">|\\s") |> as.numeric() * 3,
+    censored_value |> str_detect("ND") ~ 0,
+    .default = censored_value |> as.numeric()
+  )) |>
+  select(sample_date, site_id, censored_value, numeric_value) |>
+  write_csv("02 Output Data/01 CSV/sabs_data_clean.csv")
 ```
 
 ```{r join-data}
@@ -478,8 +496,14 @@ sabs2023 <- sabs |>
   select(cct_code_updated, sample_date, enterococci_cfu_per_100ml, enterococci_cfu_per_100ml_numeric, week) |>
   mutate(cct_code_updated = fct(cct_code_updated)) |>
   filter(!is.na(sample_date)) |>
-  rename(site_id = cct_code_updated) |>
-  select(1, 2, 3)
+  rename(site_id = cct_code_updated, censored_value = enterococci_cfu_per_100ml) |>
+  mutate(numeric_value = case_when(
+    censored_value |> str_detect("<") ~ censored_value |> str_remove("<|\\s") |> as.numeric() / 3,
+    censored_value |> str_detect(">") ~ censored_value |> str_remove(">|\\s") |> as.numeric() * 3,
+    censored_value |> str_detect("ND") ~ 0,
+    .default = censored_value |> as.numeric()
+  )) |>
+  select(sample_date, site_id, censored_value, numeric_value)
 
 # How many records for each site?
 filter(sabs2023) |>
@@ -672,6 +696,19 @@ tail(lims)
 slice_sample(lims, n = 50)
 ```
 
+```{r clean-site-codes}
+lims |>
+  distinct(site_id) |>
+  arrange(site_id)
+
+# Clean the codes
+lims <- lims |>
+  mutate(site_id = case_when(
+    site_id == "CN9_EAST" ~ "CS09",
+    .default = str_to_upper(site_id)
+  ))
+```
+
 ```{r clean-data}
 # Which sites in the LIMS data are not in the database or in the Excel data?
 sites_not_in <- dplyr::setdiff(
@@ -698,7 +735,9 @@ lims |>
 # Which of these have been running for a long time?
 # If we confirm that we want to include these data, I will need a mapping
 # For now, I exclude the sites that are not currently monitored
+```
 
+```{r clean-values}
 lims |>
   distinct(enterococci_cfu_per_100ml)
 
@@ -713,7 +752,7 @@ lims <- lims |>
   )) |>
   filter(!is.na(enterococci_cfu_per_100ml))
   
-# Create new numeric value from character data
+# Create new numeric values from character data
 lims <- lims |>
   filter(!is.na(enterococci_cfu_per_100ml)) |>
   mutate(enterococci_cfu_per_100ml_numeric = case_when(
@@ -725,7 +764,8 @@ lims <- lims |>
 # Write to csv
 lims |>
   mutate(sample_date = date(sample_date)) |>
-  select(sample_date, site_id, lab_owner, analysis, enterococci_cfu_per_100ml, enterococci_cfu_per_100ml_numeric, sample_number) |>
+  rename(censored_value = enterococci_cfu_per_100ml, numeric_value = enterococci_cfu_per_100ml_numeric) |>
+  select(sample_date, site_id, lab_owner, analysis, censored_value, numeric_value, sample_number) |>
   write_csv("02 Output Data/01 CSV/lims_data_clean.csv")
 ```
 
