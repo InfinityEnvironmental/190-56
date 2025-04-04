@@ -333,6 +333,19 @@ blue_flag |>
   geom_histogram() +
   labs(title = "Distribution of results for Blue Flag data", subtitle = "2011 to 2025", x = "Enterococci (cfu per 100 mL)", y = "Number of results", caption = "(Note that one value of 3000 cfu per 100 mL was removed)") +
   theme(text = element_text(family = "Century Gothic"))
+
+ggsave("blue-flag-results.jpg", path = "05 Reports/", width = 7, height = 9, dpi = 600)
+```
+
+```{r blue-flag-sites, fig.cap = "Number of sites sampled per month", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
+# How many sites sampled every month
+blue_flag |>
+  group_by(year = year(sample_date), month = month(sample_date, label = TRUE), site_name) |>
+  count() |>
+  ggplot(aes(x = month, y = n, fill = site_name)) +
+  geom_col() +
+  facet_wrap(facets = vars(year)) +
+  theme(text = element_text(family = "Century Gothic"), axis.text.x = element_text(angle = 90))
 ```
 
 
