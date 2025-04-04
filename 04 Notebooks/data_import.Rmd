@@ -43,7 +43,7 @@ con <- dbConnect(RPostgres::Postgres(),
 dbGetInfo(con)
 ```
 
-# Historical Data
+# CMB Spreadsheets
 
 ```{r list-files}
 # List the files in the directory
@@ -253,7 +253,7 @@ faecal |>
 ```
 
 
-# Compare 2023 data between City of Cape Town and Infinity
+# SABS Data
 
 In 2023/2024 data samples were collected with sample codes that don't match any other sample codes in the monitoring programme. I want to see how well our data corresponds to City of Cape Town data.
 
@@ -539,3 +539,94 @@ CS12 connected to what?
 CS24E and CS24W connected to what?
 XCS16
 XCS33
+
+# Blue Flag Data
+
+```{r read-blue-flag-data}
+path <- "../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/05_Data/03 Water Quality/Coastal Water Quality/Blue Flag Data/"
+filename <- str_c(path, list.files(path), sep = "")
+
+blue_flag_files <- filename |>
+  map_df(~tibble(
+    filename = .x,
+    sheet = excel_sheets(.x)
+    ))
+
+# Read in data
+n = 40
+(file <- blue_flag_files |> slice(n) |> pull(1))
+(sheet <- blue_flag_files |> slice(n) |> pull(2))
+(blue_flag_append <- read_excel(
+  path = file, 
+  sheet = sheet, 
+  range = "B30:D130",
+  col_names = c("sample_date", "ecoli_cfu_per_100ml", "faecal_streptococci_cfu_per_100ml"),
+  col_types = c("date", "text", "text")
+  ) |>
+  filter(!if_all(1:3, is.na)) |>
+  mutate(
+    file = file |> str_remove(path),
+    sheet = sheet))
+
+(blue_flag_data <- bind_rows(blue_flag_data, blue_flag_append))
+
+# Check Blue Flag Data
+blue_flag_data
+
+# Write Blue Flag data to file
+write_csv(blue_flag_data, "02 Output Data/blue_flag_raw.csv")
+```
+
+```{r clean-blue-flag}
+# Check sites
+blue_flag_data |>
+  distinct(sheet) |>
+  arrange(sheet)
+
+blue_flag_data |>
+  arrange(-as.integer(faecal_streptococci_cfu_per_100ml))
+
+blue_flag_data |>
+  filter(if_any(everything(), is.na))
+
+blue_flag <- blue_flag_data |>
+  mutate(site_name = case_when(
+    sheet |> str_to_lower() |> str_detect("bikini") ~ "Bikini Beach",
+    sheet |> str_to_lower() |> str_detect("clifton") ~ "Clifton Fourth",
+    sheet |> str_to_lower() |> str_detect("fish") ~ "Fish Hoek",
+    sheet |> str_to_lower() |> str_detect("llan") ~ "Llandudno",
+    sheet |> str_to_lower() |> str_detect("melkbos") ~ "Melkbos",
+    sheet |> str_to_lower() |> str_detect("muiz") ~ "Muizenberg",
+    sheet |> str_to_lower() |> str_detect("seafo") ~ "Seaforth",
+    sheet |> str_to_lower() |> str_detect("silw") ~ "Silwerstroom",
+    sheet |> str_to_lower() |> str_detect("strandf") ~ "Strandfontein",
+    .default = sheet
+  )) |>
+  select(site_name, sample_date, faecal_streptococci_cfu_per_100ml)
+
+blue_flag <- blue_flag |>
+  filter(!if_any(everything(), is.na))
+```
+
+```{r check-blue-flag}
+# Check the highest values
+blue_flag |>
+  arrange(-as.integer(faecal_streptococci_cfu_per_100ml))
+
+# Have a look at the data
+blue_flag |>
+  mutate(faecal_streptococci_cfu_per_100ml = faecal_streptococci_cfu_per_100ml |> as.numeric()) |>
+  filter(faecal_streptococci_cfu_per_100ml < 400) |>
+  ggplot(aes(x = faecal_streptococci_cfu_per_100ml |> as.numeric(), fill = site_name)) +
+  geom_histogram(position = position_dodge())
+
+# Check that everything can be converted to an integer
+blue_flag |>
+  mutate(faecal_streptococci_cfu_per_100ml = as.numeric(faecal_streptococci_cfu_per_100ml)) |>
+  filter(is.na(faecal_streptococci_cfu_per_100ml))
+
+# Export the clean data
+write_csv(blue_flag, "02 Output Data/blue_flag_clean.csv")
+```
+
+

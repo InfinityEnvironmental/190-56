@@ -46,6 +46,8 @@ lims <- read_csv("02 Output Data/01 CSV/lims_data_clean.csv") |>
   mutate(dataset = 'lims')
 walab <- tbl(con, I("coastal.results")) |> collect() |>
   mutate(dataset = "walab")
+blue_flag <- read_csv("02 Output Data/blue_flag_clean.csv") |>
+  mutate(dataset = "blue_flag")
 ```
 
 # Sample Frequency
@@ -307,6 +309,32 @@ Key points to note:
 3. The blue bars show data that are both in the SABS data and in the CMB spreadsheets
 4. Note that there are always data on the first sampling date of the week in the Excel spreadsheets that are not in the SABS data
 5. Note that there are always data on the second and third sampling days of the week that are not in the spreadsheets
+
+## Blue Flag Data
+
+```{r blue-flag-counts, fig.cap = "Sample frequency from the Blue Flag dataset", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
+blue_flag |>
+  group_by(year = year(sample_date), month = month(sample_date, label = TRUE)) |>
+  count() |>
+  ggplot(aes(x = month, y = n)) +
+  geom_col() +
+  labs(title = "Sample frequency of the Blue Flag dataset", x = "Month", y = "Number of samples") +
+  facet_wrap(facets = vars(year)) +
+  theme(text = element_text(family = "Century Gothic"), axis.text.x = element_text(angle = 90))
+
+ggsave("blue-flag-frequency.jpg", path = "05 Reports/", width = 7, height = 9, dpi = 600)
+```
+
+```{r blue-flag-results, fig.cap = "Blue Flag results over time", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
+blue_flag |>
+  mutate(faecal_streptococci_cfu_per_100ml = as.numeric(faecal_streptococci_cfu_per_100ml)) |>
+  filter(faecal_streptococci_cfu_per_100ml < 3000) |>
+  ggplot(aes(x = faecal_streptococci_cfu_per_100ml)) +
+  geom_histogram() +
+  labs(title = "Distribution of results for Blue Flag data", subtitle = "2011 to 2025", x = "Enterococci (cfu per 100 mL)", y = "Number of results", caption = "(Note that one value of 3000 cfu per 100 mL was removed)") +
+  theme(text = element_text(family = "Century Gothic"))
+```
+
 
 ## All data sources shown together
 
