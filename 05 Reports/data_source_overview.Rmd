@@ -109,8 +109,8 @@ median_frequency <- lims |>
   group_by(site_id) |>
   arrange(sample_date, .by_group = TRUE) |>
   mutate(time_since_previous_sample = sample_date - lag(sample_date)) |>
-  summarise(average_frequency = mean(time_since_previous_sample, na.rm = TRUE)) |>
-  summarise(median_frequency = median(average_frequency, na.rm = TRUE)) |>
+  summarise(median_frequency = median(time_since_previous_sample, na.rm = TRUE)) |>
+  summarise(median_frequency = median(median_frequency, na.rm = TRUE)) |>
   pull()
 ```
 
@@ -172,7 +172,6 @@ Key points to note:
 2. There is also a small amount of data in the Excel spreadsheets that are not in the LIMS data, and this increases from 2023 onwards as the SABS data were populated into the Excel spreadsheets
 3. There are more sites in the LIMS data than in the CMB spreadsheets, accounting for the higher number of samples per month
 
-
 ## Overlap between LIMS data and SABS data
 
 ```{r frequency-overlap-sabs-lims}
@@ -229,6 +228,86 @@ Key points to note:
 2. The LIMS data in 2024 and 2025 are therefore completely made up of SSB data, and the results are typical of Enterolert data
 3. This makes it highly likely that these data come from Enterolert results from within the SSB
 
+## Overlap between SABS and CMB data
+
+```{r frequency-overlap-sabs-cmb}
+cmb <- cct |>
+  filter(source == "CMB")
+
+sabs_cmb_both <- dplyr::intersect(
+  sabs |> select(sample_date, site_id, censored_value, numeric_value),
+  cmb |> select(sample_date, site_id, censored_value, numeric_value)
+) |>
+  mutate(subset = "SABS & CMB")
+
+sabs_only <- dplyr::setdiff(
+  sabs |> select(sample_date, site_id, censored_value, numeric_value),
+  cmb |> select(sample_date, site_id, censored_value, numeric_value)
+) |>
+  mutate(subset = "SABS")
+
+cmb_only <- dplyr::setdiff(
+  cmb |> select(sample_date, site_id, censored_value, numeric_value),
+  sabs |> select(sample_date, site_id, censored_value, numeric_value)
+) |>
+  mutate(subset = "CMB")
+
+sabs_cmb <- bind_rows(
+  sabs_cmb_both,
+  sabs_only,
+  cmb_only
+)
+```
+
+```{r plot-sabs-cmb-overlap, fig.cap = "Overlap of data between CMB and SABS datasets", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
+sabs_cmb |>
+  mutate(
+    year = year(sample_date),
+    month = month(sample_date, label = TRUE)
+  ) |>
+  group_by(year, month, subset) |>
+  count() |>
+  ggplot(aes(x = month, y = n, fill = subset)) +
+  geom_col() +
+  labs(x = "Date",
+    y = "Number of samples",
+    fill = "Subset of data"
+  ) +
+  facet_wrap(facets = vars(year)) +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 90),
+    text = element_text(family = "Century Gothic")
+  )
+```
+Key points to note:
+
+1. There is much less overlap in the CMB data and the SABS data than expected.
+2. This is primarily because many of the dates of the SABS data were incorrectly entered into the spreadsheets, and the records therefore appear to be different results, when they are in fact the same. We should be able to confirm this by comparing the daily distribution of SABS data and CMB data during this period.
+3. We would expect that most of the data added to the spreadsheets would have been from SABS, and the few that were not from SABS would be from Blue Flag.
+
+```{r sabs-cmb-dates, fig.cap = "Dates of SABS and CMB data", fig.width = 7, fig.height = 9, include = TRUE, echo = FALSE}
+sabs_cmb |>
+  mutate(sample_date = date(sample_date)) |>
+  group_by(sample_date, subset) |>
+  summarise(count = n()) |>
+  ggplot(aes(x = sample_date, y = count, fill = subset)) +
+  geom_col(position = position_dodge(preserve = "single")) +
+  labs(x = "Date", y = "Number of samples", fill = "Subset of data") +
+  theme(legend.position = "bottom",
+        text = element_text(family = "Century Gothic")) +
+  coord_cartesian(xlim = c(ymd("2023-10-01"), ymd("2023-11-01"))) +
+  scale_x_date(minor_breaks = "1 day")
+```
+
+Key points to note:
+
+1. The red bars show data that are in the CMB spreadsheets but not in the SABS data
+2. The green bars show data that are in the SABS data but not in the CMB spreadsheets
+3. The blue bars show data that are both in the SABS data and in the CMB spreadsheets
+4. Note that there are always data on the first sampling date of the week in the Excel spreadsheets that are not in the SABS data
+5. Note that there are always data on the second and third sampling days of the week that are not in the spreadsheets
+
 ## All data sources shown together
 
 ```{r plot-all-data}
@@ -238,11 +317,11 @@ cct_counts <- cct |>
   count() |>
   mutate(dataset = "CMB")
 
-lims_counts <- lims |>
+cmb_counts <- cmb |>
   mutate(year = year(sample_date), month = month(sample_date, label = TRUE)) |>
   group_by(year, month) |>
   count() |>
-  mutate(dataset = "LIMS")
+  mutate(dataset = "cmb")
 
 sabs_counts <- sabs |>
   mutate(year = year(sample_date), month = month(sample_date, label = TRUE)) |>
@@ -256,7 +335,7 @@ walab_counts <- walab |>
   count() |>
   mutate(dataset = "WALAB")
 
-all_counts <- bind_rows(cct_counts, lims_counts, sabs_counts, walab_counts)
+all_counts <- bind_rows(cct_counts, cmb_counts, sabs_counts, walab_counts)
 ```
 
 ### All data sources from 2005 to 2025
