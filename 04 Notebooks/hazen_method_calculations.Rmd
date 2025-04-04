@@ -19,7 +19,7 @@ library(tidyverse)
 library(readxl)
 ```
 
-# Hazen Method
+# Hazen Method Set Up
 
 ```{r read-excel-data}
 hout_bay <- read_excel("../../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/02_Working Directory/01 Input Data/From CCT/13_Hout_Bay_(XCN10) weekly.xlsm",
@@ -87,6 +87,83 @@ quantile(l, probs = 0.90, type = 5)
 
 ```
 
+# Using Hazen Method on Database Data
 
+```{r test-hazen}
+hazen_annual <- results |>
+  group_by(year = year(date)) |>
+  summarise(
+    min_date = min(date),
+    max_date = max(date),
+    n_ecoli = sum(!is.na(ecoli_cfu_per_100ml)),
+    hazen95_ecoli = quantile(ecoli_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
+    hazen90_ecoli = quantile(ecoli_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
+    hazen_category_ecoli = case_when(
+      n_ecoli < 10 ~ "Not enough samples",
+      hazen95_ecoli <= 100 ~ "Excellent",
+      hazen95_ecoli <= 200 ~ "Good",
+      hazen95_ecoli > 200 & hazen90_ecoli > 185 ~ "Poor",
+      hazen95_ecoli > 200 & hazen90_ecoli < 185 ~ "Sufficient"
+  ),
+    n_faecal = sum(!is.na(faecal_streptococci_cfu_per_100ml)),
+    hazen95_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
+    hazen90_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
+  hazen_category_faecal = case_when(
+      n_faecal < 10 ~ "Not enough samples",
+      hazen95_faecal <= 100 ~ "Excellent",
+      hazen95_faecal <= 200 ~ "Good",
+      hazen95_faecal > 200 & hazen90_faecal > 185 ~ "Poor",
+      hazen95_faecal > 200 & hazen90_faecal < 185 ~ "Sufficient"
+  )
+  ) |>
+  mutate(hazen_category_ecoli = fct(hazen_category_ecoli, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent"))) |>
+  mutate(hazen_category_faecal = fct(hazen_category_faecal, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent")))
+```
+
+```{r test-hazen}
+hazen_annual_site <- results |>
+  group_by(year = year(date), site_id) |>
+  summarise(
+    min_date = min(date),
+    max_date = max(date),
+    n_ecoli = sum(!is.na(ecoli_cfu_per_100ml)),
+    hazen95_ecoli = quantile(ecoli_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
+    hazen90_ecoli = quantile(ecoli_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
+    hazen_category_ecoli = case_when(
+      n_ecoli < 10 ~ "Not enough samples",
+      hazen95_ecoli <= 100 ~ "Excellent",
+      hazen95_ecoli <= 200 ~ "Good",
+      hazen95_ecoli > 200 & hazen90_ecoli > 185 ~ "Poor",
+      hazen95_ecoli > 200 & hazen90_ecoli < 185 ~ "Sufficient"
+  ),
+    n_faecal = sum(!is.na(faecal_streptococci_cfu_per_100ml)),
+    hazen95_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
+    hazen90_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
+  hazen_category_faecal = case_when(
+      n_faecal < 10 ~ "Not enough samples",
+      hazen95_faecal <= 100 ~ "Excellent",
+      hazen95_faecal <= 200 ~ "Good",
+      hazen95_faecal > 200 & hazen90_faecal > 185 ~ "Poor",
+      hazen95_faecal > 200 & hazen90_faecal < 185 ~ "Sufficient"
+  )
+  ) |>
+  mutate(hazen_category_ecoli = fct(hazen_category_ecoli, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent"))) |>
+  mutate(hazen_category_faecal = fct(hazen_category_faecal, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent")))
+```
+
+```{r plot-hazen}
+hazen_annual |>
+  ggplot(aes(x = year)) +
+  labs(x = "Year") +
+  geom_tile(aes(fill = hazen_category_ecoli)) +
+  scale_fill_brewer(name = "Water Quality Category", type = "div", palette = "RdYlGn")
+
+RColorBrewer::display.brewer.all()
+```
+
+```{r}
+sites |>
+  inner_join(hazen_annual)
+```
 
 

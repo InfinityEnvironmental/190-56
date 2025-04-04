@@ -1,0 +1,213 @@
+---
+title: "Import Coastal Water Quality Data"
+author: "Francois van Schalkwyk"
+date: "2025-03-19"
+output: html_document
+---
+
+# Workspace Set-Up
+
+Make sure that you are working in the outfalls project, found in the working directory.
+
+## Set working directory for all code chunks to project root directory
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## Load required packages
+
+```{r message = FALSE}
+library(tidyverse)
+library(dbplyr)
+library(DBI)
+library(pdftools)
+library(readxl)
+```
+
+## Database Connection
+
+```{r db connection}
+# Connect to the Postgres database
+con <- dbConnect(RPostgres::Postgres(),
+  host = "infinity.cdmqm0mu0qf8.eu-north-1.rds.amazonaws.com",
+  port = 5432,
+  user = rstudioapi::askForPassword(prompt = "Username: "),
+  password = rstudioapi::askForPassword(),
+  dbname = "infinity"
+)
+```
+
+```{r}
+dbGetInfo(con)
+```
+
+# Data Import
+
+## Check which pdf files have not yet been imported
+
+```{r not-yet-imported}
+# List of files in folder
+files_list <- list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/", pattern = "*.pdf")
+
+extract_sample_date <- function(filename){
+  sample_date <- pdf_text(paste("../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/", filename, sep = "")) |>
+    str_split("\\n") |>
+    unlist() |>
+    keep(~str_detect(.x, "Sample taken")) |>
+    str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+    pluck(1) |>
+    dmy()
+  
+  tibble(filename = filename, sample_date = sample_date)
+}
+
+# Map the function across the list of files in the directory
+files <- map_df(files_list, ~extract_sample_date(.x))
+
+# Retrieve a list of sample dates from the results table in database
+database <- tbl(con, I("coastal.results")) |>
+  distinct(sample_date) |>
+  collect() |>
+  arrange(desc(sample_date))
+
+# Check which files are not yet in database
+files |>
+  left_join(database, by = c("sample_date" = "sample_date"), keep = TRUE) |>
+  filter(is.na(sample_date.y))
+```
+
+## Extract data from pdf
+
+```{r extract-pdf}
+# Select the pdf that you want to import
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_59(28.03.2025).pdf"
+filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
+
+# Extract the pdf data
+pdf_data <- pdf_text(path) |>
+  str_split("\n")
+
+# Extract the sample date
+sample_date <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Sample taken")) |>
+  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+  pluck(1) |>
+  dmy()
+
+# Extract the analysis date
+analysis_completed <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Analysis completed")) |>
+  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+  pluck(1) |>
+  dmy()
+
+# Extract the sample temperature
+sample_temp_c <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Sample temperature:")) |>
+  str_extract("(?<=(Sample temperature:\\s))\\d{1,2}\\.\\d") |>
+  pluck(1) |>
+  as.numeric()
+
+# Extract tabular data
+extract_table <- function(page){
+  page |>
+    unlist() |> 
+    head_while(~!str_detect(.x, "colony forming units")) |>
+    tail_while(~!str_detect(.x, "Sample number")) |>
+    discard(~.x == "") |>
+    unlist()
+}
+
+# Extract table from all pages of pdf
+table <- map(pdf_data, ~extract_table(.x)) |>
+  unlist()
+
+# Extract sample number
+sample_number <- table |>
+  str_sub(5,15) |>
+  str_trim()
+
+# Extract sample text
+sample_text <- table |>
+  str_sub(19,95) |>
+  str_trim()
+
+# Extract result
+sample_result <- table |>
+  str_sub(100) |>
+  str_trim()
+
+# Make a table with the extracted data
+tbl <- tibble(number = sample_number,
+       text = sample_text,
+       result = sample_result) |> 
+  mutate(number = if_else(number == "", NA, number)) |>
+  fill(number, .direction = "down") |> 
+  group_by(number) |>
+  summarise(text = str_c(text, collapse = ""), result = first(result)) |>
+  select(text, result) |>
+  mutate(
+    site_id = str_extract(text, "[:upper:]{2,3}\\s?\\d{2}\\d?[AOIWETC]?") |> str_remove_all("\\s"),
+    sample_time = str_extract(text, "\\d{1,2}h\\d{2}") |> str_replace("h", ":"),
+    sample_date = sample_date,
+    analysis_completed = analysis_completed,
+    sample_temp_c = sample_temp_c,
+    filename = filename
+    ) |>
+  select(-text) |>
+  rename(enterococci_cfu_per_100ml = result) |>
+  mutate(site_id = case_when(
+    str_detect(site_id, "\\d{3}") & str_detect(site_id, "1$") ~ str_replace(site_id, "1$", "I"),
+    str_detect(site_id, "\\d{3}") & str_detect(site_id, "0$") ~ str_replace(site_id, "0$", "O"),
+    .default = site_id
+  )) |>
+  mutate(enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "None found", "ND"))
+
+# Check data
+tbl
+
+# Copy to database
+copy_to(con, tbl, name = "coastal", overwrite = TRUE)
+```
+
+## Upload to database
+
+```{sql, connection = con}
+BEGIN;
+```
+
+```{sql, connection = con}
+WITH cte AS 
+(SELECT
+  site_id,
+  sample_date,
+  sample_time::time,
+  analysis_completed,
+  sample_temp_c,
+  enterococci_cfu_per_100ml,
+  filename,
+  'WLAB'::coastal.lab AS lab_code
+FROM coastal)
+INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code)
+SELECT * FROM cte;
+```
+
+```{sql, connection = con}
+SELECT
+  site_id, sample_date, sample_time, enterococci_cfu_per_100ml
+FROM coastal.results
+WHERE sample_date = '2025-03-31';
+```
+
+```{sql, connection = con}
+ROLLBACK;
+```
+
+```{sql, connection = con}
+COMMIT;
+```
