@@ -81,12 +81,15 @@ files |>
 ## Extract data from pdf
 
 ```{r extract-pdf}
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_60(31.03.2025).pdf"
+# Select the pdf that you want to import
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_59(28.03.2025).pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
+# Extract the pdf data
 pdf_data <- pdf_text(path) |>
   str_split("\n")
 
+# Extract the sample date
 sample_date <- pdf_data |>
   unlist() |> 
   keep(~str_detect(.x, "Sample taken")) |>
@@ -94,6 +97,7 @@ sample_date <- pdf_data |>
   pluck(1) |>
   dmy()
 
+# Extract the analysis date
 analysis_completed <- pdf_data |>
   unlist() |> 
   keep(~str_detect(.x, "Analysis completed")) |>
@@ -101,6 +105,7 @@ analysis_completed <- pdf_data |>
   pluck(1) |>
   dmy()
 
+# Extract the sample temperature
 sample_temp_c <- pdf_data |>
   unlist() |> 
   keep(~str_detect(.x, "Sample temperature:")) |>
@@ -109,7 +114,6 @@ sample_temp_c <- pdf_data |>
   as.numeric()
 
 # Extract tabular data
-
 extract_table <- function(page){
   page |>
     unlist() |> 
@@ -119,21 +123,26 @@ extract_table <- function(page){
     unlist()
 }
 
+# Extract table from all pages of pdf
 table <- map(pdf_data, ~extract_table(.x)) |>
   unlist()
-  
+
+# Extract sample number
 sample_number <- table |>
   str_sub(5,15) |>
   str_trim()
 
+# Extract sample text
 sample_text <- table |>
   str_sub(19,95) |>
   str_trim()
 
+# Extract result
 sample_result <- table |>
   str_sub(100) |>
   str_trim()
 
+# Make a table with the extracted data
 tbl <- tibble(number = sample_number,
        text = sample_text,
        result = sample_result) |> 
@@ -202,3 +211,577 @@ ROLLBACK;
 ```{sql, connection = con}
 COMMIT;
 ```
+
+# Historical Data
+
+```{r list-files}
+# List the files in the directory
+path <- "01 Input Data/Coastal Water Quality Data/"
+files <- list.files(path = path, pattern = "*.xls*")
+full_path <- paste(path, files, sep = "")
+```
+
+```{r read-excel-function-copy}
+# Create function for extracting data and populating table
+read_bacteria_data <- function(file, sheet){
+  # Extract filename
+  filename <- file |> str_remove("01 Input Data/Coastal Water Quality Data/")
+  
+  # Read Ecoli data
+  data <- read_excel(file,
+                      range = "A1:B1000",
+                      sheet = sheet,
+                      col_names = c("date", "value_cfu_per_100ml"),
+                      col_types = c("date", "numeric"))
+  
+  # If empty tibble, create new empty tibble
+  if (nrow(data) == 0) {
+    data <- tibble(date = date(), value_cfu_per_100ml = numeric())
+    data <- add_case(data, date = NA, value_cfu_per_100ml = NA) |>
+      mutate(date = date(date))
+  }
+  
+  results <- data |>
+    slice(-1) |>
+    filter(!is.na(value_cfu_per_100ml)) |>
+    mutate(
+      date = date(date),
+      file = filename
+      )
+
+  return(results)
+}
+```
+
+```{r run-function}
+# Run the function for faecal streptococci
+faecal <- str_c(path, files) |>
+  map_df(~read_bacteria_data(.x, 3))
+```
+
+```{r summary-statistics}
+# Check summary statistics for faecal streptococci
+faecal |>
+  group_by(file) |>
+  arrange(file) |>
+  summarise(
+    min_date = min(date),
+    max_date = max(date),
+    n = sum(!is.na(value_cfu_per_100ml)),
+    min = min(value_cfu_per_100ml, na.rm = TRUE),
+    max = max(value_cfu_per_100ml, na.rm = TRUE)
+    )
+```
+
+*Faecal streptococci:*
+Some clear threshold values: 2419, 7257, 15000, 4500, 24196, 450, 72588
+Some clear divided data: 0.033, 0.33 and then some strange decimal data but very consistent: 0.1249387
+
+```{r faecal-plot}
+faecal |>
+  ggplot(aes(x = date, y = value_cfu_per_100ml, colour = file)) +
+  geom_point() +
+  theme(legend.position = "none") +
+  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-06-01")))
+```
+
+The faecal streptococci data don't seem to have the same solid lines that the E. coli data had. There are also some streaks but these streaks occur at frequencies that can be reasonably expected from weekly sampling. These are also likely to be due to censored values, which will be dealt with in due course.
+
+The values greater than 70000 come from Enterolert values that were diluted and still exceeded the threshold. The threshold value of 2419 was exceeded, the value was diluted 10 times, and it still exceeded the 24190 value. This was multiplied by 3 to get 72000.
+
+I want to separate out the data that are in one sheet but not in another. 
+Let me start with one file and see how it goes.
+
+```{r added-data}
+faecal <- faecal |>
+  mutate(
+    site_id = str_extract(file, "[:upper:]{2,3}\\d{2}[:upper:]?"),
+    added = str_detect(file, "SSB|CMB")
+      ) |>
+  select(-file)
+
+# Which records have been added to the spreadsheets and are not in the SSB spreadsheets?
+added <- dplyr::setdiff(
+  faecal |> filter(added) |> select(-added),
+  faecal |> filter(!added) |> select(-added)
+  ) |>
+  arrange(date, site_id)
+
+# Combine all the data and remove the duplicates
+all <- dplyr::union(
+  faecal |> filter(added) |> select(-added),
+  faecal |> filter(!added) |> select(-added)
+)
+
+# Keep only the SSB data
+only_ssb <- dplyr::setdiff(all, added)
+
+# Combine the data sets again
+faecal <- bind_rows(
+  added |> mutate(source = "CMB"),
+  only_ssb |> mutate(source = "SSB")
+)
+```
+
+```{r censored-values}
+# Replace censored values with character value including < operator
+faecal <- faecal |>
+  mutate(censored_value = case_when(
+    round(value_cfu_per_100ml, 2) == 0.67 ~ "<2",
+    (round(value_cfu_per_100ml, 2) == 0.33 | value_cfu_per_100ml == 0.3) ~ "<1",
+    round(value_cfu_per_100ml, 3) == 0.033 ~ "<1",
+    round(value_cfu_per_100ml, 2) == 0.12 ~ "<1",
+    round(value_cfu_per_100ml, 2) == 0.22 ~ "<1",
+    round(value_cfu_per_100ml, 2) == 3.33 ~ "<10",
+    round(value_cfu_per_100ml, 2) == 16.67 ~ "<50",
+    round(value_cfu_per_100ml, 2) == 33.33 ~ "<100",
+    round(value_cfu_per_100ml, 2) == 806.67 ~ ">2420",
+    round(value_cfu_per_100ml, 2) == 3.48 ~ "4",
+    round(value_cfu_per_100ml, 2) == 4.18 ~ "4",
+    round(value_cfu_per_100ml, 2) == 2.48 ~ "2",
+    value_cfu_per_100ml == 450 ~ ">150",
+    value_cfu_per_100ml == 4500 ~ ">1500",
+    value_cfu_per_100ml == 15000 ~ ">5000",
+    value_cfu_per_100ml == 7257 ~ ">2419",
+    value_cfu_per_100ml == 1.3 ~ "ND",
+    value_cfu_per_100ml == 72588 ~ ">24196",
+    value_cfu_per_100ml == 24196 ~ ">24196",
+    value_cfu_per_100ml == 15000 ~ ">5000",
+    value_cfu_per_100ml == 1500 & date > "2023-08-01" ~ ">1500",
+    value_cfu_per_100ml == 7257 ~ ">2419",
+    value_cfu_per_100ml == 450 & date > "2023-08-01" & date < "2024-11-01" ~ ">150",
+    .default = as.character(value_cfu_per_100ml)
+    )) |>
+  mutate(censored_value = if_else(censored_value == "0", "ND", censored_value))
+```
+
+Censored values can be found both at the lower detection limits and at the upper detection limits. Streaks at the upper limits can also indicate censored values
+
+```{r upper-censored-values-faecal}
+faecal |>
+  ggplot(aes(x = date, y = value_cfu_per_100ml)) +
+  geom_point(alpha = 0.5) +
+  theme(
+    legend.position = "none"
+  ) +
+  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2024-11-01"))) +
+  scale_x_date(minor_breaks = "1 year") +
+  facet_grid(cols = vars(source))
+```
+
+The obvious streaks that were divisible by 3 were divided by three and preceded by the > operator. Other streaks were visible in the 2023 period that are not a consistent value and cannot be easily divided by 3, and are not therefore obvious censored values. These values are of concern, as the frequency indicates a non-random distribution.
+Values are quite commonly distributed along 50 unit intervals. From mid-2020 to end of 2021 the value of 600 was very common and was replace during this period with <200 because this is common censored value.
+
+For faecal streptococci, similar censored values were replaced with their character equivalents.
+
+```{r check-censored}
+faecal |>
+  distinct(censored_value) |>
+  arrange(censored_value)
+```
+
+```{r plot-censored}
+faecal |>
+  mutate(censored = str_detect(censored_value, "<|>")) |>
+  ggplot(aes(x = date, y = value_cfu_per_100ml, colour = censored)) +
+    geom_point() +
+  coord_cartesian(xlim = c(ymd("2014-01-01"), ymd("2025-01-01")), ylim = c(0, 80000)) +
+  scale_x_date(minor_breaks = "1 year")
+```
+
+```{r summary-statistics}
+# Check summary statistics for faecal streptococci
+faecal |>
+  group_by(site_id) |>
+  arrange(site_id) |>
+  summarise(
+    min_date = min(date),
+    max_date = max(date),
+    n = sum(!is.na(value_cfu_per_100ml)),
+    min = min(value_cfu_per_100ml, na.rm = TRUE) |> as.integer(),
+    max = max(value_cfu_per_100ml, na.rm = TRUE) |> as.integer()
+    )
+
+# Plot by site
+faecal |>
+  mutate(month = floor_date(date, unit = "months")) |>
+  ggplot(aes(x = month, y = value_cfu_per_100ml)) +
+  geom_col() +
+  scale_x_date(minor_breaks = "1 year")
+```
+
+```{r save-data}
+faecal |>
+  mutate(numeric_value = case_when(
+    censored_value |> str_detect("<") ~ censored_value |> str_remove("<|\\s") |> as.numeric() / 3,
+    censored_value |> str_detect(">") ~ censored_value |> str_remove(">|\\s") |> as.numeric() * 3,
+    censored_value |> str_detect("ND") ~ 0,
+    .default = censored_value |> as.numeric()
+  )) |>
+  write_csv("02 Output Data/01 CSV/faecal_streptococci_data_clean.csv")
+```
+
+
+# Compare 2023 data between City of Cape Town and Infinity
+
+In 2023/2024 data samples were collected with sample codes that don't match any other sample codes in the monitoring programme. I want to see how well our data corresponds to City of Cape Town data.
+
+```{r read-sabs}
+# Read in SABS data from Infinity
+sabs <- read_excel("../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/07_Cleaned Data/Coastal WQ Weekly 2023-24_cleaned.xlsx",
+           col_names = c(
+             "site_description",
+             "cct_code",
+             "cct_code_updated",
+             "updated",
+             "coords",
+             "area",
+             "week",
+             "sample_date",
+             "temp_c",
+             "sabs_code",
+             "enterococci_cfu_per_100ml",
+             "enterococci_cfu_per_100ml_numeric",
+             "sabs_sheet",
+             "issues_flagged",
+             "comments"
+           ), col_types = c(
+             "text",
+             "text",
+             "text",
+             "text",
+             "text",
+             "text",
+             "numeric",
+             "date",
+             "numeric",
+             "text",
+             "text",
+             "numeric",
+             "text",
+             "text",
+             "text"
+           ), 
+           skip = 1)
+
+# Unique sites and descriptions
+sabs |>
+  distinct(cct_code, cct_code_updated, site_description) |>
+  arrange(cct_code)
+
+# Summarise data
+sabs |>
+  summary()
+
+# Check when coastal data end
+tbl(con, I("coastal.results")) |>
+  arrange(sample_date) |>
+  arrange(sample_date)
+
+# Export clean data to file
+sabs |>
+  select(cct_code_updated, sample_date, enterococci_cfu_per_100ml, enterococci_cfu_per_100ml_numeric, week) |>
+  mutate(cct_code_updated = fct(cct_code_updated)) |>
+  filter(!is.na(sample_date)) |>
+  rename(site_id = cct_code_updated, censored_value = enterococci_cfu_per_100ml) |>
+  mutate(numeric_value = case_when(
+    censored_value |> str_detect("<") ~ censored_value |> str_remove("<|\\s") |> as.numeric() / 3,
+    censored_value |> str_detect(">") ~ censored_value |> str_remove(">|\\s") |> as.numeric() * 3,
+    censored_value |> str_detect("ND") ~ 0,
+    .default = censored_value |> as.numeric()
+  )) |>
+  select(sample_date, site_id, censored_value, numeric_value) |>
+  write_csv("02 Output Data/01 CSV/sabs_data_clean.csv")
+```
+
+```{r join-data}
+# Create simple table for SABS data that aligns with CCT data
+sabs2023 <- sabs |>
+  select(cct_code_updated, sample_date, enterococci_cfu_per_100ml, enterococci_cfu_per_100ml_numeric, week) |>
+  mutate(cct_code_updated = fct(cct_code_updated)) |>
+  filter(!is.na(sample_date)) |>
+  rename(site_id = cct_code_updated, censored_value = enterococci_cfu_per_100ml) |>
+  mutate(numeric_value = case_when(
+    censored_value |> str_detect("<") ~ censored_value |> str_remove("<|\\s") |> as.numeric() / 3,
+    censored_value |> str_detect(">") ~ censored_value |> str_remove(">|\\s") |> as.numeric() * 3,
+    censored_value |> str_detect("ND") ~ 0,
+    .default = censored_value |> as.numeric()
+  )) |>
+  select(sample_date, site_id, censored_value, numeric_value)
+
+# How many records for each site?
+filter(sabs2023) |>
+  group_by(site_id) |>
+  count() |>
+  arrange(-n)
+
+# Create a table with data for the same period as the SABS data
+faec2023_full <- faecal |>
+  filter(date >= "2023-10-03" & date <= "2024-11-06" & full) |>
+  rename(sample_date = date, enterococci_cfu_per_100ml = censored_value) |>
+  select(site_id, sample_date, enterococci_cfu_per_100ml) |>
+  mutate(enterococci_cfu_per_100ml = if_else(enterococci_cfu_per_100ml == "<1", "ND", enterococci_cfu_per_100ml))
+
+faec2023_ssb <- faecal |>
+  filter(date >= "2023-10-03" & date <= "2024-11-06" & !full) |>
+  rename(sample_date = date, enterococci_cfu_per_100ml = censored_value) |>
+  select(site_id, sample_date, enterococci_cfu_per_100ml) |>
+  mutate(enterococci_cfu_per_100ml = if_else(enterococci_cfu_per_100ml == "<1", "ND", enterococci_cfu_per_100ml))
+
+# How many sites for each?
+sabs2023 |>
+  distinct(site_id) # 36 sites
+
+faec2023_full |>
+  distinct(site_id) # 20 sites
+
+faec2023_ssb |>
+  distinct(site_id) # 62 sites
+
+# Find sites that do not have a combined spreadsheet
+sites_not_combined <- setdiff(distinct(faec2023_ssb, site_id), distinct(faec2023_full, site_id)) |> pull(1)
+
+# Number of records
+nrow(sabs2023) # 1549
+nrow(faec2023) # 1877
+
+# Combine the three data sets
+faec2023_full |> mutate(dataset = "SSB + CMB") |>
+  bind_rows(sabs2023 |> mutate(dataset = "SABS")) |>
+  bind_rows(faec2023_ssb |> mutate(dataset = "SSB")) |>
+  arrange(sample_date, site_id, dataset, enterococci_cfu_per_100ml) |>
+  filter(!(site_id %in% sites_not_combined & dataset == "SSB"))
+
+sabs |>
+  distinct(cct_code, cct_code_updated, site_description) |>
+  arrange(cct_code)
+
+# Handle censored values the same way
+sabs <- sabs |>
+  mutate(numeric = case_when(
+    str_detect(enterococci_cfu_per_100ml, "<") ~ 0,
+    str_detect(enterococci_cfu_per_100ml, ">") ~ as.numeric(str_remove(enterococci_cfu_per_100ml, ">")) * 3,
+    str_detect(enterococci_cfu_per_100ml, "ND") ~ 0,
+    .default = as.numeric(enterococci_cfu_per_100ml)
+  ),
+  sample_date = date(sample_date))
+
+faec2023 <- faec2023 |>
+  mutate(numeric = case_when(
+    str_detect(enterococci_cfu_per_100ml, "<") ~ 0,
+    str_detect(enterococci_cfu_per_100ml, ">") ~ as.numeric(str_remove(enterococci_cfu_per_100ml, ">")) * 3,
+    str_detect(enterococci_cfu_per_100ml, "ND") ~ 0,
+    .default = as.numeric(enterococci_cfu_per_100ml)
+  ))
+
+ggplot() +
+  geom_point(data = sabs, aes(x = sample_date, y = numeric, colour = "SABS Data")) +
+  geom_point(data = faec2023, aes(x = sample_date, y = numeric, colour = "CCT Data")) +
+  theme(
+    legend.position = "none"
+  )
+
+sabs |>
+  full_join(faec2023, by = c("sample_date" = "date", "cct_code_updated" = "site_id"), keep = TRUE) |>
+  select(cct_code_updated, sample_date, site_id, date, enterococci_cfu_per_100ml, value_cfu_per_100ml) |>
+  filter(!if_any(c(cct_code_updated, site_id), is.na))
+
+faecal |>
+  filter(value_cfu_per_100ml > 60000)
+
+filter(faecal, date == "2024-10-09" & site_id == "CN22")
+
+```
+
+Possible scenarios:
+1. Exists in CCT SSB + CMB data + not in CCT SSB data + not in SABS data (SSB data that is not the SABS data)(sample date wrong in Excel)
+2. Exists in CCT SSB + CMB data + not in CCT SSB data + exists in SABS data (SSB data that is from SABS data)(ideal)
+3. No SSB + CMB sheet + not in CCT SSB + exists in SABS (No sheet for weekly samples)
+4. No sheet in CCT + exists in SABS (site code not part of larger monitoring programme, doesn't correspond to current site code)
+5. Not in CCT SSB + CMB + not in CCT SSB data + exists in SABS data (not captured)(not ideal)
+6. Exists in CCT SSB + CMB + exists in CCT SSB + not in SABS data (SSB Data)(ideal)
+
+The data set from Infinity has 1565 records, and for the same period, the CCT data set has 1877 records.
+There are 569 combinations of site and date that exist in both data sets. There is some agreement between the values - many of the values of 3.33333 or 0 are ND values in the Infinity data. Some values do not agree between 
+SABS data has 1565 records
+
+# Hazen Method
+
+```{r test-hazen}
+hazen_annual <- results |>
+  group_by(year = year(date)) |>
+  summarise(
+    min_date = min(date),
+    max_date = max(date),
+    n_ecoli = sum(!is.na(ecoli_cfu_per_100ml)),
+    hazen95_ecoli = quantile(ecoli_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
+    hazen90_ecoli = quantile(ecoli_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
+    hazen_category_ecoli = case_when(
+      n_ecoli < 10 ~ "Not enough samples",
+      hazen95_ecoli <= 100 ~ "Excellent",
+      hazen95_ecoli <= 200 ~ "Good",
+      hazen95_ecoli > 200 & hazen90_ecoli > 185 ~ "Poor",
+      hazen95_ecoli > 200 & hazen90_ecoli < 185 ~ "Sufficient"
+  ),
+    n_faecal = sum(!is.na(faecal_streptococci_cfu_per_100ml)),
+    hazen95_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
+    hazen90_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
+  hazen_category_faecal = case_when(
+      n_faecal < 10 ~ "Not enough samples",
+      hazen95_faecal <= 100 ~ "Excellent",
+      hazen95_faecal <= 200 ~ "Good",
+      hazen95_faecal > 200 & hazen90_faecal > 185 ~ "Poor",
+      hazen95_faecal > 200 & hazen90_faecal < 185 ~ "Sufficient"
+  )
+  ) |>
+  mutate(hazen_category_ecoli = fct(hazen_category_ecoli, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent"))) |>
+  mutate(hazen_category_faecal = fct(hazen_category_faecal, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent")))
+```
+
+```{r test-hazen}
+hazen_annual_site <- results |>
+  group_by(year = year(date), site_id) |>
+  summarise(
+    min_date = min(date),
+    max_date = max(date),
+    n_ecoli = sum(!is.na(ecoli_cfu_per_100ml)),
+    hazen95_ecoli = quantile(ecoli_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
+    hazen90_ecoli = quantile(ecoli_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
+    hazen_category_ecoli = case_when(
+      n_ecoli < 10 ~ "Not enough samples",
+      hazen95_ecoli <= 100 ~ "Excellent",
+      hazen95_ecoli <= 200 ~ "Good",
+      hazen95_ecoli > 200 & hazen90_ecoli > 185 ~ "Poor",
+      hazen95_ecoli > 200 & hazen90_ecoli < 185 ~ "Sufficient"
+  ),
+    n_faecal = sum(!is.na(faecal_streptococci_cfu_per_100ml)),
+    hazen95_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
+    hazen90_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
+  hazen_category_faecal = case_when(
+      n_faecal < 10 ~ "Not enough samples",
+      hazen95_faecal <= 100 ~ "Excellent",
+      hazen95_faecal <= 200 ~ "Good",
+      hazen95_faecal > 200 & hazen90_faecal > 185 ~ "Poor",
+      hazen95_faecal > 200 & hazen90_faecal < 185 ~ "Sufficient"
+  )
+  ) |>
+  mutate(hazen_category_ecoli = fct(hazen_category_ecoli, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent"))) |>
+  mutate(hazen_category_faecal = fct(hazen_category_faecal, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent")))
+```
+
+```{r plot-hazen}
+hazen_annual |>
+  ggplot(aes(x = year)) +
+  labs(x = "Year") +
+  geom_tile(aes(fill = hazen_category_ecoli)) +
+  scale_fill_brewer(name = "Water Quality Category", type = "div", palette = "RdYlGn")
+
+RColorBrewer::display.brewer.all()
+```
+
+```{r}
+sites |>
+  inner_join(hazen_annual)
+```
+
+# LIMS Data
+
+```{r read-lims-data}
+lims <- read_excel("01 Input Data/Coastal Water Quality Data/LIMS Data/LIMS Data.xlsm",
+           col_names = c("sample_date", "site_id", "lab_owner", "analysis", "enterococci_cfu_per_100ml", "sample_number"),
+           col_types = c("date", "text", "text", "text", "text", "numeric"),
+           skip = 1)
+
+# Have a look at the data
+glimpse(lims)
+summary(lims)
+head(lims)
+tail(lims)
+slice_sample(lims, n = 50)
+```
+
+```{r clean-site-codes}
+lims |>
+  distinct(site_id) |>
+  arrange(site_id)
+
+# Clean the codes
+lims <- lims |>
+  mutate(site_id = case_when(
+    site_id == "CN9_EAST" ~ "CS09",
+    .default = str_to_upper(site_id)
+  ))
+```
+
+```{r clean-data}
+# Which sites in the LIMS data are not in the database or in the Excel data?
+sites_not_in <- dplyr::setdiff(
+  lims |> mutate(site_id = str_to_upper(site_id)) |> distinct(site_id),
+  tbl(con, I("coastal.sites")) |> collect() |> distinct(site_id)
+) |> pull()
+
+# Current sites
+tbl(con, I("coastal.sites")) |> collect()
+
+# Filter LIMS data for only sites that are currently being monitored
+lims |>
+  filter((site_id %in% sites_not_in)) |>
+  group_by(site_id) |>
+  summarise(
+    min_date = min(sample_date),
+    max_date = max(sample_date),
+    sample_size = n(),
+    min_value = min(enterococci_cfu_per_100ml),
+    max_value = max(enterococci_cfu_per_100ml)
+            ) |>
+  filter(sample_size > 30)
+
+# Which of these have been running for a long time?
+# If we confirm that we want to include these data, I will need a mapping
+# For now, I exclude the sites that are not currently monitored
+```
+
+```{r clean-values}
+lims |>
+  distinct(enterococci_cfu_per_100ml)
+
+lims <- lims |>
+  mutate(enterococci_cfu_per_100ml = case_when(
+    enterococci_cfu_per_100ml == 450 ~ ">150",
+    enterococci_cfu_per_100ml == 2419 ~ ">2419",
+    enterococci_cfu_per_100ml == 4500 ~ ">1500",
+    enterococci_cfu_per_100ml == 24196 ~ ">24196",
+    enterococci_cfu_per_100ml |> str_detect("nr|og") ~ NA,
+    .default = enterococci_cfu_per_100ml
+  )) |>
+  filter(!is.na(enterococci_cfu_per_100ml))
+  
+# Create new numeric values from character data
+lims <- lims |>
+  filter(!is.na(enterococci_cfu_per_100ml)) |>
+  mutate(enterococci_cfu_per_100ml_numeric = case_when(
+    str_detect(enterococci_cfu_per_100ml, "<") ~ str_remove(enterococci_cfu_per_100ml, "<") |> as.numeric() / 3,
+    str_detect(enterococci_cfu_per_100ml, ">") ~ str_remove(enterococci_cfu_per_100ml, ">") |> as.numeric() * 3,
+    .default = as.numeric(enterococci_cfu_per_100ml)
+  ))
+
+# Write to csv
+lims |>
+  mutate(sample_date = date(sample_date)) |>
+  rename(censored_value = enterococci_cfu_per_100ml, numeric_value = enterococci_cfu_per_100ml_numeric) |>
+  select(sample_date, site_id, lab_owner, analysis, censored_value, numeric_value, sample_number) |>
+  write_csv("02 Output Data/01 CSV/lims_data_clean.csv")
+```
+
+Can CN05A be connected to CN05 (Green Point Pump Station)?
+Can CN06A be connected to CN06 Three Anchor Bay NW Rocks or CN06C Rocklands Beach?
+CN12B can be connected to CN12A because they are combined in the spreadsheets
+CN15?
+CN20O Maiden's Cove Tidal Pool Outside?
+CS01 connected to CS01A Kalk Bay Harbour Beach?
+CS05 connected to what?
+CS08 connected to what?
+CS12 connected to what?
+CS24E and CS24W connected to what?
+XCS16
+XCS33
