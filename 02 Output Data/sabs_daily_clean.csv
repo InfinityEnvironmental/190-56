@@ -1,0 +1,402 @@
+sample_date,analysis_completed,site_description,site_id,sample_time,censored_value
+04-06-2024,04-06-2024,Camps Bay In front of Lifesaving Tower,ICS12,11h21,>150
+05-06-2024,05-06-2024,Camps Bay In front of Lifesaving Tower,ICS12,09h26,5
+06-06-2024,06-06-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h50,24
+07-06-2024,07-06-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,2
+10-06-2024,10-06-2024,Camps Bay In front of Lifesaving Tower,ICS12,09h32,7
+11-06-2024,11-06-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h30,None found
+12-06-2024,12-06-2024,Camps Bay In front of Lifesaving Tower,ICS12,09h14,13
+12-06-2024,12-06-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h40,6
+12-06-2024,12-06-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h46,78
+13-06-2024,13-06-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,39
+14-06-2024,14-06-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,14
+19-06-2024,19-06-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,108
+20-06-2024,20-06-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,6
+01-07-2024,01-07-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,13
+03-07-2024,03-07-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,>150
+04-07-2024,04-07-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h42,38
+05-07-2024,05-07-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h00,46
+08-07-2024,08-07-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,107
+09-07-2024,09-07-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,>150
+10-07-2024,10-07-2024,Camps Bay In front of Lifesaving Tower,ICS12,09h45,88
+12-07-2024,12-07-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h30,67
+12-07-2024,12-07-2024,Camps Bay In front of Lifesaving Tower,ICS12,12h40,76
+15-07-2024,15-07-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h40,63
+16-07-2024,16-07-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,40
+17-07-2024,17-07-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,24
+18-07-2024,18-07-2024,Camps Bay In front of Lifesaving Tower,ICS12,11h30,84
+19-07-2024,19-07-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,38
+01-08-2024,01-08-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,3
+05-08-2024,05-08-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h30,5
+06-08-2024,06-08-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,21
+08-08-2024,08-08-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h19,22
+12-08-2024,12-08-2024,Camps Bay In front of Lifesaving Tower,ICS12,11h00,56
+13-08-2024,14-08-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,21
+14-08-2024,14-08-2024,Camps Bay In front of Lifesaving Tower,ICS12,09h40,15
+14-08-2024,14-08-2024,Camps Bay In front of Lifesaving Tower,ICS12,11h30,31
+15-08-2024,16-08-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h00,11
+16-08-2024,16-08-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,2
+20-08-2024,20-08-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h00,None found
+20-08-2024,20-08-2024,Strandfontein Point East of Tidal Pool,ICS12,10h00,None found
+20-08-2024,20-08-2024,Camps Bay Central,CN41,10h12,None found
+20-08-2024,20-08-2024,Glen Beach,CN31,10h05,None found
+20-08-2024,20-08-2024,Saunders Rocks,ICS14,10h25,None found
+20-08-2024,20-08-2024,Mouille Point,CN04,10h53,None found
+02-09-2024,02-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h25,None found
+02-09-2024,02-09-2024,Camps Bay Central,CN41,10h30,None found
+02-09-2024,02-09-2024,Glen Beach,CN31,11h00,None found
+02-09-2024,02-09-2024,Mouille Point,CN04,11h25,None found
+03-09-2024,03-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,13h50,None found
+03-09-2024,03-09-2024,Camps Bay Central,CN41,13h55,None found
+03-09-2024,03-09-2024,Glen Beach,CN31,14h08,None found
+03-09-2024,03-09-2024,Mouille Point,CN04,14h40,None found
+04-09-2024,05-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,12h25,None found
+04-09-2024,05-09-2024,Camps Bay Central,CN41,12h34,None found
+04-09-2024,05-09-2024,Glen Beach,CN31,12h52,None found
+04-09-2024,05-09-2024,Mouille Point,CN04,13h32,None found
+04-09-2024,04-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,08h44,None found
+05-09-2024,05-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h30,None found
+05-09-2024,05-09-2024,Camps Bay Central,CN41,10h35,None found
+05-09-2024,05-09-2024,Glen Beach,CN31,10h50,4
+05-09-2024,05-09-2024,Mouille Point,CN04,11h20,2
+06-09-2024,06-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h06,None found
+06-09-2024,06-09-2024,Camps Bay Central,CN41,10h12,None found
+06-09-2024,06-09-2024,Glen Beach,CN31,10h25,None found
+06-09-2024,06-09-2024,Mouille Point,CN04,11h00,None found
+09-09-2024,09-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h30,3
+09-09-2024,09-09-2024,Camps Bay Central,CN41,10h35,None found
+09-09-2024,09-09-2024,Glen Beach,CN31,10h55,None found
+09-09-2024,09-09-2024,Mouille Point,CN04,11h20,None found
+10-09-2024,10-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,11h58,None found
+10-09-2024,10-09-2024,Camps Bay Central,CN41,11h53,None found
+10-09-2024,10-09-2024,Glen Beach,CN31,11h40,None found
+10-09-2024,10-09-2024,Mouille Point,CN04,11h12,None found
+10-09-2024,10-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h37,None found
+11-09-2024,11-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h50,None found
+11-09-2024,11-09-2024,Camps Bay Central,CN41,10h55,None found
+11-09-2024,11-09-2024,Glen Beach,CN31,11h15,>150
+11-09-2024,11-09-2024,Mouille Point,CN04,11h45,>150
+12-09-2024,12-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h10,None found
+12-09-2024,12-09-2024,Camps Bay Central,CN41,10h17,None found
+12-09-2024,12-09-2024,Glen Beach,CN31,10h30,None found
+12-09-2024,12-09-2024,Mouille Point,CN04,11h00,None found
+13-09-2024,13-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h45,None found
+13-09-2024,13-09-2024,Camps Bay Central,CN41,10h50,None found
+13-09-2024,13-09-2024,Glen Beach,CN31,11h00,None found
+13-09-2024,13-09-2024,Mouille Point,CN04,11h45,None found
+16-09-2024,16-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,11h30,None found
+16-09-2024,16-09-2024,Camps Bay Central,CN41,11h45,None found
+16-09-2024,16-09-2024,Glen Beach,CN31,12h35,None found
+16-09-2024,16-09-2024,Mouille Point,CN04,12h55,None found
+17-09-2024,17-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,11h45,None found
+17-09-2024,17-09-2024,Camps Bay Central,CN41,11h50,5
+17-09-2024,17-09-2024,Glen Beach,CN31,12h05,9
+17-09-2024,17-09-2024,Mouille Point,CN04,12h30,65
+17-09-2024,17-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,08h45,12
+19-09-2024,19-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,None found
+19-09-2024,19-09-2024,Camps Bay Central,CN41,NA,None found
+19-09-2024,19-09-2024,Glen Beach,CN31,NA,None found
+19-09-2024,19-09-2024,Mouille Point,CN04,NA,None found
+20-09-2024,20-09-2024,Camps Bay In front of Lifesaving Tower,ICS12,NA,None found
+20-09-2024,20-09-2024,Camps Bay Central,CN41,NA,None found
+20-09-2024,20-09-2024,Glen Beach,CN31,NA,None found
+20-09-2024,20-09-2024,Mouille Point,CN04,NA,None found
+03-10-2024,03-10-2024,Camps Bay In front of Lifesaving Tower,ICS12,12h45,1
+03-10-2024,03-10-2024,Camps Bay Central,CN41,13h00,8
+03-10-2024,03-10-2024,Glen Beach,CN31,13h15,1
+03-10-2024,03-10-2024,Mouille Point,CN04,13h37,None found
+04-10-2024,04-10-2024,Camps Bay In front of Lifesaving Tower,ICS12,12h13,1
+04-10-2024,04-10-2024,Camps Bay Central,CN41,12h20,None found
+04-10-2024,04-10-2024,Glen Beach,CN31,12h26,None found
+04-10-2024,04-10-2024,Mouille Point,CN04,12h50,141
+07-10-2024,07-10-2024,Camps Bay In front of Lifesaving Tower,ICS12,13h30,34
+07-10-2024,07-10-2024,Camps Bay Central,CN41,13h35,34
+07-10-2024,07-10-2024,Glen Beach,CN31,13h45,2
+07-10-2024,07-10-2024,Mouille Point,CN04,14h15,2
+08-10-2024,08-10-2024,Camps Bay In front of Lifesaving Tower,ICS12,12h30,8
+08-10-2024,08-10-2024,Camps Bay Central,CN41,12h40,6
+08-10-2024,08-10-2024,Glen Beach,CN31,12h55,3
+08-10-2024,08-10-2024,Mouille Point,CN04,13h20,1
+09-10-2024,09-10-2024,Camps Bay In front of Lifesaving Tower,ICS12,11h00,18
+09-10-2024,09-10-2024,Camps Bay Central,CN41,11h05,16
+09-10-2024,09-10-2024,Glen Beach,CN31,11h13,43
+09-10-2024,09-10-2024,Mouille Point,CN04,11h36,3
+09-10-2024,09-10-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h29,None found
+10-10-2024,11-10-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h30,3
+10-10-2024,11-10-2024,Camps Bay Central,CN41,10h40,3
+10-10-2024,11-10-2024,Glen Beach,CN31,10h50,4
+10-10-2024,11-10-2024,Mouille Point,CN04,11h30,1
+11-10-2024,11-10-2024,Camps Bay In front of Lifesaving Tower,ICS12,11h16,14
+11-10-2024,11-10-2024,Camps Bay Central,CN41,11h26,3
+11-10-2024,11-10-2024,Glen Beach,CN31,11h39,7
+11-10-2024,11-10-2024,Mouille Point,CN04,12h00,None found
+14-10-2024,15-10-2024,Camps Bay In front of Lifesaving Tower,ICS12,12h19,20
+14-10-2024,15-10-2024,Camps Bay Central,CN41,12h22,1
+14-10-2024,15-10-2024,Glen Beach,CN31,12h34,2
+14-10-2024,15-10-2024,Mouille Point,CN04,12h57,4
+15-10-2024,15-10-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h02,3
+15-10-2024,15-10-2024,Camps Bay Central,CN41,10h14,9
+15-10-2024,15-10-2024,Glen Beach,CN31,10h25,5
+15-10-2024,15-10-2024,Mouille Point,CN04,11h19,4
+16-10-2024,17-10-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h30,1
+16-10-2024,17-10-2024,Camps Bay Central,CN41,10h35,3
+16-10-2024,17-10-2024,Glen Beach,CN31,10h50,2
+16-10-2024,17-10-2024,Mouille Point,CN04,11h15,1
+17-10-2024,18-10-2024,Camps Bay In front of Lifesaving Tower,ICS12,11h24,17
+17-10-2024,18-10-2024,Camps Bay Central,CN41,11h27,4
+17-10-2024,18-10-2024,Glen Beach,CN31,11h38,147
+17-10-2024,18-10-2024,Mouille Point,CN04,11h58,None found
+18-10-2024,19-10-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h10,None found
+18-10-2024,19-10-2024,Camps Bay Central,CN41,10h15,1
+18-10-2024,19-10-2024,Glen Beach,CN31,10h30,2
+18-10-2024,19-10-2024,Mouille Point,CN04,10h55,None found
+01-11-2024,01-11-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h29,5
+01-11-2024,01-11-2024,Camps Bay Central,CN41,10h23,6
+01-11-2024,01-11-2024,Glen Beach,CN31,10h38,2
+01-11-2024,01-11-2024,Mouille Point,CN04,11h05,3
+04-11-2024,05-11-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h29,3
+04-11-2024,05-11-2024,Camps Bay Central,CN41,10h23,4
+04-11-2024,05-11-2024,Glen Beach,CN31,10h38,17
+04-11-2024,05-11-2024,Mouille Point,CN04,11h05,21
+05-11-2024,06-11-2024,Camps Bay In front of Lifesaving Tower,ICS12,11h36,6
+05-11-2024,06-11-2024,Camps Bay Central,CN41,11h40,17
+05-11-2024,06-11-2024,Glen Beach,CN31,11h46,3
+05-11-2024,06-11-2024,Mouille Point,CN04,12h10,2
+06-11-2024,06-11-2024,Camps Bay In front of Lifesaving Tower,ICS12,11h27,None found
+06-11-2024,06-11-2024,Camps Bay Central,CN41,11h32,4
+06-11-2024,06-11-2024,Glen Beach,CN31,11h38,2
+06-11-2024,06-11-2024,Mouille Point,CN04,12h08,1
+07-11-2024,07-11-2024,Camps Bay In front of Lifesaving Tower,ICS12,11h22,1
+07-11-2024,07-11-2024,Camps Bay Central,CN41,11h29,None found
+07-11-2024,07-11-2024,Glen Beach,CN31,11h33,None found
+07-11-2024,07-11-2024,Mouille Point,CN04,09h53,None found
+07-11-2024,07-11-2024,Hout Bay Mariners wharf,HB13,10h37,7
+07-11-2024,07-11-2024,Hout Bay,XCN10,10h48,13
+08-11-2024,08-11-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h47,None found
+08-11-2024,08-11-2024,Camps Bay Central,CN41,10h44,None found
+08-11-2024,08-11-2024,Glen Beach,CN31,11h01,4
+08-11-2024,08-11-2024,Mouille Point,CN04,11h24,None found
+08-11-2024,08-11-2024,Hout Bay Mariners wharf,HB13,10h17,20
+08-11-2024,08-11-2024,Hout Bay,XCN10,10h08,9
+11-11-2024,11-11-2024,Camps Bay In front of Lifesaving Tower,ICS12,09h36,35
+11-11-2024,11-11-2024,Camps Bay Central,CN41,09h40,2
+11-11-2024,11-11-2024,Glen Beach,CN31,10h00,3
+11-11-2024,11-11-2024,Mouille Point,CN04,10h20,1
+11-11-2024,11-11-2024,Hout Bay Mariners wharf,HB13,09h17,29
+11-11-2024,11-11-2024,Hout Bay,XCN10,09h07,4
+12-11-2024,12-11-2024,Camps Bay In front of Lifesaving Tower,ICS12,09h09,2
+12-11-2024,12-11-2024,Camps Bay Central,CN41,09h20,3
+12-11-2024,12-11-2024,Glen Beach,CN31,09h31,1
+12-11-2024,12-11-2024,Mouille Point,CN04,10h27,None found
+12-11-2024,12-11-2024,Hout Bay Mariners wharf,HB13,08h21,24
+12-11-2024,12-11-2024,Hout Bay,XCN10,08h11,16
+13-11-2024,13-11-2024,Camps Bay In front of Lifesaving Tower,ICS12,09h39,2
+13-11-2024,13-11-2024,Camps Bay Central,CN41,09h36,1
+13-11-2024,13-11-2024,Glen Beach,CN31,09h53,39
+13-11-2024,13-11-2024,Mouille Point,CN04,10h15,73
+13-11-2024,13-11-2024,Hout Bay Mariners wharf,HB13,09h08,15
+13-11-2024,13-11-2024,Hout Bay,XCN10,08h59,2
+14-11-2024,14-11-2024,Camps Bay In front of Lifesaving Tower,ICS12,09h21,None found
+14-11-2024,14-11-2024,Camps Bay Central,CN41,09h17,1
+14-11-2024,14-11-2024,Glen Beach,CN31,10h31,None found
+14-11-2024,14-11-2024,Mouille Point,CN04,10h56,9
+14-11-2024,14-11-2024,Hout Bay Mariners wharf,HB13,09h50,4
+14-11-2024,14-11-2024,Hout Bay,XCN10,09h40,56
+15-11-2024,15-11-2024,Camps Bay In front of Lifesaving Tower,ICS12,12h30,1
+15-11-2024,15-11-2024,Camps Bay Central,CN41,12h34,3
+15-11-2024,15-11-2024,Glen Beach,CN31,12h50,3
+15-11-2024,15-11-2024,Mouille Point,CN04,13h15,7
+15-11-2024,15-11-2024,Hout Bay Mariners wharf,HB13,11h52,6
+15-11-2024,15-11-2024,Hout Bay,XCN10,11h41,48
+18-11-2024,18-11-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h15,None found
+18-11-2024,18-11-2024,Camps Bay Central,CN41,10h20,None found
+18-11-2024,18-11-2024,Glen Beach,CN31,10h05,2
+18-11-2024,18-11-2024,Mouille Point,CN04,09h40,None found
+18-11-2024,18-11-2024,Hout Bay Mariners wharf,HB13,10h55,8
+18-11-2024,18-11-2024,Hout Bay,XCN10,11h05,19
+19-11-2024,19-11-2024,Camps Bay In front of Lifesaving Tower,ICS12,12h20,6
+19-11-2024,19-11-2024,Camps Bay Central,CN41,12h25,1
+19-11-2024,19-11-2024,Glen Beach,CN31,12h44,None found
+19-11-2024,19-11-2024,Mouille Point,CN04,13h17,None found
+19-11-2024,19-11-2024,Hout Bay Mariners wharf,HB13,11h56,12
+19-11-2024,19-11-2024,Hout Bay,XCN10,11h25,16
+20-11-2024,20-11-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h48,2
+20-11-2024,20-11-2024,Camps Bay Central,CN41,10h53,None found
+20-11-2024,20-11-2024,Glen Beach,CN31,11h13,None found
+20-11-2024,20-11-2024,Mouille Point,CN04,11h42,4
+20-11-2024,20-11-2024,Hout Bay Mariners wharf,HB13,10h16,26
+20-11-2024,20-11-2024,Hout Bay,XCN10,10h03,17
+02-12-2024,02-12-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h55,None found
+02-12-2024,02-12-2024,Camps Bay Central,CN41,10h52,None found
+02-12-2024,02-12-2024,Glen Beach,CN31,11h05,1
+02-12-2024,02-12-2024,Hout Bay,XCN10,13h25,2
+02-12-2024,02-12-2024,Clifton 4 th Beach,CN09,14h00,7
+03-12-2024,03-12-2024,Camps Bay infront of Lifesaving Tower,ICS12,11h05,3
+03-12-2024,03-12-2024,Camps Bay Central,CN41,11h02,1
+03-12-2024,03-12-2024,Glen Beach,CN31,11h22,4
+04-12-2024,04-12-2024,Camps Bay In front of Lifesaving Tower,ICS12,11h41,None found
+04-12-2024,04-12-2024,Camps Bay Central,CN41,11h39,1
+04-12-2024,04-12-2024,Glen Beach,CN31,11h55,None found
+05-12-2024,05-12-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h49,12
+05-12-2024,05-12-2024,Camps Bay Central,CN41,10h45,8
+05-12-2024,05-12-2024,Glen Beach,CN31,11h03,19
+06-12-2024,06-12-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h02,39
+06-12-2024,06-12-2024,Camps Bay Central,CN41,09h59,21
+06-12-2024,06-12-2024,Glen Beach,CN31,10h12,52
+09-12-2024,09-12-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h28,36
+09-12-2024,09-12-2024,Camps Bay Central,CN41,10h25,12
+09-12-2024,09-12-2024,Glen Beach,CN31,10h44,18
+10-12-2024,10-12-2024,Camps Bay In front of Lifesaving Tower,ICS12,09h35,14
+10-12-2024,10-12-2024,Camps Bay Central,CN41,09h31,5
+10-12-2024,10-12-2024,Glen Beach,CN31,09h46,9
+10-12-2024,10-12-2024,Camps Bay pool side 1,AH01,10h45,162
+10-12-2024,10-12-2024,Camps Bay pool side 2,AH01,10h50,111
+10-12-2024,10-12-2024,Camps Bay pool back wall,AH01,10h47,26
+10-12-2024,10-12-2024,Camps Bay pool southern wall,AH01,11h00,11
+11-12-2024,11-12-2024,Camps Bay In front of Lifesaving Tower,ICS12,09h59,2
+11-12-2024,11-12-2024,Camps Bay Central,CN41,09h55,1
+11-12-2024,11-12-2024,Glen Beach,CN31,10h10,5
+12-12-2024,12-12-2024,Camps Bay In front of Lifesaving Tower,ICS12,08h45,12
+12-12-2024,12-12-2024,Camps Bay Central,CN41,08h42,7
+12-12-2024,12-12-2024,Glen Beach,CN31,08h56,6
+13-12-2024,13-12-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h19,3
+13-12-2024,13-12-2024,Camps Bay Central,CN41,10h15,1
+13-12-2024,13-12-2024,Glen Beach,CN31,10h28,4
+17-12-2024,17-12-2024,Camps Bay In front of Lifesaving Tower,ICS12,09h56,None found
+17-12-2024,17-12-2024,Camps Bay Central,CN41,09h53,None found
+17-12-2024,17-12-2024,Glen Beach,CN31,10h06,2
+19-12-2024,19-12-2024,Camps Bay In front of Lifesaving Tower,ICS12,10h21,4
+19-12-2024,19-12-2024,Camps Bay Central,CN41,10h19,2
+19-12-2024,19-12-2024,Glen Beach,CN31,10h31,1
+20-12-2024,20-12-2024,Camps Bay In front of Lifesaving Tower,ICS12,09h05,2
+20-12-2024,20-12-2024,Camps Bay Central,CN41,09h10,1
+20-12-2024,20-12-2024,Glen Beach,CN31,09h30,1
+02-01-2025,02-01-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h20,11
+02-01-2025,02-01-2025,Camps Bay Central,CN41,10h15,2
+02-01-2025,02-01-2025,Glen Beach,CN31,10h35,9
+03-01-2025,03-01-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h37,4
+03-01-2025,03-01-2025,Camps Bay Central,CN41,10h42,6
+03-01-2025,03-01-2025,Glen Beach,CN31,10h56,24
+06-01-2025,06-01-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h33,1
+06-01-2025,06-01-2025,Camps Bay Central,CN41,10h29,3
+06-01-2025,06-01-2025,Glen Beach,CN31,10h44,3
+07-01-2025,07-01-2025,Camps Bay In front of Lifesaving Tower,ICS12,09h31,2
+07-01-2025,07-01-2025,Camps Bay Central,CN41,09h29,1
+07-01-2025,07-01-2025,Glen Beach,CN31,09h43,6
+08-01-2025,08-01-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h14,6
+08-01-2025,08-01-2025,Camps Bay Central,CN41,10h10,2
+08-01-2025,08-01-2025,Glen Beach,CN31,10h26,3
+09-01-2025,09-01-2025,Camps Bay In front of Lifesaving Tower,ICS12,09h50,None found
+09-01-2025,09-01-2025,Camps Bay Central,CN41,09h45,1
+09-01-2025,09-01-2025,Glen Beach,CN31,10h05,3
+10-01-2025,10-01-2025,Camps Bay In front of Lifesaving Tower,ICS12,09h50,7
+10-01-2025,10-01-2025,Camps Bay Central,CN41,09h46,2
+10-01-2025,10-01-2025,Glen Beach,CN31,10h03,5
+13-01-2025,13-01-2025,Camps Bay In front of Lifesaving Tower,ICS12,12h24,2
+13-01-2025,13-01-2025,Camps Bay Central,CN41,12h29,1
+13-01-2025,13-01-2025,Glen Beach,CN31,12h45,3
+15-01-2025,15-01-2025,Camps Bay In front of Lifesaving Tower,ICS12,11h15,1
+15-01-2025,15-01-2025,Camps Bay Central,CN41,11h18,4
+15-01-2025,15-01-2025,Glen Beach,CN31,10h45,42
+15-01-2025,15-01-2025,Glen Beach near STW,CN31,10h55,263
+15-01-2025,15-01-2025,Fish Hoek Jagger Walk Freshwater,AH01,12h25,None found
+15-01-2025,15-01-2025,Fish Hoek Jagger Walk Seawater,CN35,12h30,57
+16-01-2025,16-01-2025,Camps Bay In front of Lifesaving Tower,ICS12,13h11,8
+16-01-2025,16-01-2025,Camps Bay Central,CN41,13h15,12
+16-01-2025,16-01-2025,Glen Beach,CN31,13h28,4
+17-01-2025,17-01-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h55,11
+17-01-2025,17-01-2025,Camps Bay Central,CN41,11h02,14
+17-01-2025,17-01-2025,Glen Beach,CN31,10h40,3
+17-01-2025,17-01-2025,Hout Bay Harbour side,HB13,11h40,12
+17-01-2025,17-01-2025,Hout Bay,XCN10,11h55,38
+20-01-2025,20-01-2025,Camps Bay In front of Lifesaving Tower,ICS12,08h30,2
+20-01-2025,20-01-2025,Camps Bay Central,CN41,08h45,4
+20-01-2025,20-01-2025,Glen Beach,CN31,09h00,2
+03-02-2025,03-02-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h38,7
+03-02-2025,03-02-2025,Camps Bay Central,CN41,10h35,2
+03-02-2025,03-02-2025,Glen Beach,CN31,10h49,4
+04-02-2025,04-02-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h38,4
+04-02-2025,04-02-2025,Camps Bay Central,CN41,10h35,2
+04-02-2025,04-02-2025,Glen Beach,CN31,10h45,2
+05-02-2025,05-02-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h52,43
+05-02-2025,05-02-2025,Camps Bay Central,CN41,10h48,21
+05-02-2025,05-02-2025,Glen Beach,CN31,11h05,114
+06-02-2025,06-02-2025,Camps Bay In front of Lifesaving Tower,ICS12,12h23,19
+06-02-2025,06-02-2025,Camps Bay Central,CN41,12h26,8
+06-02-2025,06-02-2025,Glen Beach,CN31,12h40,13
+07-02-2025,07-02-2025,Camps Bay In front of Lifesaving Tower,ICS12,11h33,21
+07-02-2025,07-02-2025,Camps Bay Central,CN41,11h28,6
+07-02-2025,07-02-2025,Glen Beach,CN31,11h51,5
+10-02-2025,10-02-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h50,2
+10-02-2025,10-02-2025,Camps Bay Central,CN41,10h55,1
+10-02-2025,10-02-2025,Glen Beach,CN31,11h20,2
+11-02-2025,11-02-2025,Camps Bay In front of Lifesaving Tower,ICS12,11h27,11
+11-02-2025,11-02-2025,Camps Bay Central,CN41,11h24,9
+11-02-2025,11-02-2025,Glen Beach,CN31,11h43,4
+12-02-2025,12-02-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h50,4
+12-02-2025,12-02-2025,Camps Bay Central,CN41,11h00,None found
+12-02-2025,12-02-2025,Glen Beach,CN31,11h30,1
+13-02-2025,13-02-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h24,2
+13-02-2025,13-02-2025,Camps Bay Central,CN41,10h22,1
+13-02-2025,13-02-2025,Glen Beach,CN31,10h33,3
+14-02-2025,14-02-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h16,7
+14-02-2025,14-02-2025,Camps Bay Central,CN41,10h13,3
+14-02-2025,14-02-2025,Glen Beach,CN31,10h25,5
+17-02-2025,17-02-2025,Camps Bay In front of Lifesaving Tower,ICS12,12h00,2
+17-02-2025,17-02-2025,Camps Bay Central,CN41,11h57,None found
+17-02-2025,17-02-2025,Glen Beach,CN31,12h02,2
+18-02-2025,18-02-2025,Camps Bay In front of Lifesaving Tower,ICS12,11h25,13
+18-02-2025,18-02-2025,Camps Bay Central,CN41,11h22,4
+18-02-2025,18-02-2025,Glen Beach,CN31,11h50,6
+19-02-2025,19-02-2025,Camps Bay In front of Lifesaving Tower,ICS12,09h31,8
+19-02-2025,19-02-2025,Camps Bay Central,CN41,09h28,27
+19-02-2025,19-02-2025,Glen Beach,CN31,09h48,6
+20-02-2025,21-02-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h13,39
+20-02-2025,21-02-2025,Camps Bay Central,CN41,10h19,5
+20-02-2025,21-02-2025,Glen Beach,CN31,10h50,3
+20-02-2025,21-02-2025,Clifton 2nd Stream Freshwater,AH01,11h05,±176000
+03-03-2025,03-03-2025,Camps Bay In front of Lifesaving Tower,ICS12,11h33,2
+03-03-2025,03-03-2025,Camps Bay Central,CN41,11h29,18
+03-03-2025,03-03-2025,Glen Beach,CN31,12h10,None found
+04-03-2025,04-03-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h34,9
+04-03-2025,04-03-2025,Camps Bay Central,CN41,10h30,12
+04-03-2025,04-03-2025,Glen Beach,CN31,10h42,2
+05-03-2025,05-03-2025,Camps Bay In front of Lifesaving Tower,ICS12,11h40,3
+05-03-2025,05-03-2025,Camps Bay Central,CN41,11h45,7
+05-03-2025,05-03-2025,Glen Beach,CN31,12h20,4
+06-03-2025,06-03-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h21,2
+06-03-2025,06-03-2025,Camps Bay Central,CN41,10h19,5
+06-03-2025,06-03-2025,Glen Beach,CN31,10h36,5
+07-03-2025,07-03-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h11,8
+07-03-2025,07-03-2025,Camps Bay Central,CN41,10h06,28
+07-03-2025,07-03-2025,Glen Beach,CN31,10h22,3
+10-03-2025,10-03-2025,Camps Bay In front of Lifesaving Tower,ICS12,11h42,11
+10-03-2025,10-03-2025,Camps Bay Central,CN41,11h38,1
+10-03-2025,10-03-2025,Glen Beach,CN31,11h53,9
+11-03-2025,11-03-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h58,102
+11-03-2025,11-03-2025,Camps Bay Central,CN41,10h54,11
+11-03-2025,11-03-2025,Glen Beach,CN31,11h09,2
+12-03-2025,12-03-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h50,3
+12-03-2025,12-03-2025,Camps Bay Central,CN41,10h48,2
+12-03-2025,12-03-2025,Glen Beach,CN31,11h01,4
+13-03-2025,13-03-2025,Camps Bay In front of Lifesaving Tower,ICS12,11h45,100
+13-03-2025,13-03-2025,Camps Bay Central,CN41,11h50,21
+13-03-2025,13-03-2025,Glen Beach,CN31,12h10,26
+14-03-2025,14-03-2025,Camps Bay In front of Lifesaving Tower,ICS12,11h33,26
+14-03-2025,14-03-2025,Camps Bay Central,CN41,11h30,9
+14-03-2025,14-03-2025,Glen Beach,CN31,11h48,None found
+17-03-2025,17-03-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h45,5
+17-03-2025,17-03-2025,Camps Bay Central,CN41,10h53,2
+17-03-2025,17-03-2025,Glen Beach,CN31,11h10,1
+18-03-2025,18-03-2025,Camps Bay In front of Lifesaving Tower,ICS12,11h03,2
+18-03-2025,18-03-2025,Camps Bay Central,CN41,11h00,3
+18-03-2025,18-03-2025,Glen Beach,CN31,11h15,None found
+19-03-2025,19-03-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h53,2
+19-03-2025,19-03-2025,Camps Bay Central,CN41,10h49,None found
+19-03-2025,19-03-2025,Glen Beach,CN31,11h04,None found
+20-03-2025,20-03-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h56,9
+20-03-2025,20-03-2025,Camps Bay Central,CN41,10h50,3
+20-03-2025,20-03-2025,Glen Beach,CN31,11h18,5
+01-04-2025,01-04-2025,Camps Bay In front of Lifesaving Tower,ICS12,10h50,2
+01-04-2025,01-04-2025,Camps Bay Central,CN41,11h08,1
+01-04-2025,01-04-2025,Glen Beach,CN31,11h13,1

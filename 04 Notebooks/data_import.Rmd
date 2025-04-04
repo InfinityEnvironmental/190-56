@@ -575,6 +575,9 @@ blue_flag_data
 
 # Write Blue Flag data to file
 write_csv(blue_flag_data, "02 Output Data/blue_flag_raw.csv")
+
+# Read Blue Flag data
+blue_flag_data <- read_csv("02 Output Data/blue_flag_raw.csv")
 ```
 
 ```{r clean-blue-flag}
@@ -624,6 +627,16 @@ blue_flag |>
 blue_flag |>
   mutate(faecal_streptococci_cfu_per_100ml = as.numeric(faecal_streptococci_cfu_per_100ml)) |>
   filter(is.na(faecal_streptococci_cfu_per_100ml))
+
+# Add censored values
+blue_flag <- blue_flag |>
+  mutate(censored_value = case_when(
+    faecal_streptococci_cfu_per_100ml %in% c(150, 151) ~ ">150",
+    faecal_streptococci_cfu_per_100ml == 300 ~ ">300",
+    faecal_streptococci_cfu_per_100ml == 3000 ~ ">3000",
+    .default = as.character(faecal_streptococci_cfu_per_100ml)
+    )) |>
+  select(site_name, sample_date, censored_value)
 
 # Export the clean data
 write_csv(blue_flag, "02 Output Data/blue_flag_clean.csv")
@@ -761,6 +774,7 @@ setdiff(sites_capture)
 # Check the values in the data
 daily_data <- daily_data |>
   mutate(enterococci_cfu_per_100ml = str_remove(enterococci_cfu_per_100ml, "\\s")) |>
+  mutate(enterococci_cfu_per_100ml = str_remove(enterococci_cfu_per_100ml, "`")) |>
   arrange(enterococci_cfu_per_100ml)
 
 # Check for duplicates
@@ -770,12 +784,26 @@ daily_data |>
 
 # Write to file
 daily_data |>
-  write_csv("02 Output Data/daily_clean.csv")
+  write_csv("02 Output Data/daily_clean_strand.csv")
 
 # Check summary of daily data
 summary(daily_data)
 
 # Copy to database
 copy_to(con, tbl, name = "coastal", overwrite = TRUE)
+```
+```{r sabs-daily-data}
+# Read in data
+sabs_daily <- read_excel("../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Split Camps Bay daily.xlsx")
+
+# Clean data
+sabs_daily <- sabs_daily |>
+  filter(`Date Sampled` < "2024-10-05") |>
+  select(1:6)
+
+colnames(sabs_daily) <- c("sample_date", "analysis_completed", "site_description", "site_id", "sample_time", "censored_value")
+
+# Write SABS data to file
+write_csv(sabs_daily, "02 Output Data/sabs_daily_clean.csv")
 ```
 
