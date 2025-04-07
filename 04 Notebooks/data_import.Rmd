@@ -29,13 +29,13 @@ library(readxl)
 ## Database Connection
 
 ```{r db connection}
-# Connect to the Postgres database
+# Enter credentials when prompted
 con <- dbConnect(RPostgres::Postgres(),
-  host = "infinity.cdmqm0mu0qf8.eu-north-1.rds.amazonaws.com",
+  host = "aws-0-eu-central-1.pooler.supabase.com",
   port = 5432,
-  user = rstudioapi::askForPassword(prompt = "Username: "),
+  user = str_c(rstudioapi::askForPassword(prompt = "Username: "), "wnrvdvesovnkmqbhkhjz", sep = "."),
   password = rstudioapi::askForPassword(),
-  dbname = "infinity"
+  dbname = "postgres"
 )
 ```
 
@@ -252,7 +252,6 @@ faecal |>
   write_csv("02 Output Data/01 CSV/faecal_streptococci_data_clean.csv")
 ```
 
-
 # SABS Data
 
 In 2023/2024 data samples were collected with sample codes that don't match any other sample codes in the monitoring programme. I want to see how well our data corresponds to City of Cape Town data.
@@ -296,9 +295,14 @@ sabs <- read_excel("../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/0
            skip = 1)
 
 # Unique sites and descriptions
-sabs |>
+walab <- tbl(con, I("coastal.sites")) |> collect()
+sabs_sites <- sabs |>
   distinct(cct_code, cct_code_updated, site_description) |>
   arrange(cct_code)
+
+walab |>
+  full_join(sabs_sites, by = c("site_id" = "cct_code_updated")) |>
+  select(site_id, site_description.x, site_description.y)
 
 # Summarise data
 sabs |>
@@ -311,18 +315,24 @@ tbl(con, I("coastal.results")) |>
 
 # Export clean data to file
 sabs |>
-  select(cct_code_updated, sample_date, enterococci_cfu_per_100ml, enterococci_cfu_per_100ml_numeric, week) |>
-  mutate(cct_code_updated = fct(cct_code_updated)) |>
+  select(cct_code_updated, sample_date, enterococci_cfu_per_100ml, enterococci_cfu_per_100ml_numeric, sabs_sheet) |>
+  mutate(
+    cct_code_updated = fct(cct_code_updated),
+    sabs_sheet = str_c(sabs_sheet, ".pdf", sep = "")
+    ) |>
   filter(!is.na(sample_date)) |>
-  rename(site_id = cct_code_updated, censored_value = enterococci_cfu_per_100ml) |>
+  rename(site_id = cct_code_updated, censored_value = enterococci_cfu_per_100ml, filename = sabs_sheet) |>
   mutate(numeric_value = case_when(
     censored_value |> str_detect("<") ~ censored_value |> str_remove("<|\\s") |> as.numeric() / 3,
     censored_value |> str_detect(">") ~ censored_value |> str_remove(">|\\s") |> as.numeric() * 3,
     censored_value |> str_detect("ND") ~ 0,
     .default = censored_value |> as.numeric()
   )) |>
-  select(sample_date, site_id, censored_value, numeric_value) |>
+  select(sample_date, site_id, censored_value, filename) |>
   write_csv("02 Output Data/01 CSV/sabs_data_clean.csv")
+
+# Compare SABS sites to WALAB sites
+sabs
 ```
 
 ```{r join-data}
@@ -792,16 +802,40 @@ summary(daily_data)
 # Copy to database
 copy_to(con, tbl, name = "coastal", overwrite = TRUE)
 ```
+
+```{r clean-atlantic-daily}
+read_csv("../02 Output Data/daily_clean_atlantic.csv") |>
+  mutate(site_id = if_else(site_id == "ISC13", "HB13", site_id)) |>
+  write_csv("../02 Output Data/daily_clean_atlantic.csv")
+```
+
+# SABS Daily Data
+
 ```{r sabs-daily-data}
 # Read in data
 sabs_daily <- read_excel("../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Split Camps Bay daily.xlsx")
 
 # Clean data
 sabs_daily <- sabs_daily |>
-  filter(`Date Sampled` < "2024-10-05") |>
+  rename(
+    sample_date = `Date Sampled`,
+    date_received = `Date Received &Analysed`,
+    site_description = `Site_Description`,
+    site_id = `Site_Code`,
+    sample_time = Time,
+    enterococci_cfu_per_100ml = `Enterococci cfu/100ml`,
+    ecoli_cfu_per_100ml = `E.coli cfu/100ml`,
+    issues = Issues,
+    comments = `Issues comments`
+  ) |>
+  mutate(
+    sample_date = dmy(sample_date),
+    date_received = dmy(date_received),
+    sample_time = str_replace(sample_time, "h", ":") |> str_c(":00", sep = "") |> hms::as_hms(),
+    enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "±", "") |> str_replace("None found", "ND")
+  ) |>
+  filter(sample_date < "2024-10-05") |>
   select(1:6)
-
-colnames(sabs_daily) <- c("sample_date", "analysis_completed", "site_description", "site_id", "sample_time", "censored_value")
 
 # Write SABS data to file
 write_csv(sabs_daily, "02 Output Data/sabs_daily_clean.csv")
