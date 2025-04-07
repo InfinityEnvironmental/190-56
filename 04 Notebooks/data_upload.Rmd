@@ -29,13 +29,13 @@ library(readxl)
 ## Database Connection
 
 ```{r db connection}
-# Connect to the Postgres database
+# Enter credentials when prompted
 con <- dbConnect(RPostgres::Postgres(),
-  host = "infinity.cdmqm0mu0qf8.eu-north-1.rds.amazonaws.com",
+  host = "aws-0-eu-central-1.pooler.supabase.com",
   port = 5432,
-  user = rstudioapi::askForPassword(prompt = "Username: "),
+  user = str_c(rstudioapi::askForPassword(prompt = "Username: "), "wnrvdvesovnkmqbhkhjz", sep = "."),
   password = rstudioapi::askForPassword(),
-  dbname = "infinity"
+  dbname = "postgres"
 )
 ```
 
@@ -82,7 +82,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_61(01.04.2025).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_62(02.04.2025).pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 # Extract the pdf data
@@ -201,7 +201,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
-WHERE sample_date = '2025-04-01';
+WHERE sample_date = '2025-04-02';
 ```
 
 ```{sql, connection = con}
