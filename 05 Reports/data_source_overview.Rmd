@@ -27,12 +27,13 @@ library(extrafont)
 
 ```{r db-connection}
 # Connect to the Postgres database
+# Enter credentials when prompted
 con <- dbConnect(RPostgres::Postgres(),
-  host = "infinity.cdmqm0mu0qf8.eu-north-1.rds.amazonaws.com",
+  host = "aws-0-eu-central-1.pooler.supabase.com",
   port = 5432,
-  user = rstudioapi::askForPassword(prompt = "Username: "),
+  user = str_c(rstudioapi::askForPassword(prompt = "Username: "), "wnrvdvesovnkmqbhkhjz", sep = "."),
   password = rstudioapi::askForPassword(),
-  dbname = "infinity"
+  dbname = "postgres"
 )
 ```
 
@@ -45,9 +46,25 @@ sabs <- read_csv("02 Output Data/01 CSV/sabs_data_clean.csv") |>
 lims <- read_csv("02 Output Data/01 CSV/lims_data_clean.csv") |>
   mutate(dataset = 'lims')
 walab <- tbl(con, I("coastal.results")) |> collect() |>
-  mutate(dataset = "walab")
+  mutate(dataset = "walab") |>
+  rename(censored_value = enterococci_cfu_per_100ml)
 blue_flag <- read_csv("02 Output Data/blue_flag_clean.csv") |>
   mutate(dataset = "blue_flag")
+daily_strand <- read_csv("02 Output Data/daily_clean_strand.csv") |>
+  arrange(desc(sample_date), site_id) |>
+  select(site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename) |>
+  rename(censored_value = enterococci_cfu_per_100ml) |>
+  mutate(dataset = "daily_strand")
+daily_atlantic <- read_csv("02 Output Data/daily_clean_atlantic.csv") |>
+  arrange(desc(sample_date), site_id) |>
+  rename(censored_value = enterococci_cfu_per_100ml) |>
+  select(site_id, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename) |>
+  mutate(dataset = "daily_atlantic")
+daily_sabs <- read_csv("02 Output Data/sabs_daily_clean.csv") |>
+  select(site_id, sample_date, sample_time, date_received, site_description, enterococci_cfu_per_100ml) |>
+  rename(censored_value = enterococci_cfu_per_100ml) |>
+  mutate(dataset = "sabs_daily")
+
 ```
 
 # Sample Frequency
@@ -117,6 +134,13 @@ median_frequency <- lims |>
 ```
 
 The average frequency of the samples for every site in the LIMS dataset is roughly two weeks (median = `r median_frequency`).
+
+```{r}
+lims |>
+  filter(site_id == "XCN03A") |>
+  arrange(sample_date)
+```
+
 
 ## Overlap between CMB and LIMS datasets
 
@@ -346,6 +370,14 @@ blue_flag |>
   geom_col() +
   facet_wrap(facets = vars(year)) +
   theme(text = element_text(family = "Century Gothic"), axis.text.x = element_text(angle = 90))
+```
+
+```{r}
+blue_flag |>
+  filter(site_name == "Llandudno") |>
+  group_by(sample_date) |>
+  count() |>
+  arrange(sample_date)
 ```
 
 
@@ -578,6 +610,12 @@ all_results |>
 
 # Sites
 
+```{r}
+sabs |>
+  filter(sample_date <= "2024-04-30" & site_id == "ICS03")
+```
+
+
 ```{r sites-differences}
 cct_sites <- cct |>
   distinct(site_id) |>
@@ -594,32 +632,118 @@ lims_sites <- lims |>
 walab_sites <- walab |>
   distinct(site_id) |>
   arrange(site_id)
+
+sabs_daily_sites <- daily_sabs |>
+  distinct(site_id) |>
+  arrange(site_id)
+
+daily_atlantic_sites <- daily_atlantic |>
+  distinct(site_id) |>
+  arrange(site_id)
+
+daily_strand_sites <- daily_strand |>
+  distinct(site_id) |>
+  arrange(site_id)
+
+blue_flag_sites <- blue_flag |>
+  distinct(site_name) |>
+  arrange(site_name)
 ```
 
-```{r sites-discrepancies}
-# CCT and SABS
-dplyr::setdiff(cct_sites, sabs_sites) # 52 sites
-dplyr::setdiff(sabs_sites, cct_sites) # 11 sites
+```{r check-lims-overlap}
+# Check overlap with WALAB database
+# Which sites are in LIMS but not in WALAB
 
-# CCT and WALAB
-dplyr::setdiff(cct_sites, walab_sites) # 2 sites
-dplyr::setdiff(walab_sites, cct_sites) # 33 sites
+lims_not_walab <- dplyr::setdiff(lims_sites, walab_sites)
+walab_not_lims <- dplyr::setdiff(walab_sites, lims_sites) |> pull()
 
-# SABS and LIMS
-dplyr::setdiff(sabs_sites, lims_sites) # 11 sites
-dplyr::setdiff(lims_sites, sabs_sites) # 79 sites
+walab_sites_table <- tbl(con, I("coastal.sites")) |> collect()
 
-# LIMS and WALAB
-dplyr::setdiff(lims_sites, walab_sites) # 19 sites
-dplyr::setdiff(walab_sites, lims_sites) # 23 sites
+walab_not_lims_table <- walab_sites_table |>
+  filter(site_id %in% walab_not_lims) |>
+  select(site_id, site_description)
 
-# CCT and LIMS
-dplyr::setdiff(lims_sites, cct_sites) # 44 sites
-dplyr::setdiff(cct_sites, lims_sites) # 17 sites
+walab_sites_table |>
+  arrange(site_description)
+lims_not_walab
+```
 
-# SABS and WALAB
-dplyr::setdiff(sabs_sites, walab_sites) # 7 sites
-dplyr::setdiff(walab_sites, sabs_sites) # 79 sites
+```{r check-sabs-overlap}
+# Which sites are in SABS but not in WALAB
+sabs_not_walab <- dplyr::setdiff(sabs_sites, walab_sites)
+walab_not_sabs <- dplyr::setdiff(walab_sites, sabs_sites) |> pull()
+
+walab_sites_table <- tbl(con, I("coastal.sites")) |> collect()
+
+walab_not_sabs_table <- walab_sites_table |>
+  filter(site_id %in% walab_not_sabs) |>
+  select(site_id, site_description)
+
+walab_not_sabs_table |>
+  arrange(site_description)
+sabs_not_walab
+
+# Check which dates these sites were sampled
+sabs |>
+  filter(site_id %in% pull(sabs_not_walab)) |>
+  arrange(site_id)
+```
+```{r check-sabs-daily-overlap}
+# Which sites are in SABS daily but not in WALAB
+sabs_daily_not_walab <- dplyr::setdiff(sabs_daily_sites, walab_sites)
+walab_not_sabs_daily <- dplyr::setdiff(walab_sites, sabs_daily_sites) |> pull()
+
+walab_sites_table <- tbl(con, I("coastal.sites")) |> collect()
+
+walab_not_sabs_daily_table <- walab_sites_table |>
+  filter(site_id %in% walab_not_sabs_daily) |>
+  select(site_id, site_description)
+
+walab_not_sabs_daily_table
+sabs_daily_not_walab
+
+daily_sabs
+```
+
+```{r check-atlantic-daily-overlap}
+# Which sites are in SABS daily but not in WALAB
+daily_atlantic_not_walab <- dplyr::setdiff(daily_atlantic_sites, walab_sites)
+walab_not_daily_atlantic <- dplyr::setdiff(walab_sites, daily_atlantic_sites) |> pull()
+
+walab_sites_table <- tbl(con, I("coastal.sites")) |> collect()
+
+walab_not_daily_atlantic_table <- walab_sites_table |>
+  filter(site_id %in% walab_not_daily_atlantic) |>
+  select(site_id, site_description)
+
+walab_sites_table
+daily_atlantic_not_walab
+
+daily_atlantic |>
+  filter(site_id == "ISC13")
+
+daily_atlantic_not_walab |>
+  distinct(site_id)
+```
+
+```{r check-strand-daily-overlap}
+# Which sites are in SABS daily but not in WALAB
+daily_strand_not_walab <- dplyr::setdiff(daily_strand_sites, walab_sites)
+walab_not_daily_strand <- dplyr::setdiff(walab_sites, daily_strand_sites) |> pull()
+
+walab_sites_table <- tbl(con, I("coastal.sites")) |> collect()
+
+walab_not_daily_strand_table <- walab_sites_table |>
+  filter(site_id %in% walab_not_daily_strand) |>
+  select(site_id, site_description)
+
+daily_strand
+```
+
+```{r check-blue-flag-sites}
+blue_flag_sites
+walab_sites_table |>
+  arrange(site_description)
 ```
 
 

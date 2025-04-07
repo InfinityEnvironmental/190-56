@@ -211,3 +211,10 @@ ROLLBACK;
 ```{sql, connection = con}
 COMMIT;
 ```
+
+# Upload historical data to database
+
+```{r}
+read_csv("02 Output Data/01 CSV/lims_data_clean.csv")
+```
+
