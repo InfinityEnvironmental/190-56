@@ -552,7 +552,7 @@ XCS33
 
 # Blue Flag Data
 
-```{r read-blue-flag-data}
+```{r read-blue-flag-data, fig.width = 7, fig.height = 10, dpi = 600}
 path <- "../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/05_Data/03 Water Quality/Coastal Water Quality/Blue Flag Data/"
 filename <- str_c(path, list.files(path), sep = "")
 
@@ -563,13 +563,13 @@ blue_flag_files <- filename |>
     ))
 
 # Read in data
-n = 40
+n = 2
 (file <- blue_flag_files |> slice(n) |> pull(1))
 (sheet <- blue_flag_files |> slice(n) |> pull(2))
 (blue_flag_append <- read_excel(
   path = file, 
   sheet = sheet, 
-  range = "B30:D130",
+  range = "B30:D62",
   col_names = c("sample_date", "ecoli_cfu_per_100ml", "faecal_streptococci_cfu_per_100ml"),
   col_types = c("date", "text", "text")
   ) |>
@@ -578,79 +578,130 @@ n = 40
     file = file |> str_remove(path),
     sheet = sheet))
 
+blue_flag_append <- blue_flag_append |>
+  mutate(site = "N")
+
 (blue_flag_data <- bind_rows(blue_flag_data, blue_flag_append))
 
 # Check Blue Flag Data
-blue_flag_data
+blue_flag_data |>
+  mutate(sample_date = date(sample_date)) |>
+  group_by(sheet) |>
+  summarise(min_date = min(sample_date), max_date = max(sample_date), n()) |>
+  arrange(sheet)
+  ggplot(aes(y = sheet, x = min_date, xend = max_date)) +
+  geom_segment() +
+  scale_x_date(minor_breaks = "1 year")
+
+# Add sites codes to Blue Flag data
+blue_flag_data <- blue_flag_data |>
+  mutate(site = case_when(
+    sheet |> str_to_lower() |> str_detect("bikini") ~ "XCS08",
+    sheet |> str_to_lower() |> str_detect("camps bay") ~ "CN11",
+    sheet |> str_to_lower() |> str_detect("clifton") ~ "CN09",
+    sheet |> str_to_lower() |> str_detect("fish") ~ "XCS16",
+    (sheet |> str_to_lower() |> str_detect("lland")) & str_detect(site, "Confl") ~ "XCN03A",
+    (sheet |> str_to_lower() |> str_detect("lland")) & (!str_detect(site, "XCN03A") | is.na(site)) ~ "XCN03",
+    str_detect(sheet, "Melkbos") & str_detect(sheet, "N") ~ "XCN07",
+    str_detect(sheet, "Melkbos") & str_detect(sheet, "S") ~ "XCN15",
+    str_detect(sheet, "Melkbosstrand") & str_detect(site, "S") ~ "XCN15",
+    str_detect(sheet, "Melkbosstrand") & (!str_detect(site, "S") | is.na(site)) ~ "XCN07",
+    sheet |> str_to_lower() |> str_detect("mnandi") ~ "CS19",
+    sheet |> str_to_lower() |> str_detect("muiz") ~ "CS34",
+    sheet |> str_to_lower() |> str_detect("seaforth") ~ "XCS13",
+    sheet |> str_to_lower() |> str_detect("silwer") ~ "XCN14",
+    sheet |> str_to_lower() |> str_detect("strandf") ~ "CS13",
+    .default = site
+  )) |>
+  arrange(sheet)
+
+# Check the site periods
+blue_flag_data |>
+  mutate(month = floor_date(date(sample_date), "month")) |>
+  group_by(site, month) |>
+  count() |>
+  ggplot(aes(x = month, y = n)) +
+  geom_col() +
+  facet_wrap(facets = vars(site)) +
+  scale_x_date(minor_breaks = "1 year")
 
 # Write Blue Flag data to file
 write_csv(blue_flag_data, "02 Output Data/blue_flag_raw.csv")
-
-# Read Blue Flag data
-blue_flag_data <- read_csv("02 Output Data/blue_flag_raw.csv")
 ```
+
+## Clean Blue Flag data
 
 ```{r clean-blue-flag}
+# Read Blue Flag data
+blue_flag_data <- read_csv("02 Output Data/blue_flag_raw.csv")
+
 # Check sites
 blue_flag_data |>
-  distinct(sheet) |>
-  arrange(sheet)
+  distinct(site) |>
+  arrange(site)
 
-blue_flag_data |>
-  arrange(-as.integer(faecal_streptococci_cfu_per_100ml))
-
-blue_flag_data |>
-  filter(if_any(everything(), is.na))
-
-blue_flag <- blue_flag_data |>
-  mutate(site_name = case_when(
-    sheet |> str_to_lower() |> str_detect("bikini") ~ "Bikini Beach",
-    sheet |> str_to_lower() |> str_detect("clifton") ~ "Clifton Fourth",
-    sheet |> str_to_lower() |> str_detect("fish") ~ "Fish Hoek",
-    sheet |> str_to_lower() |> str_detect("llan") ~ "Llandudno",
-    sheet |> str_to_lower() |> str_detect("melkbos") ~ "Melkbos",
-    sheet |> str_to_lower() |> str_detect("muiz") ~ "Muizenberg",
-    sheet |> str_to_lower() |> str_detect("seafo") ~ "Seaforth",
-    sheet |> str_to_lower() |> str_detect("silw") ~ "Silwerstroom",
-    sheet |> str_to_lower() |> str_detect("strandf") ~ "Strandfontein",
-    .default = sheet
-  )) |>
-  select(site_name, sample_date, faecal_streptococci_cfu_per_100ml)
-
-blue_flag <- blue_flag |>
-  filter(!if_any(everything(), is.na))
-```
-
-```{r check-blue-flag}
 # Check the highest values
-blue_flag |>
+blue_flag_data |>
   arrange(-as.integer(faecal_streptococci_cfu_per_100ml))
 
-# Have a look at the data
-blue_flag |>
-  mutate(faecal_streptococci_cfu_per_100ml = faecal_streptococci_cfu_per_100ml |> as.numeric()) |>
-  filter(faecal_streptococci_cfu_per_100ml < 400) |>
-  ggplot(aes(x = faecal_streptococci_cfu_per_100ml |> as.numeric(), fill = site_name)) +
-  geom_histogram(position = position_dodge())
+# Check NA values
+blue_flag_data |>
+  filter(if_any(everything(), is.na)) # Decision to keep genuine missing values
 
-# Check that everything can be converted to an integer
-blue_flag |>
+# Check the data
+str(blue_flag_data)
+
+# Keep only important columns
+blue_flag_data <- blue_flag_data |>
+  select(site, sample_date, faecal_streptococci_cfu_per_100ml, file)
+
+# Check the range of values for faecal
+blue_flag_data |>
   mutate(faecal_streptococci_cfu_per_100ml = as.numeric(faecal_streptococci_cfu_per_100ml)) |>
-  filter(is.na(faecal_streptococci_cfu_per_100ml))
+  distinct(faecal_streptococci_cfu_per_100ml) |>
+  arrange(faecal_streptococci_cfu_per_100ml)
 
-# Add censored values
-blue_flag <- blue_flag |>
-  mutate(censored_value = case_when(
-    faecal_streptococci_cfu_per_100ml %in% c(150, 151) ~ ">150",
-    faecal_streptococci_cfu_per_100ml == 300 ~ ">300",
-    faecal_streptococci_cfu_per_100ml == 3000 ~ ">3000",
-    .default = as.character(faecal_streptococci_cfu_per_100ml)
-    )) |>
-  select(site_name, sample_date, censored_value)
+# Create censored values
+blue_flag_data <- blue_flag_data |>
+  mutate(faecal_streptococci_cfu_per_100ml = case_when(
+    faecal_streptococci_cfu_per_100ml %in% c("150", "151") ~ ">150",
+    faecal_streptococci_cfu_per_100ml == "300" ~ ">300",
+    faecal_streptococci_cfu_per_100ml == "3000" ~ ">3000",
+    .default = faecal_streptococci_cfu_per_100ml
+  ))
+
+# Plot the data for each month
+blue_flag_data |>
+  mutate(sample_date = date(sample_date)) |>
+  mutate(month = floor_date(sample_date, "month")) |>
+  group_by(site, month) |>
+  count() |>
+  ggplot(aes(x = month, y = n)) +
+  geom_col() +
+  facet_wrap(facets = vars(site)) +
+  scale_x_date(minor_breaks = "1 year")
+
+blue_flag_data |>
+  filter(site == "XCS13")
+
+# Plot the actual results
+blue_flag_data |>
+  mutate(numeric_value = case_when(
+    str_detect(faecal_streptococci_cfu_per_100ml, ">") ~ str_remove(faecal_streptococci_cfu_per_100ml, ">") |> as.numeric(),
+    .default = faecal_streptococci_cfu_per_100ml |> as.numeric()
+  )) |>
+  ggplot(aes(x = sample_date, y = numeric_value, colour = site)) +
+  geom_point()
+
+# Change the names of the columns
+blue_flag_data |>
+  rename(site_id = site, censored_value = faecal_streptococci_cfu_per_100ml) |>
 
 # Export the clean data
-write_csv(blue_flag, "02 Output Data/blue_flag_clean.csv")
+write_csv("02 Output Data/blue_flag_clean.csv")
 ```
+
+The only site that has data for 2017/2018 summer is Seaforth.
 
 # Daily Samples
 

@@ -214,7 +214,33 @@ COMMIT;
 
 # Upload historical data to database
 
+## LIMS Data
+
 ```{r}
 read_csv("02 Output Data/01 CSV/lims_data_clean.csv")
+
+# LIMS data are ready for upload as soon as the sites are uploaded to database
+```
+
+## Blue Flag Data
+
+1. Remove duplicates
+1. Add site codes to the Blue Flag data
+2. Differentiate between confluence sites and beach sites for Llandudno
+3. Differentiate between Melkbos N and S
+
+```{r check-data}
+blue_flag <- read_csv("02 Output Data/blue_flag_clean.csv")
+
+summary(blue_flag)
+
+blue_flag |>
+  group_by(site_name, sample_date) |>
+  count() |>
+  arrange(-n)
+
+blue_flag |>
+  filter(site_name == "Fish Hoek") |>
+  arrange(sample_date)
 ```
 
