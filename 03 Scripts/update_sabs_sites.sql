@@ -57,9 +57,3 @@ SELECT * FROM coastal.sites;
 
 ROLLBACK;
 COMMIT;
-
-
-
-
-
-
