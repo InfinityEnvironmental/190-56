@@ -224,23 +224,88 @@ read_csv("02 Output Data/01 CSV/lims_data_clean.csv")
 
 ## Blue Flag Data
 
-1. Remove duplicates
-1. Add site codes to the Blue Flag data
-2. Differentiate between confluence sites and beach sites for Llandudno
-3. Differentiate between Melkbos N and S
+```{r}
+read_csv("02 Output Data/blue_flag_clean.csv")
 
-```{r check-data}
-blue_flag <- read_csv("02 Output Data/blue_flag_clean.csv")
+# Blue Flag data are ready to be uploaded once the LIMS sites are uploaded to database
+```
 
-summary(blue_flag)
+## SABS Routine Data
 
-blue_flag |>
-  group_by(site_name, sample_date) |>
+```{r read-sabs-data}
+sabs_clean <- read_csv("02 Output Data/01 CSV/sabs_data_clean.csv")
+
+# Check unique sites
+sabs_clean |>
+  distinct(site_id) |>
+  arrange(site_id)
+
+# Sites that need to be changed
+sabs_clean <- sabs_clean |>
+  mutate(site_id = case_when(
+    site_id == "CS12" ~ "CS45",
+    site_id == "ICS03" & sample_date > "2024-04-30" ~ "ICS14",
+    .default = site_id
+    ))
+
+# SABS data are ready for upload once the SABS sites have been uploaded to database
+
+```
+
+## SABS Daily Samples
+
+```{r read-sabs-dailies}
+sabs_daily_clean <- read_csv("02 Output Data/sabs_daily_clean.csv")
+
+sabs_daily_clean |>
+  group_by(sample_date, site_id, enterococci_cfu_per_100ml) |>
   count() |>
   arrange(-n)
 
-blue_flag |>
-  filter(site_name == "Fish Hoek") |>
-  arrange(sample_date)
+sabs_daily_clean |>
+  filter(sample_date == "2024-08-30")
+
+# Remove Strandfontein data from Atlantic data
+sabs_daily_clean <- sabs_daily_clean |>
+  filter(!(site_description |> str_detect("Strandf")))
+
+# Daily SABS data are ready to upload as soon as ICS12 is uploaded as a site
+```
+
+## WALAB Atlantic Daily
+
+```{r}
+daily_clean_atlantic <- read_csv("02 Output Data/daily_clean_atlantic.csv")
+
+daily_clean_atlantic |>
+  distinct(site_id)
+
+daily_clean_atlantic |>
+  group_by(site_id, sample_date) |>
+  count() |>
+  arrange(-n)
+
+# These data are ready to upload as soon as ICS10 and ICS15 are uploaded
+```
+
+## WALAB Strand Daily
+
+```{r read-strand-daily}
+strand_daily_clean <- read_csv("02 Output Data/daily_clean_strand.csv")
+
+# Reorganize columns
+strand_daily_clean |>
+  select(site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename)
+
+# Check for duplicate data
+strand_daily_clean |>
+  group_by(sample_date, site_id) |>
+  count() |>
+  arrange(-n)
+
+strand_daily_clean |>
+  filter(sample_date == "2025-02-13")
+
+# These data are ready for upload
 ```
 

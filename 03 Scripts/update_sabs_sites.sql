@@ -34,7 +34,6 @@ VALUES
 	('ICS06', 'GLENCAIRN ELSA RIVER MOUTH', 'Recreational Node', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
 	('ICS09', 'GORDONS BAY PARKING AREA', 'Recreational Node', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
 	('ICS08', 'ZANDVLEI MOUTH', 'Recreational Node', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CS12', 'STRANDFONTEIN POINT EAST OF TIDAL POOL', 'Recreational Node', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
 	('ICS14', 'SAUNDERS ROCKS', 'Recreational Node', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326));
 
 -- Daily samples for SABS
@@ -57,3 +56,9 @@ SELECT * FROM coastal.sites;
 
 ROLLBACK;
 COMMIT;
+
+
+
+
+
+
