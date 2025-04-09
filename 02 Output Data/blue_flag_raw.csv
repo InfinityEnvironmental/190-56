@@ -1,1413 +1,1197 @@
-sample_date,ecoli_cfu_per_100ml,faecal_streptococci_cfu_per_100ml,file,sheet
-2017-11-24T00:00:00Z,1,7,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2017-12-14T00:00:00Z,1,15,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2017-12-19T00:00:00Z,1,2,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2018-01-03T00:00:00Z,72,68,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2018-01-10T00:00:00Z,14,13,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2018-01-17T00:00:00Z,35,21,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2018-01-24T00:00:00Z,1,7,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2018-11-29T00:00:00Z,1,6,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2018-12-06T00:00:00Z,23,31,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2018-12-13T00:00:00Z,12,14,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2018-12-19T00:00:00Z,32,42,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2019-01-04T00:00:00Z,5,19,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2019-01-10T00:00:00Z,19,56,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2019-01-16T00:00:00Z,93,73,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2019-01-23T00:00:00Z,45,3000,95th percentile Water Quality - Consolidated Seaforth.xls,Seaforth 2 seasons SABS
-2018-11-28T00:00:00Z,2,4,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2018-12-05T00:00:00Z,56,3,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2018-12-19T00:00:00Z,2,4,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2019-01-03T00:00:00Z,2,3,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2019-01-15T00:00:00Z,10,15,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2019-01-22T00:00:00Z,12,19,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2019-11-20T00:00:00Z,1,33,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2019-12-04T00:00:00Z,2,1,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2019-12-11T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2020-01-08T00:00:00Z,18,21,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2020-01-15T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2020-01-22T00:00:00Z,4,8,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2020-11-25T00:00:00Z,1,8,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2020-12-02T00:00:00Z,1,7,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2020-12-08T00:00:00Z,1,37,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2020-12-15T00:00:00Z,14,1,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2021-01-06T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2021-01-13T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2021-01-20T00:00:00Z,117,1,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2021-01-27T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2021-11-23T00:00:00Z,6,5,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2021-12-01T00:00:00Z,4,4,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2021-12-08T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2021-12-14T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2021-12-22T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2022-01-04T00:00:00Z,3,10,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2022-01-11T00:00:00Z,1,5,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2022-01-19T00:00:00Z,3,6,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2022-01-26T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Bikini beach
-2018-11-28T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2018-12-05T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2018-12-19T00:00:00Z,19,46,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2019-01-03T00:00:00Z,21,88,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2019-01-15T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2019-01-22T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2019-11-20T00:00:00Z,1,6,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2019-12-04T00:00:00Z,1,4,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2019-12-11T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2020-01-08T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2020-01-15T00:00:00Z,3,4,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2020-01-22T00:00:00Z,2,17,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2020-02-05T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2020-02-19T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2020-03-03T00:00:00Z,24,2,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2020-03-18T00:00:00Z,4,5,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2020-11-25T00:00:00Z,1,6,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2020-12-02T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2020-12-08T00:00:00Z,4,44,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2020-12-15T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-01-06T00:00:00Z,1,26,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-01-13T00:00:00Z,1,7,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-01-20T00:00:00Z,1,9,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-01-27T00:00:00Z,3,3,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-02-02T00:00:00Z,19,15,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-02-09T00:00:00Z,2,1,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-02-16T00:00:00Z,4,12,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-02-23T00:00:00Z,4,66,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-03-02T00:00:00Z,26,13,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-03-16T00:00:00Z,1,15,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-11-23T00:00:00Z,1,5,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-12-01T00:00:00Z,1,4,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-12-08T00:00:00Z,1,8,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-12-14T00:00:00Z,1,12,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2021-12-22T00:00:00Z,1,4,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2022-01-04T00:00:00Z,6,11,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2022-01-12T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2022-01-20T00:00:00Z,2,1,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2022-01-26T00:00:00Z,15,2,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2022-02-02T00:00:00Z,27,18,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2022-02-16T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2022-03-03T00:00:00Z,29,15,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2022-03-15T00:00:00Z,2,6,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2022-03-31T00:00:00Z,25,37,BF Water Quality from WESSA Apr2022.xlsx,Camps Bay
-2018-11-28T00:00:00Z,1,9,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2018-12-05T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2018-12-19T00:00:00Z,6,21,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2019-01-03T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2019-01-15T00:00:00Z,20,8,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2019-01-22T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2019-11-20T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2019-12-04T00:00:00Z,2,5,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2019-12-11T00:00:00Z,2,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2020-01-08T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2020-01-15T00:00:00Z,9,13,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2020-01-22T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2020-02-05T00:00:00Z,1,4,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2020-02-19T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2020-03-03T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2020-03-18T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2020-11-25T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2020-12-02T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2020-12-08T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2020-12-15T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2021-01-06T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2021-01-13T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2021-01-20T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2021-01-27T00:00:00Z,3,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2021-11-25T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2021-12-02T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2021-12-08T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2021-12-14T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2021-12-22T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2022-01-04T00:00:00Z,2,5,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2022-01-12T00:00:00Z,2,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2022-01-20T00:00:00Z,6,5,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2022-01-27T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Clifton
-2018-11-28T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2018-12-06T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2018-12-19T00:00:00Z,110,8,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2019-01-04T00:00:00Z,2,2,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2019-01-16T00:00:00Z,18,3,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2019-01-23T00:00:00Z,2,17,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2019-11-21T00:00:00Z,1,10,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2019-12-05T00:00:00Z,3,3,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2019-12-12T00:00:00Z,28,12,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2020-01-09T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2020-01-16T00:00:00Z,4,1,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2020-01-23T00:00:00Z,53,34,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2020-02-06T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2020-02-12T00:00:00Z,2,4,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2020-02-20T00:00:00Z,5,23,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2020-03-03T00:00:00Z,700,5,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2020-03-19T00:00:00Z,36,14,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2020-11-26T00:00:00Z,1,4,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2020-12-03T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2020-12-09T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2020-12-17T00:00:00Z,2,1,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2021-01-07T00:00:00Z,47,144,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2021-01-14T00:00:00Z,1,10,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2021-01-21T00:00:00Z,7,21,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2021-01-28T00:00:00Z,24,13,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2021-11-23T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2021-12-02T00:00:00Z,2280,150,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2021-12-09T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2021-12-15T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2021-12-23T00:00:00Z,2,4,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2022-01-05T00:00:00Z,4,8,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2022-01-11T00:00:00Z,2,12,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2022-01-19T00:00:00Z,4,5,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2022-01-26T00:00:00Z,41,15,BF Water Quality from WESSA Apr2022.xlsx,Fish Hoek
-2018-11-28T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2018-12-05T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2018-12-19T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2019-01-03T00:00:00Z,11,24,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2019-01-15T00:00:00Z,1,10,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2019-01-22T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2019-11-20T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2019-12-04T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2019-12-11T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2020-01-08T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2020-01-15T00:00:00Z,2,3,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2020-01-22T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2020-11-25T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2020-12-02T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2020-12-08T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2020-12-15T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2021-01-06T00:00:00Z,12,34,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2021-01-13T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2021-01-20T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2021-01-27T00:00:00Z,3,2,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2021-11-23T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2021-12-01T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2021-12-08T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2021-12-14T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2021-12-22T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2022-01-04T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2022-01-12T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2022-01-20T00:00:00Z,2,4,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2022-01-26T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,LLandudno
-2018-11-28T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2018-12-05T00:00:00Z,3,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2018-12-19T00:00:00Z,2,4,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2019-01-03T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2019-01-15T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2019-01-22T00:00:00Z,7,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2019-11-20T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2019-12-04T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2019-12-11T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2020-01-08T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2020-01-15T00:00:00Z,11,3,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2020-01-22T00:00:00Z,2,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2020-02-05T00:00:00Z,8,5,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2020-02-19T00:00:00Z,2,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2020-03-03T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2020-03-18T00:00:00Z,3,2,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2020-11-25T00:00:00Z,2,2,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2020-12-02T00:00:00Z,4,2,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2020-12-08T00:00:00Z,2,5,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2020-12-15T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2021-01-06T00:00:00Z,23,120,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2021-01-13T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2021-01-20T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2021-01-27T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2021-11-25T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2021-12-01T00:00:00Z,6,4,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2011-12-08T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2021-12-14T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2021-12-22T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2022-01-04T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2022-01-11T00:00:00Z,1,11,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2022-01-20T00:00:00Z,4,6,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2022-01-27T00:00:00Z,17,18,BF Water Quality from WESSA Apr2022.xlsx,Melkbosstrand
-2018-11-28T00:00:00Z,4,1,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2018-12-06T00:00:00Z,48,22,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2018-12-19T00:00:00Z,67,2,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2019-01-04T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2019-01-16T00:00:00Z,24,7,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2019-01-22T00:00:00Z,21,11,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2019-11-21T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2019-12-05T00:00:00Z,10,1,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2019-12-12T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2020-01-09T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2020-01-16T00:00:00Z,20,4,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2020-01-23T00:00:00Z,1120,150,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2020-02-05T00:00:00Z,14,35,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2020-02-20T00:00:00Z,20,2,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2020-03-03T00:00:00Z,1,5,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2020-03-19T00:00:00Z,52,3,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2020-11-26T00:00:00Z,79,34,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2020-12-03T00:00:00Z,3,1,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2020-12-09T00:00:00Z,114,63,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2020-12-17T00:00:00Z,116,34,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2021-01-07T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2021-01-14T00:00:00Z,3,2,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2021-01-21T00:00:00Z,50,45,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2021-01-28T00:00:00Z,5,1,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2021-11-23T00:00:00Z,625,150,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2021-12-02T00:00:00Z,33,122,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2021-12-09T00:00:00Z,43,23,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2021-12-15T00:00:00Z,6,11,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2021-12-23T00:00:00Z,118,150,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2022-01-04T00:00:00Z,28,25,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2022-01-11T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2022-01-19T00:00:00Z,3,6,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2022-01-26T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Mnandi
-2018-11-28T00:00:00Z,10,10,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2018-12-06T00:00:00Z,1,8,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2018-12-19T00:00:00Z,1,5,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2019-01-04T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2019-01-16T00:00:00Z,17,6,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2019-01-22T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2019-11-21T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2019-12-05T00:00:00Z,1,10,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2019-12-12T00:00:00Z,16,1,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2020-01-09T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2020-01-16T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2020-01-23T00:00:00Z,56,79,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2020-02-06T00:00:00Z,3,2,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2020-02-20T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2020-03-03T00:00:00Z,15,1,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2020-03-19T00:00:00Z,4,1,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2020-11-26T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2020-12-03T00:00:00Z,3,80,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2020-12-09T00:00:00Z,3,3,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2020-12-17T00:00:00Z,1,13,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-01-07T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-01-14T00:00:00Z,2,12,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-01-21T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-01-28T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-02-02T00:00:00Z,147,127,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-02-08T00:00:00Z,65,150,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-02-09T00:00:00Z,5,5,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-02-11T00:00:00Z,10,23,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-02-16T00:00:00Z,97,150,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-02-23T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-03-02T00:00:00Z,43,44,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-03-16T00:00:00Z,1,57,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-11-23T00:00:00Z,11,104,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-12-02T00:00:00Z,35,11,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-12-09T00:00:00Z,6,1,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-12-15T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2021-12-23T00:00:00Z,5,9,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2022-01-05T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2022-01-11T00:00:00Z,1,13,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2022-01-19T00:00:00Z,1,6,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2022-01-26T00:00:00Z,1,9,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2022-02-02T00:00:00Z,2,19,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2022-02-16T00:00:00Z,5,7,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2022-03-03T00:00:00Z,28,16,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2022-03-15T00:00:00Z,7,1,BF Water Quality from WESSA Apr2022.xlsx,Muizenberg
-2018-11-28T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2018-12-05T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2018-12-19T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2019-01-03T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2019-01-15T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2019-01-15T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2019-01-22T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2019-11-20T00:00:00Z,1,6,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2019-12-11T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2020-01-08T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2020-01-15T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2020-01-22T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2020-11-25T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2020-12-02T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2020-12-08T00:00:00Z,1,7,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2020-12-15T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2021-01-06T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2021-01-13T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2021-01-20T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2021-01-27T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2021-11-25T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2021-12-01T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2021-12-08T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2021-12-14T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2021-12-22T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2022-01-04T00:00:00Z,1,9,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2022-01-11T00:00:00Z,1,21,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2022-01-20T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2022-01-27T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Silwerstroom
-2018-11-28T00:00:00Z,93,47,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2018-12-06T00:00:00Z,2,7,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2018-12-19T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2019-01-04T00:00:00Z,1,2,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2019-01-16T00:00:00Z,16,7,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2019-11-21T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2019-12-05T00:00:00Z,10,5,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2019-12-12T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2020-01-09T00:00:00Z,3,1,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2020-01-16T00:00:00Z,6,31,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2020-01-23T00:00:00Z,105,71,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2020-02-06T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2020-02-20T00:00:00Z,42,79,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2020-03-03T00:00:00Z,7,9,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2020-03-19T00:00:00Z,5,8,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2020-11-26T00:00:00Z,3,18,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2020-12-03T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2020-12-09T00:00:00Z,3,2,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2020-12-17T00:00:00Z,5,32,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-01-07T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-01-14T00:00:00Z,3,5,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-01-21T00:00:00Z,21,12,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-01-28T00:00:00Z,56,69,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-02-02T00:00:00Z,130,150,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-02-08T00:00:00Z,2,18,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-02-09T00:00:00Z,15,16,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-02-16T00:00:00Z,146,91,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-02-23T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-03-02T00:00:00Z,4,22,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-03-16T00:00:00Z,1,15,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-11-23T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-12-02T00:00:00Z,445,150,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-12-09T00:00:00Z,22,9,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-12-15T00:00:00Z,27,150,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2021-12-23T00:00:00Z,3,3,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2022-01-05T00:00:00Z,7,14,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2022-01-11T00:00:00Z,2,17,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2022-01-19T00:00:00Z,4,85,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2022-01-26T00:00:00Z,10,16,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2022-02-02T00:00:00Z,1,3,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2022-02-16T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2022-03-03T00:00:00Z,4,13,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2022-03-15T00:00:00Z,1,1,BF Water Quality from WESSA Apr2022.xlsx,Strandfontein
-2019-11-21T00:00:00Z,25,79,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2019-12-05T00:00:00Z,4,23,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2019-12-12T00:00:00Z,16,47,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2020-01-09T00:00:00Z,40,63,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2020-01-16T00:00:00Z,38,49,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2020-01-23T00:00:00Z,44,48,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2020-02-06T00:00:00Z,89,111,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2020-02-20T00:00:00Z,19,8,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2020-03-03T00:00:00Z,105,150,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2020-03-19T00:00:00Z,5,3,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2020-11-26T00:00:00Z,110,150,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2020-12-03T00:00:00Z,27,21,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2020-12-09T00:00:00Z,42,51,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2020-12-17T00:00:00Z,117,85,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2021-01-07T00:00:00Z,36,118,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2021-01-14T00:00:00Z,84,120,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2021-01-21T00:00:00Z,29,56,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2021-01-28T00:00:00Z,175,135,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2021-11-23T00:00:00Z,1,5,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2021-12-01T00:00:00Z,4,150,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2021-12-08T00:00:00Z,42,24,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2021-12-15T00:00:00Z,37,150,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2021-12-23T00:00:00Z,74,85,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2022-01-05T00:00:00Z,92,131,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2022-01-12T00:00:00Z,105,115,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2022-01-19T00:00:00Z,6,58,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2022-01-26T00:00:00Z,8,29,BF Water Quality from WESSA Apr2022.xlsx,Seaforth
-2021-11-23T00:00:00Z,6,5,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2021-12-01T00:00:00Z,4,4,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2021-12-08T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2021-12-14T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2021-12-22T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2022-01-04T00:00:00Z,3,10,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2022-01-11T00:00:00Z,1,5,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2022-01-19T00:00:00Z,3,6,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2022-01-26T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2022-11-29T00:00:00Z,1,7,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2022-12-07T00:00:00Z,3,71,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2022-12-14T00:00:00Z,23,84,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2022-12-20T00:00:00Z,2,3,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2023-01-04T00:00:00Z,59,59,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2023-01-10T00:00:00Z,1,14,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2023-01-18T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2023-01-24T00:00:00Z,31,150,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2023-01-27T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2023-01-31T00:00:00Z,1,2,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2023-11-28T00:00:00Z,1,7,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2023-12-06T00:00:00Z,3,1,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2023-12-13T00:00:00Z,1,4,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2023-12-19T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2024-01-03T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2024-01-09T00:00:00Z,2,1,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2024-01-16T00:00:00Z,8,26,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2024-01-23T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2024-01-30T00:00:00Z,4,2,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2024-11-21T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2024-12-03T00:00:00Z,1,77,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2024-12-19T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2025-01-07T00:00:00Z,1,7,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2025-01-14T00:00:00Z,1,8,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2025-01-21T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2025-01-28T00:00:00Z,4,38,Blue Flag 95th percentile Compliance.xlsx,Bikini beach
-2021-11-23T00:00:00Z,1,5,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2021-12-01T00:00:00Z,1,4,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2021-12-08T00:00:00Z,1,8,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2021-12-14T00:00:00Z,1,12,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2021-12-22T00:00:00Z,1,4,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2022-01-04T00:00:00Z,6,11,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2022-01-12T00:00:00Z,1,3,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2022-01-20T00:00:00Z,2,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2022-01-26T00:00:00Z,15,2,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2022-02-02T00:00:00Z,27,18,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2022-02-16T00:00:00Z,1,2,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2022-03-03T00:00:00Z,29,15,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2022-03-15T00:00:00Z,2,6,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2022-03-31T00:00:00Z,25,37,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2022-11-29T00:00:00Z,2,11,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2022-12-07T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2022-12-14T00:00:00Z,1,10,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2022-12-20T00:00:00Z,1,12,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2023-01-04T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2023-01-10T00:00:00Z,2,8,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2023-01-18T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2023-01-24T00:00:00Z,11,62,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2023-01-31T00:00:00Z,1,5,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2023-02-16T00:00:00Z,26,107,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2023-11-28T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2023-12-06T00:00:00Z,78,16,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2023-12-13T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2023-12-19T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-01-03T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-01-09T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-01-17T00:00:00Z,30,28,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-01-23T00:00:00Z,1,3,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-01-30T00:00:00Z,5,9,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-02-06T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-02-13T00:00:00Z,13,57,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-02-20T00:00:00Z,1,5,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-02-27T00:00:00Z,18,98,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-03-05T00:00:00Z,25,13,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-03-13T00:00:00Z,17,150,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-03-18T00:00:00Z,6,29,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-03-19T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-03-27T00:00:00Z,2,2,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-11-20T00:00:00Z,23,14,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-12-05T00:00:00Z,6,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-12-12T00:00:00Z,72,15,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2024-12-19T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2025-01-05T00:00:00Z,6,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2025-01-08T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2025-01-16T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2025-01-28T00:00:00Z,35,88,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2025-02-04T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2025-02-11T00:00:00Z,1,33,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2025-02-18T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2025-02-19T00:00:00Z,1,22,Blue Flag 95th percentile Compliance.xlsx,Camps Bay
-2021-11-25T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2021-12-02T00:00:00Z,1,3,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2021-12-08T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2021-12-14T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2021-12-22T00:00:00Z,1,3,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2022-01-04T00:00:00Z,2,5,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2022-01-12T00:00:00Z,2,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2022-01-20T00:00:00Z,6,5,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2022-01-27T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2022-11-29T00:00:00Z,1,4,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2022-12-07T00:00:00Z,1,10,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2022-12-14T00:00:00Z,2,29,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2022-12-20T00:00:00Z,11,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2023-01-04T00:00:00Z,3,31,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2023-01-10T00:00:00Z,10,35,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2023-01-18T00:00:00Z,3500,19,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2023-01-20T00:00:00Z,14,11,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2023-01-24T00:00:00Z,8,21,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2023-01-31T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2023-11-28T00:00:00Z,3,2,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2023-12-06T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2023-12-13T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2023-12-19T00:00:00Z,33,53,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2024-01-03T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2024-01-09T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2024-01-17T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2024-01-23T00:00:00Z,1,6,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2024-01-30T00:00:00Z,16,16,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2024-11-20T00:00:00Z,144,46,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2024-12-05T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2024-12-12T00:00:00Z,97,29,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2024-12-19T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2025-01-08T00:00:00Z,2,3,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2025-01-16T00:00:00Z,26,7,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2025-01-22T00:00:00Z,5,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2025-01-28T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Clifton
-2021-11-23T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2021-12-02T00:00:00Z,2280,150,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2021-12-09T00:00:00Z,1,3,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2021-12-15T00:00:00Z,1,3,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2021-12-23T00:00:00Z,2,4,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2022-01-05T00:00:00Z,4,8,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2022-01-11T00:00:00Z,2,12,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2022-01-19T00:00:00Z,4,5,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2022-01-26T00:00:00Z,41,15,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2022-11-30T00:00:00Z,1,6,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2022-12-08T00:00:00Z,11,1,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2022-12-15T00:00:00Z,15,17,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2022-12-21T00:00:00Z,1,16,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2023-01-05T00:00:00Z,2,1,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2023-01-11T00:00:00Z,5,1,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2023-01-17T00:00:00Z,11,1,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2023-01-25T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2023-02-01T00:00:00Z,4,1,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2023-11-29T00:00:00Z,3,2,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2023-12-07T00:00:00Z,6,1,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2023-12-14T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2023-12-20T00:00:00Z,5,2,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2024-01-04T00:00:00Z,27,42,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2024-01-10T00:00:00Z,17,2,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2024-01-17T00:00:00Z,1,9,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2024-01-24T00:00:00Z,10,1,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2024-01-31T00:00:00Z,1,5,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2024-11-21T00:00:00Z,5,1,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2024-12-02T00:00:00Z,39,11,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2024-12-20T00:00:00Z,86,39,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2025-01-08T00:00:00Z,135,23,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2025-01-15T00:00:00Z,3,12,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2025-01-22T00:00:00Z,55,11,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2025-01-29T00:00:00Z,81,14,Blue Flag 95th percentile Compliance.xlsx,Fish Hoek
-2021-11-23T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2021-12-01T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2021-12-08T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2021-12-14T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2021-12-22T00:00:00Z,1,2,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2022-01-04T00:00:00Z,1,2,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2022-01-12T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2022-01-20T00:00:00Z,2,4,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2022-01-26T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2022-11-29T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2022-12-07T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2022-12-14T00:00:00Z,11,8,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2022-12-20T00:00:00Z,1,3,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2023-01-04T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2023-01-10T00:00:00Z,47,13,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2023-01-18T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2023-01-24T00:00:00Z,330,150,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2023-01-27T00:00:00Z,4,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2023-01-31T00:00:00Z,1,2,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2023-11-28T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2023-11-28T00:00:00Z,2,2,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2023-12-06T00:00:00Z,103,37,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2023-12-06T00:00:00Z,2900,150,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-01-03T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-01-03T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-01-09T00:00:00Z,4,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-01-09T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-01-17T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-01-17T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-01-23T00:00:00Z,1,9,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-01-23T00:00:00Z,1,4,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-01-30T00:00:00Z,3,2,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-01-30T00:00:00Z,38,4,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-11-20T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-11-20T00:00:00Z,28,9,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-12-05T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-12-05T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-12-12T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-12-12T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-12-19T00:00:00Z,81,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2024-12-19T00:00:00Z,12,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2025-01-08T00:00:00Z,144,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2025-01-08T00:00:00Z,41,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2025-01-16T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2025-01-16T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2025-01-22T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2025-01-22T00:00:00Z,6,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2025-01-28T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2025-01-28T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,LLandudno
-2021-11-25T00:00:00Z,1,3,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2021-12-01T00:00:00Z,6,4,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2021-12-08T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2021-12-14T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2021-12-22T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2022-01-04T00:00:00Z,1,2,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2022-01-11T00:00:00Z,1,11,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2022-01-20T00:00:00Z,4,6,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2022-01-27T00:00:00Z,17,18,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2022-11-29T00:00:00Z,195,55,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2022-12-07T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2022-12-14T00:00:00Z,18,76,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2022-12-20T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2023-01-04T00:00:00Z,9,34,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2023-01-10T00:00:00Z,10,27,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2023-01-18T00:00:00Z,4,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2023-01-24T00:00:00Z,55,86,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2023-01-31T00:00:00Z,3,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2023-11-28T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2023-11-28T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2023-12-06T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2023-12-06T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2023-12-13T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2023-12-13T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2023-12-19T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2023-12-19T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-01-03T00:00:00Z,18,35,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-01-03T00:00:00Z,7,8,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-01-09T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-01-09T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-01-17T00:00:00Z,13,2,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-01-17T00:00:00Z,100,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-01-23T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-01-23T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-01-30T00:00:00Z,38,8,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-01-30T00:00:00Z,50,13,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-11-20T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-11-20T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-12-03T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-12-03T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-12-19T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2024-12-19T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2025-01-07T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2025-01-07T00:00:00Z,2,2,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2025-01-14T00:00:00Z,2,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2025-01-14T00:00:00Z,4,6,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2025-01-21T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2025-01-21T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2025-01-28T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2025-01-28T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Melkbosstrand
-2022-11-29T00:00:00Z,1,63,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2022-12-08T00:00:00Z,168,44,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2022-12-15T00:00:00Z,370,70,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2022-12-21T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2022-12-29T00:00:00Z,1,63,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2023-01-05T00:00:00Z,42,9,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2023-01-11T00:00:00Z,130,15,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2023-01-17T00:00:00Z,320,105,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2023-01-25T00:00:00Z,12,22,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2023-02-01T00:00:00Z,1,2,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2023-11-29T00:00:00Z,116,62,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2023-12-07T00:00:00Z,12,4,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2023-12-14T00:00:00Z,16,14,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2023-12-20T00:00:00Z,8,6,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2024-01-04T00:00:00Z,215,21,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2024-01-10T00:00:00Z,34,21,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2024-01-16T00:00:00Z,20,35,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2024-01-24T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2024-01-31T00:00:00Z,67,93,Blue Flag 95th percentile Compliance.xlsx,Mnandi
-2022-11-30T00:00:00Z,18,3,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2022-12-08T00:00:00Z,141,65,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2022-12-15T00:00:00Z,29,48,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2022-12-21T00:00:00Z,2,1,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2022-12-30T00:00:00Z,18,3,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2023-01-05T00:00:00Z,3,1,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2023-01-11T00:00:00Z,1,24,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2023-01-17T00:00:00Z,27,49,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2023-01-25T00:00:00Z,3,13,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2023-02-01T00:00:00Z,3,12,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2023-02-16T00:00:00Z,16,13,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2023-11-29T00:00:00Z,95,77,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2023-12-07T00:00:00Z,1,2,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2023-12-14T00:00:00Z,17,4,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2023-12-20T00:00:00Z,1,4,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2024-01-04T00:00:00Z,45,7,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2024-01-10T00:00:00Z,25,6,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2024-01-16T00:00:00Z,1,10,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2024-01-24T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2024-01-31T00:00:00Z,42,47,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2024-02-06T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2024-02-13T00:00:00Z,8,16,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2024-02-27T00:00:00Z,3400,150,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2024-03-04T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2024-03-05T00:00:00Z,5,14,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2024-03-13T00:00:00Z,6,150,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2024-03-18T00:00:00Z,1,52,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2024-03-19T00:00:00Z,23,45,Blue Flag 95th percentile Compliance.xlsx,Strandfontein
-2021-11-23T00:00:00Z,11,104,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2021-12-02T00:00:00Z,35,11,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2021-12-09T00:00:00Z,6,1,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2021-12-15T00:00:00Z,1,2,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2021-12-23T00:00:00Z,5,9,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2022-01-05T00:00:00Z,1,3,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2022-01-11T00:00:00Z,1,13,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2022-01-19T00:00:00Z,1,6,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2022-01-26T00:00:00Z,1,9,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2022-02-02T00:00:00Z,2,19,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2022-02-16T00:00:00Z,5,7,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2022-03-03T00:00:00Z,28,16,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2022-03-15T00:00:00Z,7,1,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2022-11-30T00:00:00Z,20,10,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2022-12-08T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2022-12-15T00:00:00Z,26,3,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2022-12-21T00:00:00Z,3,42,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2023-01-05T00:00:00Z,18,17,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2023-01-11T00:00:00Z,390,15,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2023-01-17T00:00:00Z,2,10,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2023-01-25T00:00:00Z,1,10,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2023-02-01T00:00:00Z,3,12,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2023-02-16T00:00:00Z,59,140,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2023-11-29T00:00:00Z,1,3,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2023-12-07T00:00:00Z,42,2,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2023-12-14T00:00:00Z,3,22,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2023-12-20T00:00:00Z,2,3,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-01-04T00:00:00Z,88,34,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-01-10T00:00:00Z,91,82,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-01-16T00:00:00Z,8,11,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-01-24T00:00:00Z,12,1,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-01-31T00:00:00Z,12,1,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-02-06T00:00:00Z,1,7,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-02-13T00:00:00Z,33,37,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-02-20T00:00:00Z,1,3,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-02-27T00:00:00Z,7,5,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-03-05T00:00:00Z,4,9,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-03-13T00:00:00Z,11,150,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-03-18T00:00:00Z,1,3,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-03-19T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-03-27T00:00:00Z,54,48,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-11-21T00:00:00Z,7,14,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-12-02T00:00:00Z,4,5,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2024-12-20T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2025-01-08T00:00:00Z,2,13,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2025-01-15T00:00:00Z,1,4,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2025-01-21T00:00:00Z,11,11,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2025-01-29T00:00:00Z,88,66,Blue Flag 95th percentile Compliance.xlsx,Muizenberg
-2021-11-25T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2021-12-01T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2021-12-08T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2021-12-14T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2021-12-22T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2022-01-04T00:00:00Z,1,9,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2022-01-11T00:00:00Z,1,21,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2022-01-20T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2022-01-27T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2022-11-29T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2022-12-07T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2022-12-14T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2022-12-20T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2023-01-04T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2023-01-10T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2023-01-18T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2023-01-24T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2023-01-31T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2023-11-28T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2023-12-06T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2023-12-13T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2023-12-19T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2024-01-03T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2024-01-09T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2024-01-17T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2024-01-23T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2024-01-30T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2024-11-20T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2024-12-03T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2024-12-19T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2025-01-07T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2025-01-14T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2025-01-21T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2025-01-28T00:00:00Z,1,1,Blue Flag 95th percentile Compliance.xlsx,Silwerstroom
-2019-11-21T00:00:00Z,25,79,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2019-12-05T00:00:00Z,4,23,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2019-12-12T00:00:00Z,16,47,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2020-01-09T00:00:00Z,40,63,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2020-01-16T00:00:00Z,38,49,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2020-01-23T00:00:00Z,44,48,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2020-02-06T00:00:00Z,89,111,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2020-02-20T00:00:00Z,19,8,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2020-03-03T00:00:00Z,105,150,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2020-03-19T00:00:00Z,5,3,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2020-11-26T00:00:00Z,110,150,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2020-12-03T00:00:00Z,27,21,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2020-12-09T00:00:00Z,42,51,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2020-12-17T00:00:00Z,117,85,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2021-01-07T00:00:00Z,36,118,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2021-01-14T00:00:00Z,84,120,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2021-01-21T00:00:00Z,29,56,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2021-01-28T00:00:00Z,175,135,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2021-11-23T00:00:00Z,1,5,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2021-12-01T00:00:00Z,4,150,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2021-12-08T00:00:00Z,42,24,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2021-12-15T00:00:00Z,37,150,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2021-12-23T00:00:00Z,74,85,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2022-01-05T00:00:00Z,92,131,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2022-01-12T00:00:00Z,105,115,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2022-01-19T00:00:00Z,6,58,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2022-01-26T00:00:00Z,8,29,Blue Flag 95th percentile Compliance.xlsx,Seaforth
-2012-11-19T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2012-11-26T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2012-12-03T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2012-12-10T00:00:00Z,1,17,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2012-12-18T00:00:00Z,1,2,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2013-01-02T00:00:00Z,15,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2013-01-21T00:00:00Z,23,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2013-02-11T00:00:00Z,1,5,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2013-02-18T00:00:00Z,1,4,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2013-02-25T00:00:00Z,93,26,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2013-03-04T00:00:00Z,4,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2013-03-11T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2013-03-18T00:00:00Z,1,5,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2013-11-27T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2013-12-02T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2013-12-09T00:00:00Z,4,38,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2013-12-17T00:00:00Z,1,2,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2013-12-19T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-01-02T00:00:00Z,1,3,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-01-06T00:00:00Z,7,10,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-01-13T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-01-20T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-01-27T00:00:00Z,23,3,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-02-10T00:00:00Z,31,2,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-02-17T00:00:00Z,4,48,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-02-24T00:00:00Z,1,5,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-03-17T00:00:00Z,1,2,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-03-24T00:00:00Z,102,151,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-03-31T00:00:00Z,20,9,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-11-05T00:00:00Z,6,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-11-19T00:00:00Z,2,6,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-12-03T00:00:00Z,22,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-12-15T00:00:00Z,10,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-12-17T00:00:00Z,10,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-12-23T00:00:00Z,2,NA,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2014-12-30T00:00:00Z,42,4,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2015-01-14T00:00:00Z,2,2,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2015-01-28T00:00:00Z,14,2,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2015-02-11T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2015-02-25T00:00:00Z,2,5,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2015-03-11T00:00:00Z,2,5,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2015-03-25T00:00:00Z,2,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2015-11-18T00:00:00Z,1,2,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2015-12-02T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2015-12-22T00:00:00Z,60,47,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2016-01-13T00:00:00Z,3,7,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2016-01-20T00:00:00Z,1,4,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2016-02-03T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2016-02-10T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2016-02-24T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2016-03-23T00:00:00Z,2,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Clifton(IV)
-2012-11-19T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2012-11-26T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2012-12-03T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2012-12-10T00:00:00Z,9,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2012-12-18T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2013-01-02T00:00:00Z,43,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2013-01-21T00:00:00Z,4,2,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2013-02-11T00:00:00Z,23,63,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2013-02-18T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2013-02-25T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2013-03-04T00:00:00Z,1,4,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2013-03-11T00:00:00Z,43,14,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2013-03-18T00:00:00Z,1,13,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2013-11-27T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2013-12-02T00:00:00Z,1,2,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2013-12-09T00:00:00Z,1,20,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2013-12-17T00:00:00Z,1,29,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2013-12-19T00:00:00Z,1,2,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-01-02T00:00:00Z,4,5,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-01-06T00:00:00Z,6,3,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-01-13T00:00:00Z,240,52,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-01-20T00:00:00Z,1,96,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-01-27T00:00:00Z,1,2,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-02-03T00:00:00Z,10,8,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-02-10T00:00:00Z,29,38,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-02-17T00:00:00Z,1,99,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-02-24T00:00:00Z,24,127,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-03-03T00:00:00Z,1,10,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-03-10T00:00:00Z,10,10,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-03-17T00:00:00Z,86,37,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-03-24T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-11-05T00:00:00Z,100,87,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-11-19T00:00:00Z,56,59,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-12-03T00:00:00Z,4,26,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-12-17T00:00:00Z,90,10,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2014-12-30T00:00:00Z,2,40,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-01-14T00:00:00Z,8,12,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-01-28T00:00:00Z,58,10,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-02-11T00:00:00Z,8,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-02-25T00:00:00Z,4,10,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-03-11T00:00:00Z,8,3,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-03-25T00:00:00Z,2,6,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-04-08T00:00:00Z,4,4,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-04-22T00:00:00Z,10,2,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-05-06T00:00:00Z,6,28,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-05-20T00:00:00Z,10,3,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-06-03T00:00:00Z,54,200,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-06-17T00:00:00Z,10,28,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-07-01T00:00:00Z,14,5,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-11-18T00:00:00Z,2,4,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-12-02T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2015-12-22T00:00:00Z,29,21,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2016-01-13T00:00:00Z,1,3,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2016-01-20T00:00:00Z,1,2,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2016-02-03T00:00:00Z,29,32,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2016-02-10T00:00:00Z,1,1,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2016-02-24T00:00:00Z,2,6,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2016-03-23T00:00:00Z,1,11,CampsBay CliftonIV Water Quality spreadsheet.xlsx,Camps Bay
-2012-11-21T00:00:00Z,3,76,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2012-12-05T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2012-12-19T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2013-01-02T00:00:00Z,23,2,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2013-01-30T00:00:00Z,460,151,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2013-11-27T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2013-12-04T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2013-12-18T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2014-01-02T00:00:00Z,3,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2014-01-15T00:00:00Z,96,16,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2014-01-29T00:00:00Z,43,26,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2014-11-10T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2014-11-19T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2014-12-03T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2014-12-17T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2014-12-30T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2015-01-14T00:00:00Z,2,12,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2015-01-28T00:00:00Z,4,3,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2015-11-18T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2015-12-02T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2015-12-21T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2016-01-18T00:00:00Z,2,13,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2016-01-27T00:00:00Z,12,12,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2016-02-24T00:00:00Z,23,18,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2016-11-24T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2016-11-30T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2016-12-06T00:00:00Z,1,6,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2016-12-12T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2016-12-15T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2016-12-19T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2017-01-04T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2017-01-09T00:00:00Z,1,65,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2017-01-12T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2017-01-18T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Silwerstrm
-2012-11-19T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2012-11-26T00:00:00Z,4,9,CoCT Water Quality - Consolidated.xls,Strandfn
-2012-12-03T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2012-12-10T00:00:00Z,4,5,CoCT Water Quality - Consolidated.xls,Strandfn
-2012-12-18T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2013-01-02T00:00:00Z,4,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2013-01-21T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2013-02-11T00:00:00Z,75,25,CoCT Water Quality - Consolidated.xls,Strandfn
-2013-02-18T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2013-02-25T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2013-03-04T00:00:00Z,240,56,CoCT Water Quality - Consolidated.xls,Strandfn
-2013-03-11T00:00:00Z,4,15,CoCT Water Quality - Consolidated.xls,Strandfn
-2013-03-18T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2013-11-27T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Strandfn
-2013-12-02T00:00:00Z,9,4,CoCT Water Quality - Consolidated.xls,Strandfn
-2013-12-09T00:00:00Z,9,8,CoCT Water Quality - Consolidated.xls,Strandfn
-2013-12-17T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2013-12-19T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-01-02T00:00:00Z,9,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-01-06T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-01-13T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-01-20T00:00:00Z,3,5,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-01-27T00:00:00Z,1,7,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-02-03T00:00:00Z,10,3,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-02-10T00:00:00Z,1,4,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-02-17T00:00:00Z,27,151,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-02-24T00:00:00Z,84,17,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-03-03T00:00:00Z,3,11,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-03-10T00:00:00Z,122,27,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-03-17T00:00:00Z,2,44,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-03-24T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-11-12T00:00:00Z,2,2,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-11-26T00:00:00Z,50,6,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-12-10T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2014-12-19T00:00:00Z,2,25,CoCT Water Quality - Consolidated.xls,Strandfn
-2015-01-07T00:00:00Z,2,10,CoCT Water Quality - Consolidated.xls,Strandfn
-2015-01-21T00:00:00Z,6,21,CoCT Water Quality - Consolidated.xls,Strandfn
-2015-02-04T00:00:00Z,8,16,CoCT Water Quality - Consolidated.xls,Strandfn
-2015-02-18T00:00:00Z,10,9,CoCT Water Quality - Consolidated.xls,Strandfn
-2015-03-04T00:00:00Z,14,17,CoCT Water Quality - Consolidated.xls,Strandfn
-2015-03-18T00:00:00Z,8,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2015-03-31T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2015-11-18T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2015-12-02T00:00:00Z,1,4,CoCT Water Quality - Consolidated.xls,Strandfn
-2015-12-22T00:00:00Z,8,4,CoCT Water Quality - Consolidated.xls,Strandfn
-2016-01-13T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2016-01-20T00:00:00Z,11,3,CoCT Water Quality - Consolidated.xls,Strandfn
-2016-02-03T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2016-02-10T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2016-02-24T00:00:00Z,4,4,CoCT Water Quality - Consolidated.xls,Strandfn
-2016-03-30T00:00:00Z,6,8,CoCT Water Quality - Consolidated.xls,Strandfn
-2016-11-23T00:00:00Z,3,7,CoCT Water Quality - Consolidated.xls,Strandfn
-2016-11-30T00:00:00Z,1,4,CoCT Water Quality - Consolidated.xls,Strandfn
-2016-12-06T00:00:00Z,15,15,CoCT Water Quality - Consolidated.xls,Strandfn
-2016-12-14T00:00:00Z,1,35,CoCT Water Quality - Consolidated.xls,Strandfn
-2016-12-21T00:00:00Z,1,7,CoCT Water Quality - Consolidated.xls,Strandfn
-2017-01-04T00:00:00Z,45,14,CoCT Water Quality - Consolidated.xls,Strandfn
-2017-01-11T00:00:00Z,4,10,CoCT Water Quality - Consolidated.xls,Strandfn
-2017-01-18T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Strandfn
-2017-01-25T00:00:00Z,8,16,CoCT Water Quality - Consolidated.xls,Strandfn
-2017-02-01T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Strandfn
-2017-02-08T00:00:00Z,14,19,CoCT Water Quality - Consolidated.xls,Strandfn
-2017-03-01T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Strandfn
-2017-03-08T00:00:00Z,5,13,CoCT Water Quality - Consolidated.xls,Strandfn
-2012-11-19T00:00:00Z,1,8,CoCT Water Quality - Consolidated.xls,Muiz
-2012-11-26T00:00:00Z,1,5,CoCT Water Quality - Consolidated.xls,Muiz
-2012-12-03T00:00:00Z,1,4,CoCT Water Quality - Consolidated.xls,Muiz
-2012-12-10T00:00:00Z,7,16,CoCT Water Quality - Consolidated.xls,Muiz
-2012-12-18T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Muiz
-2013-01-02T00:00:00Z,7,2,CoCT Water Quality - Consolidated.xls,Muiz
-2013-01-21T00:00:00Z,1,15,CoCT Water Quality - Consolidated.xls,Muiz
-2013-02-11T00:00:00Z,1100,150,CoCT Water Quality - Consolidated.xls,Muiz
-2013-02-18T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Muiz
-2013-02-25T00:00:00Z,4,5,CoCT Water Quality - Consolidated.xls,Muiz
-2013-03-04T00:00:00Z,1,22,CoCT Water Quality - Consolidated.xls,Muiz
-2013-03-11T00:00:00Z,14,47,CoCT Water Quality - Consolidated.xls,Muiz
-2013-03-18T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Muiz
-2013-11-27T00:00:00Z,1,7,CoCT Water Quality - Consolidated.xls,Muiz
-2013-12-02T00:00:00Z,9,1,CoCT Water Quality - Consolidated.xls,Muiz
-2013-12-09T00:00:00Z,4,48,CoCT Water Quality - Consolidated.xls,Muiz
-2013-12-17T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Muiz
-2013-12-19T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Muiz
-2014-01-02T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Muiz
-2014-01-06T00:00:00Z,23,15,CoCT Water Quality - Consolidated.xls,Muiz
-2014-01-13T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Muiz
-2014-01-20T00:00:00Z,11,6,CoCT Water Quality - Consolidated.xls,Muiz
-2014-01-27T00:00:00Z,23,11,CoCT Water Quality - Consolidated.xls,Muiz
-2014-02-03T00:00:00Z,10,12,CoCT Water Quality - Consolidated.xls,Muiz
-2014-02-10T00:00:00Z,10,1,CoCT Water Quality - Consolidated.xls,Muiz
-2014-02-17T00:00:00Z,25,151,CoCT Water Quality - Consolidated.xls,Muiz
-2014-02-24T00:00:00Z,2,11,CoCT Water Quality - Consolidated.xls,Muiz
-2014-03-03T00:00:00Z,4,15,CoCT Water Quality - Consolidated.xls,Muiz
-2014-03-10T00:00:00Z,104,16,CoCT Water Quality - Consolidated.xls,Muiz
-2014-03-17T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Muiz
-2014-03-24T00:00:00Z,2,6,CoCT Water Quality - Consolidated.xls,Muiz
-2014-11-12T00:00:00Z,4,6,CoCT Water Quality - Consolidated.xls,Muiz
-2014-11-26T00:00:00Z,18,29,CoCT Water Quality - Consolidated.xls,Muiz
-2014-12-10T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Muiz
-2014-12-19T00:00:00Z,2,4,CoCT Water Quality - Consolidated.xls,Muiz
-2015-01-07T00:00:00Z,6,20,CoCT Water Quality - Consolidated.xls,Muiz
-2015-01-21T00:00:00Z,8,10,CoCT Water Quality - Consolidated.xls,Muiz
-2015-02-04T00:00:00Z,4,32,CoCT Water Quality - Consolidated.xls,Muiz
-2015-02-18T00:00:00Z,14,31,CoCT Water Quality - Consolidated.xls,Muiz
-2015-03-04T00:00:00Z,26,26,CoCT Water Quality - Consolidated.xls,Muiz
-2015-03-18T00:00:00Z,30,32,CoCT Water Quality - Consolidated.xls,Muiz
-2015-03-31T00:00:00Z,8,10,CoCT Water Quality - Consolidated.xls,Muiz
-2015-11-18T00:00:00Z,12,22,CoCT Water Quality - Consolidated.xls,Muiz
-2015-12-02T00:00:00Z,1,5,CoCT Water Quality - Consolidated.xls,Muiz
-2015-12-22T00:00:00Z,9,34,CoCT Water Quality - Consolidated.xls,Muiz
-2016-01-13T00:00:00Z,1,9,CoCT Water Quality - Consolidated.xls,Muiz
-2016-01-20T00:00:00Z,44,60,CoCT Water Quality - Consolidated.xls,Muiz
-2016-02-03T00:00:00Z,1,18,CoCT Water Quality - Consolidated.xls,Muiz
-2016-02-10T00:00:00Z,17,30,CoCT Water Quality - Consolidated.xls,Muiz
-2016-02-24T00:00:00Z,2,6,CoCT Water Quality - Consolidated.xls,Muiz
-2016-03-23T00:00:00Z,12,53,CoCT Water Quality - Consolidated.xls,Muiz
-2016-11-30T00:00:00Z,1,10,CoCT Water Quality - Consolidated.xls,Muiz
-2016-11-23T00:00:00Z,2,7,CoCT Water Quality - Consolidated.xls,Muiz
-2016-12-06T00:00:00Z,3,5,CoCT Water Quality - Consolidated.xls,Muiz
-2016-12-14T00:00:00Z,2,3,CoCT Water Quality - Consolidated.xls,Muiz
-2016-12-21T00:00:00Z,1,50,CoCT Water Quality - Consolidated.xls,Muiz
-2017-01-04T00:00:00Z,3,21,CoCT Water Quality - Consolidated.xls,Muiz
-2017-01-11T00:00:00Z,8,8,CoCT Water Quality - Consolidated.xls,Muiz
-2017-01-18T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Muiz
-2017-01-25T00:00:00Z,8,4,CoCT Water Quality - Consolidated.xls,Muiz
-2017-02-01T00:00:00Z,2,4,CoCT Water Quality - Consolidated.xls,Muiz
-2017-02-08T00:00:00Z,14,63,CoCT Water Quality - Consolidated.xls,Muiz
-2017-03-01T00:00:00Z,5,2,CoCT Water Quality - Consolidated.xls,Muiz
-2017-03-08T00:00:00Z,3,24,CoCT Water Quality - Consolidated.xls,Muiz
-2014-11-05T00:00:00Z,6,1,CoCT Water Quality - Consolidated.xls,Mnandi
-2014-11-19T00:00:00Z,2,6,CoCT Water Quality - Consolidated.xls,Mnandi
-2014-12-03T00:00:00Z,22,1,CoCT Water Quality - Consolidated.xls,Mnandi
-2014-12-15T00:00:00Z,10,1,CoCT Water Quality - Consolidated.xls,Mnandi
-2014-12-17T00:00:00Z,10,1,CoCT Water Quality - Consolidated.xls,Mnandi
-2014-12-23T00:00:00Z,2,NA,CoCT Water Quality - Consolidated.xls,Mnandi
-2014-12-30T00:00:00Z,42,4,CoCT Water Quality - Consolidated.xls,Mnandi
-2015-01-14T00:00:00Z,2,2,CoCT Water Quality - Consolidated.xls,Mnandi
-2015-01-28T00:00:00Z,14,2,CoCT Water Quality - Consolidated.xls,Mnandi
-2015-02-11T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Mnandi
-2015-02-25T00:00:00Z,2,5,CoCT Water Quality - Consolidated.xls,Mnandi
-2015-03-11T00:00:00Z,2,5,CoCT Water Quality - Consolidated.xls,Mnandi
-2015-03-25T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Mnandi
-2015-11-18T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Mnandi
-2015-12-02T00:00:00Z,18,3,CoCT Water Quality - Consolidated.xls,Mnandi
-2015-12-22T00:00:00Z,10,6,CoCT Water Quality - Consolidated.xls,Mnandi
-2016-01-13T00:00:00Z,1,5,CoCT Water Quality - Consolidated.xls,Mnandi
-2016-01-20T00:00:00Z,5,1,CoCT Water Quality - Consolidated.xls,Mnandi
-2016-02-03T00:00:00Z,36,9,CoCT Water Quality - Consolidated.xls,Mnandi
-2016-02-10T00:00:00Z,6,1,CoCT Water Quality - Consolidated.xls,Mnandi
-2016-02-24T00:00:00Z,8,2,CoCT Water Quality - Consolidated.xls,Mnandi
-2016-03-23T00:00:00Z,14,3,CoCT Water Quality - Consolidated.xls,Mnandi
-2016-11-30T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Mnandi
-2016-11-23T00:00:00Z,12,33,CoCT Water Quality - Consolidated.xls,Mnandi
-2016-12-06T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Mnandi
-2016-12-14T00:00:00Z,74,10,CoCT Water Quality - Consolidated.xls,Mnandi
-2016-12-21T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Mnandi
-2017-01-04T00:00:00Z,95,30,CoCT Water Quality - Consolidated.xls,Mnandi
-2017-01-11T00:00:00Z,6,6,CoCT Water Quality - Consolidated.xls,Mnandi
-2017-01-18T00:00:00Z,6,5,CoCT Water Quality - Consolidated.xls,Mnandi
-2017-01-25T00:00:00Z,45,48,CoCT Water Quality - Consolidated.xls,Mnandi
-2017-02-01T00:00:00Z,15,31,CoCT Water Quality - Consolidated.xls,Mnandi
-2017-02-08T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Mnandi
-2017-03-01T00:00:00Z,133,54,CoCT Water Quality - Consolidated.xls,Mnandi
-2017-03-08T00:00:00Z,3,5,CoCT Water Quality - Consolidated.xls,Mnandi
-2013-11-27T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2013-12-02T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2013-12-09T00:00:00Z,4,38,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2013-12-17T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2013-12-19T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-01-02T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-01-06T00:00:00Z,7,10,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-01-13T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-01-20T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-01-27T00:00:00Z,23,3,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-02-10T00:00:00Z,31,2,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-02-17T00:00:00Z,4,48,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-02-24T00:00:00Z,1,5,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-03-17T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-03-24T00:00:00Z,102,151,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-03-31T00:00:00Z,20,9,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-11-05T00:00:00Z,6,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-11-19T00:00:00Z,2,6,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-12-03T00:00:00Z,22,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-12-15T00:00:00Z,10,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-12-17T00:00:00Z,10,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-12-23T00:00:00Z,2,NA,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2014-12-30T00:00:00Z,42,4,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2015-01-14T00:00:00Z,2,2,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2015-01-28T00:00:00Z,14,2,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2015-02-11T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2015-02-25T00:00:00Z,2,5,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2015-03-11T00:00:00Z,2,5,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2015-03-25T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2015-11-18T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2015-12-02T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2015-12-22T00:00:00Z,60,47,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2016-01-13T00:00:00Z,3,7,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2016-01-20T00:00:00Z,1,4,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2016-02-03T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2016-02-10T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2016-02-24T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2016-03-23T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2016-11-23T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2016-11-30T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2016-12-06T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2016-12-14T00:00:00Z,1,6,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2016-12-21T00:00:00Z,5,2,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2017-01-04T00:00:00Z,11,2,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2017-01-11T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2017-01-18T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2017-01-25T00:00:00Z,5,5,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2017-02-01T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2017-02-08T00:00:00Z,1,5,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2017-03-01T00:00:00Z,2,3,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2017-03-08T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Clifton(IV)
-2013-11-27T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Camps Bay
-2013-12-02T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Camps Bay
-2013-12-09T00:00:00Z,1,20,CoCT Water Quality - Consolidated.xls,Camps Bay
-2013-12-17T00:00:00Z,1,29,CoCT Water Quality - Consolidated.xls,Camps Bay
-2013-12-19T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-01-02T00:00:00Z,4,5,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-01-06T00:00:00Z,6,3,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-01-13T00:00:00Z,240,52,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-01-20T00:00:00Z,1,96,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-01-27T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-02-03T00:00:00Z,10,8,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-02-10T00:00:00Z,29,38,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-02-17T00:00:00Z,1,99,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-02-24T00:00:00Z,24,127,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-03-03T00:00:00Z,1,10,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-03-10T00:00:00Z,10,10,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-03-17T00:00:00Z,86,37,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-03-24T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-11-05T00:00:00Z,100,87,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-11-19T00:00:00Z,56,59,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-12-03T00:00:00Z,4,26,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-12-17T00:00:00Z,90,10,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-12-30T00:00:00Z,2,40,CoCT Water Quality - Consolidated.xls,Camps Bay
-2015-01-14T00:00:00Z,8,12,CoCT Water Quality - Consolidated.xls,Camps Bay
-2015-01-28T00:00:00Z,58,10,CoCT Water Quality - Consolidated.xls,Camps Bay
-2015-02-11T00:00:00Z,8,1,CoCT Water Quality - Consolidated.xls,Camps Bay
-2015-02-25T00:00:00Z,4,10,CoCT Water Quality - Consolidated.xls,Camps Bay
-2015-03-11T00:00:00Z,8,3,CoCT Water Quality - Consolidated.xls,Camps Bay
-2015-03-25T00:00:00Z,2,6,CoCT Water Quality - Consolidated.xls,Camps Bay
-2015-11-18T00:00:00Z,2,4,CoCT Water Quality - Consolidated.xls,Camps Bay
-2015-12-02T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Camps Bay
-2015-12-22T00:00:00Z,29,21,CoCT Water Quality - Consolidated.xls,Camps Bay
-2016-01-13T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Camps Bay
-2016-01-20T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Camps Bay
-2016-02-03T00:00:00Z,29,32,CoCT Water Quality - Consolidated.xls,Camps Bay
-2016-02-10T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Camps Bay
-2016-02-24T00:00:00Z,2,6,CoCT Water Quality - Consolidated.xls,Camps Bay
-2016-03-23T00:00:00Z,1,11,CoCT Water Quality - Consolidated.xls,Camps Bay
-2016-11-23T00:00:00Z,3,63,CoCT Water Quality - Consolidated.xls,Camps Bay
-2016-11-30T00:00:00Z,1,4,CoCT Water Quality - Consolidated.xls,Camps Bay
-2016-12-06T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Camps Bay
-2016-12-14T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Camps Bay
-2016-12-21T00:00:00Z,1,5,CoCT Water Quality - Consolidated.xls,Camps Bay
-2017-01-04T00:00:00Z,4,10,CoCT Water Quality - Consolidated.xls,Camps Bay
-2017-01-11T00:00:00Z,1,30,CoCT Water Quality - Consolidated.xls,Camps Bay
-2017-01-18T00:00:00Z,1,4,CoCT Water Quality - Consolidated.xls,Camps Bay
-2017-01-25T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Camps Bay
-2017-02-01T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Camps Bay
-2017-02-08T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Camps Bay
-2017-03-01T00:00:00Z,2,6,CoCT Water Quality - Consolidated.xls,Camps Bay
-2017-03-08T00:00:00Z,1,5,CoCT Water Quality - Consolidated.xls,Camps Bay
-2014-11-10T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2014-11-19T00:00:00Z,2,2,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2014-12-03T00:00:00Z,44,9,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2014-12-17T00:00:00Z,10,7,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2014-12-30T00:00:00Z,36,37,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2015-01-14T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2015-01-28T00:00:00Z,64,17,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2015-02-25T00:00:00Z,30,88,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2015-03-11T00:00:00Z,10,8,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2015-03-25T00:00:00Z,46,3,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2015-12-09T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2015-12-17T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2015-12-23T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2016-01-13T00:00:00Z,1,6,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2016-01-20T00:00:00Z,33,4,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2016-01-27T00:00:00Z,5,4,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2016-02-03T00:00:00Z,6,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2016-02-10T00:00:00Z,3,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2016-02-24T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2016-03-09T00:00:00Z,3,2,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2016-03-16T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2016-03-23T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2016-11-23T00:00:00Z,2,2,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2016-11-30T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2016-12-06T00:00:00Z,1,21,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2016-12-15T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2016-12-21T00:00:00Z,2,10,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2017-01-04T00:00:00Z,3,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2017-01-12T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2017-01-18T00:00:00Z,1,30,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2017-01-25T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2017-02-01T00:00:00Z,2,2,CoCT Water Quality - Consolidated.xls,Melkbos(S)
-2014-11-10T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2014-11-19T00:00:00Z,2,2,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2014-12-03T00:00:00Z,44,9,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2014-12-17T00:00:00Z,10,7,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2014-12-30T00:00:00Z,36,37,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2015-01-14T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2015-01-28T00:00:00Z,64,17,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2015-02-25T00:00:00Z,30,88,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2015-03-11T00:00:00Z,10,8,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2015-03-25T00:00:00Z,46,3,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2015-12-09T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2015-12-17T00:00:00Z,4,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2015-12-23T00:00:00Z,3,3,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2016-01-13T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2016-01-20T00:00:00Z,9,2,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2016-01-27T00:00:00Z,5,3,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2016-02-03T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2016-02-10T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2016-02-24T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2016-03-09T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2016-03-16T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2016-03-23T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2016-11-24T00:00:00Z,6,12,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2016-11-30T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2016-12-06T00:00:00Z,1,10,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2016-12-15T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2016-12-21T00:00:00Z,1,16,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2017-01-04T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2017-01-12T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2017-01-18T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2017-01-25T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2017-02-01T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Melkbos(N)
-2012-11-19T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2012-11-26T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2012-12-03T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2012-12-10T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Lland
-2012-12-18T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2013-01-02T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2013-01-21T00:00:00Z,240,151,CoCT Water Quality - Consolidated.xls,Lland
-2013-11-27T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2013-12-02T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2013-12-09T00:00:00Z,15,41,CoCT Water Quality - Consolidated.xls,Lland
-2013-12-17T00:00:00Z,1,17,CoCT Water Quality - Consolidated.xls,Lland
-2013-12-19T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2014-01-02T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2014-01-06T00:00:00Z,1,4,CoCT Water Quality - Consolidated.xls,Lland
-2014-01-13T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2014-01-20T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2014-01-27T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2014-11-12T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Lland
-2014-11-26T00:00:00Z,12,4,CoCT Water Quality - Consolidated.xls,Lland
-2014-12-10T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Lland
-2014-12-18T00:00:00Z,2,3,CoCT Water Quality - Consolidated.xls,Lland
-2015-01-07T00:00:00Z,2,7,CoCT Water Quality - Consolidated.xls,Lland
-2015-01-21T00:00:00Z,6,1,CoCT Water Quality - Consolidated.xls,Lland
-2015-11-18T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Lland
-2015-12-02T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2015-12-22T00:00:00Z,12,24,CoCT Water Quality - Consolidated.xls,Lland
-2016-01-13T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2016-01-20T00:00:00Z,4,4,CoCT Water Quality - Consolidated.xls,Lland
-2016-02-24T00:00:00Z,2,16,CoCT Water Quality - Consolidated.xls,Lland
-2016-11-23T00:00:00Z,1,17,CoCT Water Quality - Consolidated.xls,Lland
-2016-11-30T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2016-12-06T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2016-12-14T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2016-12-21T00:00:00Z,8,5,CoCT Water Quality - Consolidated.xls,Lland
-2017-01-04T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2017-01-11T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Lland
-2017-01-18T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2017-01-25T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2017-02-01T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Lland
-2012-11-14T00:00:00Z,2,4,CoCT Water Quality - Consolidated.xls,Fish H
-2012-11-28T00:00:00Z,2,2,CoCT Water Quality - Consolidated.xls,Fish H
-2012-12-12T00:00:00Z,32,38,CoCT Water Quality - Consolidated.xls,Fish H
-2012-12-27T00:00:00Z,6,4,CoCT Water Quality - Consolidated.xls,Fish H
-2013-01-23T00:00:00Z,50,16,CoCT Water Quality - Consolidated.xls,Fish H
-2013-11-13T00:00:00Z,50,9,CoCT Water Quality - Consolidated.xls,Fish H
-2013-11-27T00:00:00Z,2,4,CoCT Water Quality - Consolidated.xls,Fish H
-2013-12-11T00:00:00Z,18,4,CoCT Water Quality - Consolidated.xls,Fish H
-2013-12-19T00:00:00Z,16,22,CoCT Water Quality - Consolidated.xls,Fish H
-2014-01-08T00:00:00Z,300,300,CoCT Water Quality - Consolidated.xls,Fish H
-2014-01-22T00:00:00Z,14,4,CoCT Water Quality - Consolidated.xls,Fish H
-2014-11-12T00:00:00Z,12,4,CoCT Water Quality - Consolidated.xls,Fish H
-2014-11-26T00:00:00Z,4,7,CoCT Water Quality - Consolidated.xls,Fish H
-2014-12-10T00:00:00Z,38,32,CoCT Water Quality - Consolidated.xls,Fish H
-2014-12-18T00:00:00Z,2,5,CoCT Water Quality - Consolidated.xls,Fish H
-2015-01-07T00:00:00Z,2,1,CoCT Water Quality - Consolidated.xls,Fish H
-2015-01-21T00:00:00Z,8,3,CoCT Water Quality - Consolidated.xls,Fish H
-2015-11-11T00:00:00Z,90,55,CoCT Water Quality - Consolidated.xls,Fish H
-2015-11-25T00:00:00Z,36,34,CoCT Water Quality - Consolidated.xls,Fish H
-2015-12-09T00:00:00Z,4,8,CoCT Water Quality - Consolidated.xls,Fish H
-2015-12-22T00:00:00Z,2,4,CoCT Water Quality - Consolidated.xls,Fish H
-2016-01-06T00:00:00Z,40,21,CoCT Water Quality - Consolidated.xls,Fish H
-2016-01-20T00:00:00Z,112,19,CoCT Water Quality - Consolidated.xls,Fish H
-2016-11-23T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Fish H
-2016-12-06T00:00:00Z,61,27,CoCT Water Quality - Consolidated.xls,Fish H
-2016-12-14T00:00:00Z,17,1,CoCT Water Quality - Consolidated.xls,Fish H
-2016-12-21T00:00:00Z,2,8,CoCT Water Quality - Consolidated.xls,Fish H
-2017-01-04T00:00:00Z,2,15,CoCT Water Quality - Consolidated.xls,Fish H
-2017-01-11T00:00:00Z,6,22,CoCT Water Quality - Consolidated.xls,Fish H
-2017-01-18T00:00:00Z,4,4,CoCT Water Quality - Consolidated.xls,Fish H
-2017-01-25T00:00:00Z,110,26,CoCT Water Quality - Consolidated.xls,Fish H
-2017-02-01T00:00:00Z,4,2,CoCT Water Quality - Consolidated.xls,Fish H
-2012-11-02T00:00:00Z,1,11,CoCT Water Quality - Consolidated.xls,Bikini
-2012-11-19T00:00:00Z,1,7,CoCT Water Quality - Consolidated.xls,Bikini
-2012-11-26T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2012-12-03T00:00:00Z,1,9,CoCT Water Quality - Consolidated.xls,Bikini
-2012-12-10T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2012-12-18T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Bikini
-2013-01-03T00:00:00Z,1,149,CoCT Water Quality - Consolidated.xls,Bikini
-2013-01-21T00:00:00Z,4,1,CoCT Water Quality - Consolidated.xls,Bikini
-2013-02-11T00:00:00Z,93,79,CoCT Water Quality - Consolidated.xls,Bikini
-2013-02-18T00:00:00Z,1,6,CoCT Water Quality - Consolidated.xls,Bikini
-2013-02-25T00:00:00Z,1,3,CoCT Water Quality - Consolidated.xls,Bikini
-2013-03-04T00:00:00Z,4,12,CoCT Water Quality - Consolidated.xls,Bikini
-2013-03-11T00:00:00Z,9,6,CoCT Water Quality - Consolidated.xls,Bikini
-2013-11-27T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2013-12-02T00:00:00Z,1,9,CoCT Water Quality - Consolidated.xls,Bikini
-2013-12-09T00:00:00Z,43,10,CoCT Water Quality - Consolidated.xls,Bikini
-2013-12-17T00:00:00Z,1,14,CoCT Water Quality - Consolidated.xls,Bikini
-2013-12-19T00:00:00Z,1,41,CoCT Water Quality - Consolidated.xls,Bikini
-2014-01-02T00:00:00Z,4,27,CoCT Water Quality - Consolidated.xls,Bikini
-2014-01-06T00:00:00Z,1100,126,CoCT Water Quality - Consolidated.xls,Bikini
-2014-01-13T00:00:00Z,4,2,CoCT Water Quality - Consolidated.xls,Bikini
-2014-01-20T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2014-01-27T00:00:00Z,1,17,CoCT Water Quality - Consolidated.xls,Bikini
-2014-02-03T00:00:00Z,359,2,CoCT Water Quality - Consolidated.xls,Bikini
-2014-02-10T00:00:00Z,10,1,CoCT Water Quality - Consolidated.xls,Bikini
-2014-02-17T00:00:00Z,17,28,CoCT Water Quality - Consolidated.xls,Bikini
-2014-02-24T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2014-03-03T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2014-03-10T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Bikini
-2014-03-17T00:00:00Z,1,8,CoCT Water Quality - Consolidated.xls,Bikini
-2014-03-24T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2014-11-12T00:00:00Z,2,10,CoCT Water Quality - Consolidated.xls,Bikini
-2014-11-26T00:00:00Z,60,24,CoCT Water Quality - Consolidated.xls,Bikini
-2014-12-10T00:00:00Z,2,4,CoCT Water Quality - Consolidated.xls,Bikini
-2014-12-19T00:00:00Z,2,2,CoCT Water Quality - Consolidated.xls,Bikini
-2015-01-07T00:00:00Z,4,7,CoCT Water Quality - Consolidated.xls,Bikini
-2015-01-21T00:00:00Z,36,18,CoCT Water Quality - Consolidated.xls,Bikini
-2015-02-04T00:00:00Z,2,8,CoCT Water Quality - Consolidated.xls,Bikini
-2015-02-18T00:00:00Z,144,44,CoCT Water Quality - Consolidated.xls,Bikini
-2015-03-04T00:00:00Z,8,38,CoCT Water Quality - Consolidated.xls,Bikini
-2015-03-18T00:00:00Z,8,7,CoCT Water Quality - Consolidated.xls,Bikini
-2015-03-31T00:00:00Z,14,1,CoCT Water Quality - Consolidated.xls,Bikini
-2015-11-18T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2015-12-03T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2015-12-22T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Bikini
-2016-01-13T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2016-01-20T00:00:00Z,2,2,CoCT Water Quality - Consolidated.xls,Bikini
-2016-02-03T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2016-02-10T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2016-02-24T00:00:00Z,1,6,CoCT Water Quality - Consolidated.xls,Bikini
-2016-03-23T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2016-11-30T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2016-11-23T00:00:00Z,16,13,CoCT Water Quality - Consolidated.xls,Bikini
-2016-12-06T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Bikini
-2016-12-14T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2016-12-21T00:00:00Z,1,10,CoCT Water Quality - Consolidated.xls,Bikini
-2017-01-04T00:00:00Z,4,12,CoCT Water Quality - Consolidated.xls,Bikini
-2017-01-11T00:00:00Z,1,1,CoCT Water Quality - Consolidated.xls,Bikini
-2017-01-18T00:00:00Z,1,2,CoCT Water Quality - Consolidated.xls,Bikini
-2017-01-25T00:00:00Z,1,12,CoCT Water Quality - Consolidated.xls,Bikini
-2017-02-01T00:00:00Z,3,2,CoCT Water Quality - Consolidated.xls,Bikini
+site,sample_date,faecal_streptococci_cfu_per_100ml,file
+XCS08,2012-11-02T00:00:00Z,11,CoCT Water Quality - Consolidated.xls
+XCS08,2012-11-19T00:00:00Z,7,CoCT Water Quality - Consolidated.xls
+XCS08,2012-11-26T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2012-12-03T00:00:00Z,9,CoCT Water Quality - Consolidated.xls
+XCS08,2012-12-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2012-12-18T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+XCS08,2013-01-03T00:00:00Z,149,CoCT Water Quality - Consolidated.xls
+XCS08,2013-01-21T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2013-02-11T00:00:00Z,79,CoCT Water Quality - Consolidated.xls
+XCS08,2013-02-18T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+XCS08,2013-02-25T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+XCS08,2013-03-04T00:00:00Z,12,CoCT Water Quality - Consolidated.xls
+XCS08,2013-03-11T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+XCS08,2013-11-27T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2013-12-02T00:00:00Z,9,CoCT Water Quality - Consolidated.xls
+XCS08,2013-12-09T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+XCS08,2013-12-17T00:00:00Z,14,CoCT Water Quality - Consolidated.xls
+XCS08,2013-12-19T00:00:00Z,41,CoCT Water Quality - Consolidated.xls
+XCS08,2014-01-02T00:00:00Z,27,CoCT Water Quality - Consolidated.xls
+XCS08,2014-01-06T00:00:00Z,126,CoCT Water Quality - Consolidated.xls
+XCS08,2014-01-13T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCS08,2014-01-20T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2014-01-27T00:00:00Z,17,CoCT Water Quality - Consolidated.xls
+XCS08,2014-02-03T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCS08,2014-02-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2014-02-17T00:00:00Z,28,CoCT Water Quality - Consolidated.xls
+XCS08,2014-02-24T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2014-03-03T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2014-03-10T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCS08,2014-03-17T00:00:00Z,8,CoCT Water Quality - Consolidated.xls
+XCS08,2014-03-24T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2014-11-12T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+XCS08,2014-11-26T00:00:00Z,24,CoCT Water Quality - Consolidated.xls
+XCS08,2014-12-10T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+XCS08,2014-12-19T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCS08,2015-01-07T00:00:00Z,7,CoCT Water Quality - Consolidated.xls
+XCS08,2015-01-21T00:00:00Z,18,CoCT Water Quality - Consolidated.xls
+XCS08,2015-02-04T00:00:00Z,8,CoCT Water Quality - Consolidated.xls
+XCS08,2015-02-18T00:00:00Z,44,CoCT Water Quality - Consolidated.xls
+XCS08,2015-03-04T00:00:00Z,38,CoCT Water Quality - Consolidated.xls
+XCS08,2015-03-18T00:00:00Z,7,CoCT Water Quality - Consolidated.xls
+XCS08,2015-03-31T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2015-11-18T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2015-12-03T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2015-12-22T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCS08,2016-01-13T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2016-01-20T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCS08,2016-02-03T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2016-02-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2016-02-24T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+XCS08,2016-03-23T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2016-11-30T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2016-11-23T00:00:00Z,13,CoCT Water Quality - Consolidated.xls
+XCS08,2016-12-06T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCS08,2016-12-14T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2016-12-21T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+XCS08,2017-01-04T00:00:00Z,12,CoCT Water Quality - Consolidated.xls
+XCS08,2017-01-11T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS08,2017-01-18T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCS08,2017-01-25T00:00:00Z,12,CoCT Water Quality - Consolidated.xls
+XCS08,2017-02-01T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCS08,2018-11-28T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2018-12-05T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2018-12-19T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2019-01-03T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2019-01-15T00:00:00Z,15,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2019-01-22T00:00:00Z,19,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2019-11-20T00:00:00Z,33,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2019-12-04T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2019-12-11T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2020-01-08T00:00:00Z,21,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2020-01-15T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2020-01-22T00:00:00Z,8,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2020-11-25T00:00:00Z,8,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2020-12-02T00:00:00Z,7,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2020-12-08T00:00:00Z,37,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2020-12-15T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2021-01-06T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2021-01-13T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2021-01-20T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2021-01-27T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2021-11-23T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2021-12-01T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2021-12-08T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2021-12-14T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2021-12-22T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2022-01-04T00:00:00Z,10,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2022-01-11T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2022-01-19T00:00:00Z,6,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2022-01-26T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS08,2022-11-29T00:00:00Z,7,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2022-12-07T00:00:00Z,71,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2022-12-14T00:00:00Z,84,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2022-12-20T00:00:00Z,3,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2023-01-04T00:00:00Z,59,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2023-01-10T00:00:00Z,14,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2023-01-18T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2023-01-24T00:00:00Z,150,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2023-01-27T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2023-01-31T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2023-11-28T00:00:00Z,7,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2023-12-06T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2023-12-13T00:00:00Z,4,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2023-12-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2024-01-03T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2024-01-09T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2024-01-16T00:00:00Z,26,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2024-01-23T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2024-01-30T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2024-11-21T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2024-12-03T00:00:00Z,77,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2024-12-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2025-01-07T00:00:00Z,7,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2025-01-14T00:00:00Z,8,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2025-01-21T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS08,2025-01-28T00:00:00Z,38,Blue Flag 95th percentile Compliance.xlsx
+CN11,2018-11-28T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2018-12-05T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2018-12-19T00:00:00Z,46,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2019-01-03T00:00:00Z,88,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2019-01-15T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2019-01-22T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2019-11-20T00:00:00Z,6,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2019-12-04T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2019-12-11T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2020-01-08T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2020-01-15T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2020-01-22T00:00:00Z,17,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2020-02-05T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2020-02-19T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2020-03-03T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2020-03-18T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2020-11-25T00:00:00Z,6,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2020-12-02T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2020-12-08T00:00:00Z,44,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2020-12-15T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-01-06T00:00:00Z,26,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-01-13T00:00:00Z,7,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-01-20T00:00:00Z,9,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-01-27T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-02-02T00:00:00Z,15,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-02-09T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-02-16T00:00:00Z,12,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-02-23T00:00:00Z,66,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-03-02T00:00:00Z,13,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-03-16T00:00:00Z,15,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-11-23T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-12-01T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-12-08T00:00:00Z,8,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-12-14T00:00:00Z,12,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2021-12-22T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2022-01-04T00:00:00Z,11,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2022-01-12T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2022-01-20T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2022-01-26T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2022-02-02T00:00:00Z,18,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2022-02-16T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2022-03-03T00:00:00Z,15,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2022-03-15T00:00:00Z,6,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2022-03-31T00:00:00Z,37,BF Water Quality from WESSA Apr2022.xlsx
+CN11,2022-11-29T00:00:00Z,11,Blue Flag 95th percentile Compliance.xlsx
+CN11,2022-12-07T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2022-12-14T00:00:00Z,10,Blue Flag 95th percentile Compliance.xlsx
+CN11,2022-12-20T00:00:00Z,12,Blue Flag 95th percentile Compliance.xlsx
+CN11,2023-01-04T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2023-01-10T00:00:00Z,8,Blue Flag 95th percentile Compliance.xlsx
+CN11,2023-01-18T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2023-01-24T00:00:00Z,62,Blue Flag 95th percentile Compliance.xlsx
+CN11,2023-01-31T00:00:00Z,5,Blue Flag 95th percentile Compliance.xlsx
+CN11,2023-02-16T00:00:00Z,107,Blue Flag 95th percentile Compliance.xlsx
+CN11,2023-11-28T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2023-12-06T00:00:00Z,16,Blue Flag 95th percentile Compliance.xlsx
+CN11,2023-12-13T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2023-12-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-01-03T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-01-09T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-01-17T00:00:00Z,28,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-01-23T00:00:00Z,3,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-01-30T00:00:00Z,9,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-02-06T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-02-13T00:00:00Z,57,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-02-20T00:00:00Z,5,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-02-27T00:00:00Z,98,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-03-05T00:00:00Z,13,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-03-13T00:00:00Z,150,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-03-18T00:00:00Z,29,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-03-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-03-27T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-11-20T00:00:00Z,14,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-12-05T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-12-12T00:00:00Z,15,Blue Flag 95th percentile Compliance.xlsx
+CN11,2024-12-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2025-01-05T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2025-01-08T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2025-01-16T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2025-01-28T00:00:00Z,88,Blue Flag 95th percentile Compliance.xlsx
+CN11,2025-02-04T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2025-02-11T00:00:00Z,33,Blue Flag 95th percentile Compliance.xlsx
+CN11,2025-02-18T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN11,2025-02-19T00:00:00Z,22,Blue Flag 95th percentile Compliance.xlsx
+CN11,2013-11-27T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN11,2013-12-02T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN11,2013-12-09T00:00:00Z,20,CoCT Water Quality - Consolidated.xls
+CN11,2013-12-17T00:00:00Z,29,CoCT Water Quality - Consolidated.xls
+CN11,2013-12-19T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN11,2014-01-02T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CN11,2014-01-06T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CN11,2014-01-13T00:00:00Z,52,CoCT Water Quality - Consolidated.xls
+CN11,2014-01-20T00:00:00Z,96,CoCT Water Quality - Consolidated.xls
+CN11,2014-01-27T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN11,2014-02-03T00:00:00Z,8,CoCT Water Quality - Consolidated.xls
+CN11,2014-02-10T00:00:00Z,38,CoCT Water Quality - Consolidated.xls
+CN11,2014-02-17T00:00:00Z,99,CoCT Water Quality - Consolidated.xls
+CN11,2014-02-24T00:00:00Z,127,CoCT Water Quality - Consolidated.xls
+CN11,2014-03-03T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+CN11,2014-03-10T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+CN11,2014-03-17T00:00:00Z,37,CoCT Water Quality - Consolidated.xls
+CN11,2014-03-24T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN11,2014-11-05T00:00:00Z,87,CoCT Water Quality - Consolidated.xls
+CN11,2014-11-19T00:00:00Z,59,CoCT Water Quality - Consolidated.xls
+CN11,2014-12-03T00:00:00Z,26,CoCT Water Quality - Consolidated.xls
+CN11,2014-12-17T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+CN11,2014-12-30T00:00:00Z,40,CoCT Water Quality - Consolidated.xls
+CN11,2015-01-14T00:00:00Z,12,CoCT Water Quality - Consolidated.xls
+CN11,2015-01-28T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+CN11,2015-02-11T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN11,2015-02-25T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+CN11,2015-03-11T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CN11,2015-03-25T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+CN11,2015-11-18T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CN11,2015-12-02T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN11,2015-12-22T00:00:00Z,21,CoCT Water Quality - Consolidated.xls
+CN11,2016-01-13T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CN11,2016-01-20T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN11,2016-02-03T00:00:00Z,32,CoCT Water Quality - Consolidated.xls
+CN11,2016-02-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN11,2016-02-24T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+CN11,2016-03-23T00:00:00Z,11,CoCT Water Quality - Consolidated.xls
+CN11,2016-11-23T00:00:00Z,63,CoCT Water Quality - Consolidated.xls
+CN11,2016-11-30T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CN11,2016-12-06T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN11,2016-12-14T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN11,2016-12-21T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CN11,2017-01-04T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+CN11,2017-01-11T00:00:00Z,30,CoCT Water Quality - Consolidated.xls
+CN11,2017-01-18T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CN11,2017-01-25T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CN11,2017-02-01T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN11,2017-02-08T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN11,2017-03-01T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+CN11,2017-03-08T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CN09,2018-11-28T00:00:00Z,9,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2018-12-05T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2018-12-19T00:00:00Z,21,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2019-01-03T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2019-01-15T00:00:00Z,8,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2019-01-22T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2019-11-20T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2019-12-04T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2019-12-11T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2020-01-08T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2020-01-15T00:00:00Z,13,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2020-01-22T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2020-02-05T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2020-02-19T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2020-03-03T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2020-03-18T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2020-11-25T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2020-12-02T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2020-12-08T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2020-12-15T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2021-01-06T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2021-01-13T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2021-01-20T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2021-01-27T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2021-11-25T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2021-12-02T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2021-12-08T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2021-12-14T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2021-12-22T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2022-01-04T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2022-01-12T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2022-01-20T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2022-01-27T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CN09,2022-11-29T00:00:00Z,4,Blue Flag 95th percentile Compliance.xlsx
+CN09,2022-12-07T00:00:00Z,10,Blue Flag 95th percentile Compliance.xlsx
+CN09,2022-12-14T00:00:00Z,29,Blue Flag 95th percentile Compliance.xlsx
+CN09,2022-12-20T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN09,2023-01-04T00:00:00Z,31,Blue Flag 95th percentile Compliance.xlsx
+CN09,2023-01-10T00:00:00Z,35,Blue Flag 95th percentile Compliance.xlsx
+CN09,2023-01-18T00:00:00Z,19,Blue Flag 95th percentile Compliance.xlsx
+CN09,2023-01-20T00:00:00Z,11,Blue Flag 95th percentile Compliance.xlsx
+CN09,2023-01-24T00:00:00Z,21,Blue Flag 95th percentile Compliance.xlsx
+CN09,2023-01-31T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN09,2023-11-28T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+CN09,2023-12-06T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN09,2023-12-13T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN09,2023-12-19T00:00:00Z,53,Blue Flag 95th percentile Compliance.xlsx
+CN09,2024-01-03T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN09,2024-01-09T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN09,2024-01-17T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN09,2024-01-23T00:00:00Z,6,Blue Flag 95th percentile Compliance.xlsx
+CN09,2024-01-30T00:00:00Z,16,Blue Flag 95th percentile Compliance.xlsx
+CN09,2024-11-20T00:00:00Z,46,Blue Flag 95th percentile Compliance.xlsx
+CN09,2024-12-05T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN09,2024-12-12T00:00:00Z,29,Blue Flag 95th percentile Compliance.xlsx
+CN09,2024-12-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN09,2025-01-08T00:00:00Z,3,Blue Flag 95th percentile Compliance.xlsx
+CN09,2025-01-16T00:00:00Z,7,Blue Flag 95th percentile Compliance.xlsx
+CN09,2025-01-22T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN09,2025-01-28T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CN09,2013-11-27T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2013-12-02T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2013-12-09T00:00:00Z,38,CoCT Water Quality - Consolidated.xls
+CN09,2013-12-17T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN09,2013-12-19T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2014-01-02T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CN09,2014-01-06T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+CN09,2014-01-13T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2014-01-20T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2014-01-27T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CN09,2014-02-10T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN09,2014-02-17T00:00:00Z,48,CoCT Water Quality - Consolidated.xls
+CN09,2014-02-24T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CN09,2014-03-17T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN09,2014-03-24T00:00:00Z,151,CoCT Water Quality - Consolidated.xls
+CN09,2014-03-31T00:00:00Z,9,CoCT Water Quality - Consolidated.xls
+CN09,2014-11-05T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2014-11-19T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+CN09,2014-12-03T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2014-12-15T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2014-12-17T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2014-12-23T00:00:00Z,NA,CoCT Water Quality - Consolidated.xls
+CN09,2014-12-30T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CN09,2015-01-14T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN09,2015-01-28T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN09,2015-02-11T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2015-02-25T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CN09,2015-03-11T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CN09,2015-03-25T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2015-11-18T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN09,2015-12-02T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2015-12-22T00:00:00Z,47,CoCT Water Quality - Consolidated.xls
+CN09,2016-01-13T00:00:00Z,7,CoCT Water Quality - Consolidated.xls
+CN09,2016-01-20T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CN09,2016-02-03T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2016-02-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2016-02-24T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2016-03-23T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2016-11-23T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CN09,2016-11-30T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2016-12-06T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN09,2016-12-14T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+CN09,2016-12-21T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN09,2017-01-04T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN09,2017-01-11T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN09,2017-01-18T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CN09,2017-01-25T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CN09,2017-02-01T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CN09,2017-02-08T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CN09,2017-03-01T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CN09,2017-03-08T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS16,2012-11-14T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+XCS16,2012-11-28T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCS16,2012-12-12T00:00:00Z,38,CoCT Water Quality - Consolidated.xls
+XCS16,2012-12-27T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+XCS16,2013-01-23T00:00:00Z,16,CoCT Water Quality - Consolidated.xls
+XCS16,2013-11-13T00:00:00Z,9,CoCT Water Quality - Consolidated.xls
+XCS16,2013-11-27T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+XCS16,2013-12-11T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+XCS16,2013-12-19T00:00:00Z,22,CoCT Water Quality - Consolidated.xls
+XCS16,2014-01-08T00:00:00Z,300,CoCT Water Quality - Consolidated.xls
+XCS16,2014-01-22T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+XCS16,2014-11-12T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+XCS16,2014-11-26T00:00:00Z,7,CoCT Water Quality - Consolidated.xls
+XCS16,2014-12-10T00:00:00Z,32,CoCT Water Quality - Consolidated.xls
+XCS16,2014-12-18T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+XCS16,2015-01-07T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS16,2015-01-21T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+XCS16,2015-11-11T00:00:00Z,55,CoCT Water Quality - Consolidated.xls
+XCS16,2015-11-25T00:00:00Z,34,CoCT Water Quality - Consolidated.xls
+XCS16,2015-12-09T00:00:00Z,8,CoCT Water Quality - Consolidated.xls
+XCS16,2015-12-22T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+XCS16,2016-01-06T00:00:00Z,21,CoCT Water Quality - Consolidated.xls
+XCS16,2016-01-20T00:00:00Z,19,CoCT Water Quality - Consolidated.xls
+XCS16,2016-11-23T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS16,2016-12-06T00:00:00Z,27,CoCT Water Quality - Consolidated.xls
+XCS16,2016-12-14T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCS16,2016-12-21T00:00:00Z,8,CoCT Water Quality - Consolidated.xls
+XCS16,2017-01-04T00:00:00Z,15,CoCT Water Quality - Consolidated.xls
+XCS16,2017-01-11T00:00:00Z,22,CoCT Water Quality - Consolidated.xls
+XCS16,2017-01-18T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+XCS16,2017-01-25T00:00:00Z,26,CoCT Water Quality - Consolidated.xls
+XCS16,2017-02-01T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCS16,2018-11-28T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2018-12-06T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2018-12-19T00:00:00Z,8,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2019-01-04T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2019-01-16T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2019-01-23T00:00:00Z,17,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2019-11-21T00:00:00Z,10,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2019-12-05T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2019-12-12T00:00:00Z,12,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2020-01-09T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2020-01-16T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2020-01-23T00:00:00Z,34,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2020-02-06T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2020-02-12T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2020-02-20T00:00:00Z,23,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2020-03-03T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2020-03-19T00:00:00Z,14,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2020-11-26T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2020-12-03T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2020-12-09T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2020-12-17T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2021-01-07T00:00:00Z,144,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2021-01-14T00:00:00Z,10,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2021-01-21T00:00:00Z,21,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2021-01-28T00:00:00Z,13,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2021-11-23T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2021-12-02T00:00:00Z,150,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2021-12-09T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2021-12-15T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2021-12-23T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2022-01-05T00:00:00Z,8,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2022-01-11T00:00:00Z,12,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2022-01-19T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2022-01-26T00:00:00Z,15,BF Water Quality from WESSA Apr2022.xlsx
+XCS16,2022-11-30T00:00:00Z,6,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2022-12-08T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2022-12-15T00:00:00Z,17,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2022-12-21T00:00:00Z,16,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2023-01-05T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2023-01-11T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2023-01-17T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2023-01-25T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2023-02-01T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2023-11-29T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2023-12-07T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2023-12-14T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2023-12-20T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2024-01-04T00:00:00Z,42,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2024-01-10T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2024-01-17T00:00:00Z,9,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2024-01-24T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2024-01-31T00:00:00Z,5,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2024-11-21T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2024-12-02T00:00:00Z,11,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2024-12-20T00:00:00Z,39,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2025-01-08T00:00:00Z,23,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2025-01-15T00:00:00Z,12,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2025-01-22T00:00:00Z,11,Blue Flag 95th percentile Compliance.xlsx
+XCS16,2025-01-29T00:00:00Z,14,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2018-11-28T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2018-12-05T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2018-12-19T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2019-01-03T00:00:00Z,24,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2019-01-15T00:00:00Z,10,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2019-01-22T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2019-11-20T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2019-12-04T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2019-12-11T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2020-01-08T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2020-01-15T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2020-01-22T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2020-11-25T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2020-12-02T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2020-12-08T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2020-12-15T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2021-01-06T00:00:00Z,34,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2021-01-13T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2021-01-20T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2021-01-27T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2021-11-23T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2021-12-01T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2021-12-08T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2021-12-14T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2021-12-22T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2022-01-04T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2022-01-12T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2022-01-20T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2022-01-26T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN03,2022-11-29T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2022-12-07T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2022-12-14T00:00:00Z,8,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2022-12-20T00:00:00Z,3,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2023-01-04T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2023-01-10T00:00:00Z,13,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2023-01-18T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2023-01-24T00:00:00Z,150,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2023-01-27T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2023-01-31T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2023-11-28T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2023-11-28T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2023-12-06T00:00:00Z,37,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2023-12-06T00:00:00Z,150,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2024-01-03T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2024-01-03T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2024-01-09T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2024-01-09T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2024-01-17T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2024-01-17T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2024-01-23T00:00:00Z,9,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2024-01-23T00:00:00Z,4,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2024-01-30T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2024-01-30T00:00:00Z,4,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2024-11-20T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2024-11-20T00:00:00Z,9,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2024-12-05T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2024-12-05T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2024-12-12T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2024-12-12T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2024-12-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2024-12-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2025-01-08T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2025-01-08T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2025-01-16T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2025-01-16T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2025-01-22T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2025-01-22T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2025-01-28T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03A,2025-01-28T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN03,2012-11-19T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2012-11-26T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2012-12-03T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2012-12-10T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+XCN03,2012-12-18T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2013-01-02T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2013-01-21T00:00:00Z,151,CoCT Water Quality - Consolidated.xls
+XCN03,2013-11-27T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2013-12-02T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2013-12-09T00:00:00Z,41,CoCT Water Quality - Consolidated.xls
+XCN03,2013-12-17T00:00:00Z,17,CoCT Water Quality - Consolidated.xls
+XCN03,2013-12-19T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2014-01-02T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2014-01-06T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+XCN03,2014-01-13T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2014-01-20T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2014-01-27T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2014-11-12T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2014-11-26T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+XCN03,2014-12-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2014-12-18T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+XCN03,2015-01-07T00:00:00Z,7,CoCT Water Quality - Consolidated.xls
+XCN03,2015-01-21T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2015-11-18T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+XCN03,2015-12-02T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2015-12-22T00:00:00Z,24,CoCT Water Quality - Consolidated.xls
+XCN03,2016-01-13T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2016-01-20T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+XCN03,2016-02-24T00:00:00Z,16,CoCT Water Quality - Consolidated.xls
+XCN03,2016-11-23T00:00:00Z,17,CoCT Water Quality - Consolidated.xls
+XCN03,2016-11-30T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2016-12-06T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2016-12-14T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2016-12-21T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+XCN03,2017-01-04T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2017-01-11T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+XCN03,2017-01-18T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2017-01-25T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN03,2017-02-01T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2014-11-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2014-11-19T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCN07,2014-12-03T00:00:00Z,9,CoCT Water Quality - Consolidated.xls
+XCN07,2014-12-17T00:00:00Z,7,CoCT Water Quality - Consolidated.xls
+XCN07,2014-12-30T00:00:00Z,37,CoCT Water Quality - Consolidated.xls
+XCN07,2015-01-14T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2015-01-28T00:00:00Z,17,CoCT Water Quality - Consolidated.xls
+XCN07,2015-02-25T00:00:00Z,88,CoCT Water Quality - Consolidated.xls
+XCN07,2015-03-11T00:00:00Z,8,CoCT Water Quality - Consolidated.xls
+XCN07,2015-03-25T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+XCN07,2015-12-09T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+XCN07,2015-12-17T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2015-12-23T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+XCN07,2016-01-13T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2016-01-20T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCN07,2016-01-27T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+XCN07,2016-02-03T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2016-02-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2016-02-24T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2016-03-09T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2016-03-16T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2016-03-23T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2016-11-24T00:00:00Z,12,CoCT Water Quality - Consolidated.xls
+XCN07,2016-11-30T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+XCN07,2016-12-06T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+XCN07,2016-12-15T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2016-12-21T00:00:00Z,16,CoCT Water Quality - Consolidated.xls
+XCN07,2017-01-04T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2017-01-12T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2017-01-18T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2017-01-25T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN07,2017-02-01T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2014-11-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2014-11-19T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCN15,2014-12-03T00:00:00Z,9,CoCT Water Quality - Consolidated.xls
+XCN15,2014-12-17T00:00:00Z,7,CoCT Water Quality - Consolidated.xls
+XCN15,2014-12-30T00:00:00Z,37,CoCT Water Quality - Consolidated.xls
+XCN15,2015-01-14T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2015-01-28T00:00:00Z,17,CoCT Water Quality - Consolidated.xls
+XCN15,2015-02-25T00:00:00Z,88,CoCT Water Quality - Consolidated.xls
+XCN15,2015-03-11T00:00:00Z,8,CoCT Water Quality - Consolidated.xls
+XCN15,2015-03-25T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+XCN15,2015-12-09T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2015-12-17T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2015-12-23T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2016-01-13T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+XCN15,2016-01-20T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+XCN15,2016-01-27T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+XCN15,2016-02-03T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2016-02-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2016-02-24T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2016-03-09T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCN15,2016-03-16T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2016-03-23T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2016-11-23T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCN15,2016-11-30T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2016-12-06T00:00:00Z,21,CoCT Water Quality - Consolidated.xls
+XCN15,2016-12-15T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2016-12-21T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+XCN15,2017-01-04T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2017-01-12T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2017-01-18T00:00:00Z,30,CoCT Water Quality - Consolidated.xls
+XCN15,2017-01-25T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN15,2017-02-01T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCN07,2018-11-28T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2018-12-05T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2018-12-19T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2019-01-03T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2019-01-15T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2019-01-22T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2019-11-20T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2019-12-04T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2019-12-11T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2020-01-08T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2020-01-15T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2020-01-22T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2020-02-05T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2020-02-19T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2020-03-03T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2020-03-18T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2020-11-25T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2020-12-02T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2020-12-08T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2020-12-15T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2021-01-06T00:00:00Z,120,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2021-01-13T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2021-01-20T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2021-01-27T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2021-11-25T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2021-12-01T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2011-12-08T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2021-12-14T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2021-12-22T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2022-01-04T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2022-01-11T00:00:00Z,11,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2022-01-20T00:00:00Z,6,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2022-01-27T00:00:00Z,18,BF Water Quality from WESSA Apr2022.xlsx
+XCN07,2022-11-29T00:00:00Z,55,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2022-12-07T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2022-12-14T00:00:00Z,76,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2022-12-20T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2023-01-04T00:00:00Z,34,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2023-01-10T00:00:00Z,27,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2023-01-18T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2023-01-24T00:00:00Z,86,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2023-01-31T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2023-11-28T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2023-11-28T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2023-12-06T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2023-12-06T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2023-12-13T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2023-12-13T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2023-12-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2023-12-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2024-01-03T00:00:00Z,35,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2024-01-03T00:00:00Z,8,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2024-01-09T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2024-01-09T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2024-01-17T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2024-01-17T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2024-01-23T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2024-01-23T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2024-01-30T00:00:00Z,8,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2024-01-30T00:00:00Z,13,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2024-11-20T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN15,2024-11-20T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2024-12-03T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN15,2024-12-03T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2024-12-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN15,2024-12-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2025-01-07T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN15,2025-01-07T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2025-01-14T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN15,2025-01-14T00:00:00Z,6,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2025-01-21T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN15,2025-01-21T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN07,2025-01-28T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN15,2025-01-28T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CS19,2018-11-28T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2018-12-06T00:00:00Z,22,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2018-12-19T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2019-01-04T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2019-01-16T00:00:00Z,7,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2019-01-22T00:00:00Z,11,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2019-11-21T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2019-12-05T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2019-12-12T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2020-01-09T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2020-01-16T00:00:00Z,4,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2020-01-23T00:00:00Z,150,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2020-02-05T00:00:00Z,35,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2020-02-20T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2020-03-03T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2020-03-19T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2020-11-26T00:00:00Z,34,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2020-12-03T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2020-12-09T00:00:00Z,63,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2020-12-17T00:00:00Z,34,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2021-01-07T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2021-01-14T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2021-01-21T00:00:00Z,45,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2021-01-28T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2021-11-23T00:00:00Z,150,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2021-12-02T00:00:00Z,122,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2021-12-09T00:00:00Z,23,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2021-12-15T00:00:00Z,11,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2021-12-23T00:00:00Z,150,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2022-01-04T00:00:00Z,25,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2022-01-11T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2022-01-19T00:00:00Z,6,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2022-01-26T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS19,2022-11-29T00:00:00Z,63,Blue Flag 95th percentile Compliance.xlsx
+CS19,2022-12-08T00:00:00Z,44,Blue Flag 95th percentile Compliance.xlsx
+CS19,2022-12-15T00:00:00Z,70,Blue Flag 95th percentile Compliance.xlsx
+CS19,2022-12-21T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CS19,2022-12-29T00:00:00Z,63,Blue Flag 95th percentile Compliance.xlsx
+CS19,2023-01-05T00:00:00Z,9,Blue Flag 95th percentile Compliance.xlsx
+CS19,2023-01-11T00:00:00Z,15,Blue Flag 95th percentile Compliance.xlsx
+CS19,2023-01-17T00:00:00Z,105,Blue Flag 95th percentile Compliance.xlsx
+CS19,2023-01-25T00:00:00Z,22,Blue Flag 95th percentile Compliance.xlsx
+CS19,2023-02-01T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+CS19,2023-11-29T00:00:00Z,62,Blue Flag 95th percentile Compliance.xlsx
+CS19,2023-12-07T00:00:00Z,4,Blue Flag 95th percentile Compliance.xlsx
+CS19,2023-12-14T00:00:00Z,14,Blue Flag 95th percentile Compliance.xlsx
+CS19,2023-12-20T00:00:00Z,6,Blue Flag 95th percentile Compliance.xlsx
+CS19,2024-01-04T00:00:00Z,21,Blue Flag 95th percentile Compliance.xlsx
+CS19,2024-01-10T00:00:00Z,21,Blue Flag 95th percentile Compliance.xlsx
+CS19,2024-01-16T00:00:00Z,35,Blue Flag 95th percentile Compliance.xlsx
+CS19,2024-01-24T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CS19,2024-01-31T00:00:00Z,93,Blue Flag 95th percentile Compliance.xlsx
+CS19,2014-11-05T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS19,2014-11-19T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+CS19,2014-12-03T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS19,2014-12-15T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS19,2014-12-17T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS19,2014-12-23T00:00:00Z,NA,CoCT Water Quality - Consolidated.xls
+CS19,2014-12-30T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CS19,2015-01-14T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CS19,2015-01-28T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CS19,2015-02-11T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS19,2015-02-25T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CS19,2015-03-11T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CS19,2015-03-25T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS19,2015-11-18T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS19,2015-12-02T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CS19,2015-12-22T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+CS19,2016-01-13T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CS19,2016-01-20T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS19,2016-02-03T00:00:00Z,9,CoCT Water Quality - Consolidated.xls
+CS19,2016-02-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS19,2016-02-24T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CS19,2016-03-23T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CS19,2016-11-30T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS19,2016-11-23T00:00:00Z,33,CoCT Water Quality - Consolidated.xls
+CS19,2016-12-06T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS19,2016-12-14T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+CS19,2016-12-21T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CS19,2017-01-04T00:00:00Z,30,CoCT Water Quality - Consolidated.xls
+CS19,2017-01-11T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+CS19,2017-01-18T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CS19,2017-01-25T00:00:00Z,48,CoCT Water Quality - Consolidated.xls
+CS19,2017-02-01T00:00:00Z,31,CoCT Water Quality - Consolidated.xls
+CS19,2017-02-08T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS19,2017-03-01T00:00:00Z,54,CoCT Water Quality - Consolidated.xls
+CS19,2017-03-08T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CS34,2012-11-19T00:00:00Z,8,CoCT Water Quality - Consolidated.xls
+CS34,2012-11-26T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CS34,2012-12-03T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CS34,2012-12-10T00:00:00Z,16,CoCT Water Quality - Consolidated.xls
+CS34,2012-12-18T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CS34,2013-01-02T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CS34,2013-01-21T00:00:00Z,15,CoCT Water Quality - Consolidated.xls
+CS34,2013-02-11T00:00:00Z,150,CoCT Water Quality - Consolidated.xls
+CS34,2013-02-18T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CS34,2013-02-25T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CS34,2013-03-04T00:00:00Z,22,CoCT Water Quality - Consolidated.xls
+CS34,2013-03-11T00:00:00Z,47,CoCT Water Quality - Consolidated.xls
+CS34,2013-03-18T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CS34,2013-11-27T00:00:00Z,7,CoCT Water Quality - Consolidated.xls
+CS34,2013-12-02T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS34,2013-12-09T00:00:00Z,48,CoCT Water Quality - Consolidated.xls
+CS34,2013-12-17T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS34,2013-12-19T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS34,2014-01-02T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS34,2014-01-06T00:00:00Z,15,CoCT Water Quality - Consolidated.xls
+CS34,2014-01-13T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CS34,2014-01-20T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+CS34,2014-01-27T00:00:00Z,11,CoCT Water Quality - Consolidated.xls
+CS34,2014-02-03T00:00:00Z,12,CoCT Water Quality - Consolidated.xls
+CS34,2014-02-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS34,2014-02-17T00:00:00Z,151,CoCT Water Quality - Consolidated.xls
+CS34,2014-02-24T00:00:00Z,11,CoCT Water Quality - Consolidated.xls
+CS34,2014-03-03T00:00:00Z,15,CoCT Water Quality - Consolidated.xls
+CS34,2014-03-10T00:00:00Z,16,CoCT Water Quality - Consolidated.xls
+CS34,2014-03-17T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CS34,2014-03-24T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+CS34,2014-11-12T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+CS34,2014-11-26T00:00:00Z,29,CoCT Water Quality - Consolidated.xls
+CS34,2014-12-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS34,2014-12-19T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CS34,2015-01-07T00:00:00Z,20,CoCT Water Quality - Consolidated.xls
+CS34,2015-01-21T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+CS34,2015-02-04T00:00:00Z,32,CoCT Water Quality - Consolidated.xls
+CS34,2015-02-18T00:00:00Z,31,CoCT Water Quality - Consolidated.xls
+CS34,2015-03-04T00:00:00Z,26,CoCT Water Quality - Consolidated.xls
+CS34,2015-03-18T00:00:00Z,32,CoCT Water Quality - Consolidated.xls
+CS34,2015-03-31T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+CS34,2015-11-18T00:00:00Z,22,CoCT Water Quality - Consolidated.xls
+CS34,2015-12-02T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CS34,2015-12-22T00:00:00Z,34,CoCT Water Quality - Consolidated.xls
+CS34,2016-01-13T00:00:00Z,9,CoCT Water Quality - Consolidated.xls
+CS34,2016-01-20T00:00:00Z,60,CoCT Water Quality - Consolidated.xls
+CS34,2016-02-03T00:00:00Z,18,CoCT Water Quality - Consolidated.xls
+CS34,2016-02-10T00:00:00Z,30,CoCT Water Quality - Consolidated.xls
+CS34,2016-02-24T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+CS34,2016-03-23T00:00:00Z,53,CoCT Water Quality - Consolidated.xls
+CS34,2016-11-30T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+CS34,2016-11-23T00:00:00Z,7,CoCT Water Quality - Consolidated.xls
+CS34,2016-12-06T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CS34,2016-12-14T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CS34,2016-12-21T00:00:00Z,50,CoCT Water Quality - Consolidated.xls
+CS34,2017-01-04T00:00:00Z,21,CoCT Water Quality - Consolidated.xls
+CS34,2017-01-11T00:00:00Z,8,CoCT Water Quality - Consolidated.xls
+CS34,2017-01-18T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CS34,2017-01-25T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CS34,2017-02-01T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CS34,2017-02-08T00:00:00Z,63,CoCT Water Quality - Consolidated.xls
+CS34,2017-03-01T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CS34,2017-03-08T00:00:00Z,24,CoCT Water Quality - Consolidated.xls
+CS34,2018-11-28T00:00:00Z,10,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2018-12-06T00:00:00Z,8,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2018-12-19T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2019-01-04T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2019-01-16T00:00:00Z,6,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2019-01-22T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2019-11-21T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2019-12-05T00:00:00Z,10,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2019-12-12T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2020-01-09T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2020-01-16T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2020-01-23T00:00:00Z,79,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2020-02-06T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2020-02-20T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2020-03-03T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2020-03-19T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2020-11-26T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2020-12-03T00:00:00Z,80,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2020-12-09T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2020-12-17T00:00:00Z,13,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-01-07T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-01-14T00:00:00Z,12,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-01-21T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-01-28T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-02-02T00:00:00Z,127,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-02-08T00:00:00Z,150,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-02-09T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-02-11T00:00:00Z,23,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-02-16T00:00:00Z,150,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-02-23T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-03-02T00:00:00Z,44,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-03-16T00:00:00Z,57,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-11-23T00:00:00Z,104,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-12-02T00:00:00Z,11,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-12-09T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-12-15T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2021-12-23T00:00:00Z,9,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2022-01-05T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2022-01-11T00:00:00Z,13,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2022-01-19T00:00:00Z,6,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2022-01-26T00:00:00Z,9,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2022-02-02T00:00:00Z,19,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2022-02-16T00:00:00Z,7,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2022-03-03T00:00:00Z,16,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2022-03-15T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS34,2022-11-30T00:00:00Z,10,Blue Flag 95th percentile Compliance.xlsx
+CS34,2022-12-08T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CS34,2022-12-15T00:00:00Z,3,Blue Flag 95th percentile Compliance.xlsx
+CS34,2022-12-21T00:00:00Z,42,Blue Flag 95th percentile Compliance.xlsx
+CS34,2023-01-05T00:00:00Z,17,Blue Flag 95th percentile Compliance.xlsx
+CS34,2023-01-11T00:00:00Z,15,Blue Flag 95th percentile Compliance.xlsx
+CS34,2023-01-17T00:00:00Z,10,Blue Flag 95th percentile Compliance.xlsx
+CS34,2023-01-25T00:00:00Z,10,Blue Flag 95th percentile Compliance.xlsx
+CS34,2023-02-01T00:00:00Z,12,Blue Flag 95th percentile Compliance.xlsx
+CS34,2023-02-16T00:00:00Z,140,Blue Flag 95th percentile Compliance.xlsx
+CS34,2023-11-29T00:00:00Z,3,Blue Flag 95th percentile Compliance.xlsx
+CS34,2023-12-07T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+CS34,2023-12-14T00:00:00Z,22,Blue Flag 95th percentile Compliance.xlsx
+CS34,2023-12-20T00:00:00Z,3,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-01-04T00:00:00Z,34,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-01-10T00:00:00Z,82,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-01-16T00:00:00Z,11,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-01-24T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-01-31T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-02-06T00:00:00Z,7,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-02-13T00:00:00Z,37,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-02-20T00:00:00Z,3,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-02-27T00:00:00Z,5,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-03-05T00:00:00Z,9,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-03-13T00:00:00Z,150,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-03-18T00:00:00Z,3,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-03-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-03-27T00:00:00Z,48,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-11-21T00:00:00Z,14,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-12-02T00:00:00Z,5,Blue Flag 95th percentile Compliance.xlsx
+CS34,2024-12-20T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CS34,2025-01-08T00:00:00Z,13,Blue Flag 95th percentile Compliance.xlsx
+CS34,2025-01-15T00:00:00Z,4,Blue Flag 95th percentile Compliance.xlsx
+CS34,2025-01-21T00:00:00Z,11,Blue Flag 95th percentile Compliance.xlsx
+CS34,2025-01-29T00:00:00Z,66,Blue Flag 95th percentile Compliance.xlsx
+XCS13,2019-11-21T00:00:00Z,79,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2019-12-05T00:00:00Z,23,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2019-12-12T00:00:00Z,47,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2020-01-09T00:00:00Z,63,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2020-01-16T00:00:00Z,49,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2020-01-23T00:00:00Z,48,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2020-02-06T00:00:00Z,111,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2020-02-20T00:00:00Z,8,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2020-03-03T00:00:00Z,150,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2020-03-19T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2020-11-26T00:00:00Z,150,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2020-12-03T00:00:00Z,21,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2020-12-09T00:00:00Z,51,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2020-12-17T00:00:00Z,85,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2021-01-07T00:00:00Z,118,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2021-01-14T00:00:00Z,120,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2021-01-21T00:00:00Z,56,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2021-01-28T00:00:00Z,135,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2021-11-23T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2021-12-01T00:00:00Z,150,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2021-12-08T00:00:00Z,24,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2021-12-15T00:00:00Z,150,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2021-12-23T00:00:00Z,85,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2022-01-05T00:00:00Z,131,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2022-01-12T00:00:00Z,115,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2022-01-19T00:00:00Z,58,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2022-01-26T00:00:00Z,29,BF Water Quality from WESSA Apr2022.xlsx
+XCS13,2017-11-24T00:00:00Z,7,95th percentile Water Quality - Consolidated Seaforth.xls
+XCS13,2017-12-14T00:00:00Z,15,95th percentile Water Quality - Consolidated Seaforth.xls
+XCS13,2017-12-19T00:00:00Z,2,95th percentile Water Quality - Consolidated Seaforth.xls
+XCS13,2018-01-03T00:00:00Z,68,95th percentile Water Quality - Consolidated Seaforth.xls
+XCS13,2018-01-10T00:00:00Z,13,95th percentile Water Quality - Consolidated Seaforth.xls
+XCS13,2018-01-17T00:00:00Z,21,95th percentile Water Quality - Consolidated Seaforth.xls
+XCS13,2018-01-24T00:00:00Z,7,95th percentile Water Quality - Consolidated Seaforth.xls
+XCS13,2018-11-29T00:00:00Z,6,95th percentile Water Quality - Consolidated Seaforth.xls
+XCS13,2018-12-06T00:00:00Z,31,95th percentile Water Quality - Consolidated Seaforth.xls
+XCS13,2018-12-13T00:00:00Z,14,95th percentile Water Quality - Consolidated Seaforth.xls
+XCS13,2018-12-19T00:00:00Z,42,95th percentile Water Quality - Consolidated Seaforth.xls
+XCS13,2019-01-04T00:00:00Z,19,95th percentile Water Quality - Consolidated Seaforth.xls
+XCS13,2019-01-10T00:00:00Z,56,95th percentile Water Quality - Consolidated Seaforth.xls
+XCS13,2019-01-16T00:00:00Z,73,95th percentile Water Quality - Consolidated Seaforth.xls
+XCS13,2019-01-23T00:00:00Z,3000,95th percentile Water Quality - Consolidated Seaforth.xls
+XCN14,2012-11-21T00:00:00Z,76,CoCT Water Quality - Consolidated.xls
+XCN14,2012-12-05T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2012-12-19T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2013-01-02T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+XCN14,2013-01-30T00:00:00Z,151,CoCT Water Quality - Consolidated.xls
+XCN14,2013-11-27T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2013-12-04T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2013-12-18T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2014-01-02T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2014-01-15T00:00:00Z,16,CoCT Water Quality - Consolidated.xls
+XCN14,2014-01-29T00:00:00Z,26,CoCT Water Quality - Consolidated.xls
+XCN14,2014-11-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2014-11-19T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2014-12-03T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2014-12-17T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2014-12-30T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2015-01-14T00:00:00Z,12,CoCT Water Quality - Consolidated.xls
+XCN14,2015-01-28T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+XCN14,2015-11-18T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2015-12-02T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2015-12-21T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2016-01-18T00:00:00Z,13,CoCT Water Quality - Consolidated.xls
+XCN14,2016-01-27T00:00:00Z,12,CoCT Water Quality - Consolidated.xls
+XCN14,2016-02-24T00:00:00Z,18,CoCT Water Quality - Consolidated.xls
+XCN14,2016-11-24T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2016-11-30T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2016-12-06T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+XCN14,2016-12-12T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2016-12-15T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2016-12-19T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2017-01-04T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2017-01-09T00:00:00Z,65,CoCT Water Quality - Consolidated.xls
+XCN14,2017-01-12T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2017-01-18T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+XCN14,2018-11-28T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2018-12-05T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2018-12-19T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2019-01-03T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2019-01-15T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2019-01-15T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2019-01-22T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2019-11-20T00:00:00Z,6,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2019-12-11T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2020-01-08T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2020-01-15T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2020-01-22T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2020-11-25T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2020-12-02T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2020-12-08T00:00:00Z,7,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2020-12-15T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2021-01-06T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2021-01-13T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2021-01-20T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2021-01-27T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2021-11-25T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2021-12-01T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2021-12-08T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2021-12-14T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2021-12-22T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2022-01-04T00:00:00Z,9,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2022-01-11T00:00:00Z,21,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2022-01-20T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2022-01-27T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+XCN14,2022-11-29T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2022-12-07T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2022-12-14T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2022-12-20T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2023-01-04T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2023-01-10T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2023-01-18T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2023-01-24T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2023-01-31T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2023-11-28T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2023-12-06T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2023-12-13T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2023-12-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2024-01-03T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2024-01-09T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2024-01-17T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2024-01-23T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2024-01-30T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2024-11-20T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2024-12-03T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2024-12-19T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2025-01-07T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2025-01-14T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2025-01-21T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+XCN14,2025-01-28T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CS13,2012-11-19T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2012-11-26T00:00:00Z,9,CoCT Water Quality - Consolidated.xls
+CS13,2012-12-03T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2012-12-10T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CS13,2012-12-18T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2013-01-02T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2013-01-21T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2013-02-11T00:00:00Z,25,CoCT Water Quality - Consolidated.xls
+CS13,2013-02-18T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2013-02-25T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2013-03-04T00:00:00Z,56,CoCT Water Quality - Consolidated.xls
+CS13,2013-03-11T00:00:00Z,15,CoCT Water Quality - Consolidated.xls
+CS13,2013-03-18T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2013-11-27T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CS13,2013-12-02T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CS13,2013-12-09T00:00:00Z,8,CoCT Water Quality - Consolidated.xls
+CS13,2013-12-17T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2013-12-19T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CS13,2014-01-02T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2014-01-06T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CS13,2014-01-13T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2014-01-20T00:00:00Z,5,CoCT Water Quality - Consolidated.xls
+CS13,2014-01-27T00:00:00Z,7,CoCT Water Quality - Consolidated.xls
+CS13,2014-02-03T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CS13,2014-02-10T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CS13,2014-02-17T00:00:00Z,151,CoCT Water Quality - Consolidated.xls
+CS13,2014-02-24T00:00:00Z,17,CoCT Water Quality - Consolidated.xls
+CS13,2014-03-03T00:00:00Z,11,CoCT Water Quality - Consolidated.xls
+CS13,2014-03-10T00:00:00Z,27,CoCT Water Quality - Consolidated.xls
+CS13,2014-03-17T00:00:00Z,44,CoCT Water Quality - Consolidated.xls
+CS13,2014-03-24T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2014-11-12T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CS13,2014-11-26T00:00:00Z,6,CoCT Water Quality - Consolidated.xls
+CS13,2014-12-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2014-12-19T00:00:00Z,25,CoCT Water Quality - Consolidated.xls
+CS13,2015-01-07T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+CS13,2015-01-21T00:00:00Z,21,CoCT Water Quality - Consolidated.xls
+CS13,2015-02-04T00:00:00Z,16,CoCT Water Quality - Consolidated.xls
+CS13,2015-02-18T00:00:00Z,9,CoCT Water Quality - Consolidated.xls
+CS13,2015-03-04T00:00:00Z,17,CoCT Water Quality - Consolidated.xls
+CS13,2015-03-18T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2015-03-31T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2015-11-18T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2015-12-02T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CS13,2015-12-22T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CS13,2016-01-13T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2016-01-20T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CS13,2016-02-03T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2016-02-10T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2016-02-24T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CS13,2016-03-30T00:00:00Z,8,CoCT Water Quality - Consolidated.xls
+CS13,2016-11-23T00:00:00Z,7,CoCT Water Quality - Consolidated.xls
+CS13,2016-11-30T00:00:00Z,4,CoCT Water Quality - Consolidated.xls
+CS13,2016-12-06T00:00:00Z,15,CoCT Water Quality - Consolidated.xls
+CS13,2016-12-14T00:00:00Z,35,CoCT Water Quality - Consolidated.xls
+CS13,2016-12-21T00:00:00Z,7,CoCT Water Quality - Consolidated.xls
+CS13,2017-01-04T00:00:00Z,14,CoCT Water Quality - Consolidated.xls
+CS13,2017-01-11T00:00:00Z,10,CoCT Water Quality - Consolidated.xls
+CS13,2017-01-18T00:00:00Z,2,CoCT Water Quality - Consolidated.xls
+CS13,2017-01-25T00:00:00Z,16,CoCT Water Quality - Consolidated.xls
+CS13,2017-02-01T00:00:00Z,3,CoCT Water Quality - Consolidated.xls
+CS13,2017-02-08T00:00:00Z,19,CoCT Water Quality - Consolidated.xls
+CS13,2017-03-01T00:00:00Z,1,CoCT Water Quality - Consolidated.xls
+CS13,2017-03-08T00:00:00Z,13,CoCT Water Quality - Consolidated.xls
+CS13,2018-11-28T00:00:00Z,47,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2018-12-06T00:00:00Z,7,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2018-12-19T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2019-01-04T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2019-01-16T00:00:00Z,7,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2019-11-21T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2019-12-05T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2019-12-12T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2020-01-09T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2020-01-16T00:00:00Z,31,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2020-01-23T00:00:00Z,71,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2020-02-06T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2020-02-20T00:00:00Z,79,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2020-03-03T00:00:00Z,9,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2020-03-19T00:00:00Z,8,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2020-11-26T00:00:00Z,18,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2020-12-03T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2020-12-09T00:00:00Z,2,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2020-12-17T00:00:00Z,32,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-01-07T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-01-14T00:00:00Z,5,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-01-21T00:00:00Z,12,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-01-28T00:00:00Z,69,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-02-02T00:00:00Z,150,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-02-08T00:00:00Z,18,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-02-09T00:00:00Z,16,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-02-16T00:00:00Z,91,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-02-23T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-03-02T00:00:00Z,22,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-03-16T00:00:00Z,15,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-11-23T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-12-02T00:00:00Z,150,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-12-09T00:00:00Z,9,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-12-15T00:00:00Z,150,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2021-12-23T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2022-01-05T00:00:00Z,14,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2022-01-11T00:00:00Z,17,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2022-01-19T00:00:00Z,85,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2022-01-26T00:00:00Z,16,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2022-02-02T00:00:00Z,3,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2022-02-16T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2022-03-03T00:00:00Z,13,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2022-03-15T00:00:00Z,1,BF Water Quality from WESSA Apr2022.xlsx
+CS13,2022-11-30T00:00:00Z,3,Blue Flag 95th percentile Compliance.xlsx
+CS13,2022-12-08T00:00:00Z,65,Blue Flag 95th percentile Compliance.xlsx
+CS13,2022-12-15T00:00:00Z,48,Blue Flag 95th percentile Compliance.xlsx
+CS13,2022-12-21T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CS13,2022-12-30T00:00:00Z,3,Blue Flag 95th percentile Compliance.xlsx
+CS13,2023-01-05T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CS13,2023-01-11T00:00:00Z,24,Blue Flag 95th percentile Compliance.xlsx
+CS13,2023-01-17T00:00:00Z,49,Blue Flag 95th percentile Compliance.xlsx
+CS13,2023-01-25T00:00:00Z,13,Blue Flag 95th percentile Compliance.xlsx
+CS13,2023-02-01T00:00:00Z,12,Blue Flag 95th percentile Compliance.xlsx
+CS13,2023-02-16T00:00:00Z,13,Blue Flag 95th percentile Compliance.xlsx
+CS13,2023-11-29T00:00:00Z,77,Blue Flag 95th percentile Compliance.xlsx
+CS13,2023-12-07T00:00:00Z,2,Blue Flag 95th percentile Compliance.xlsx
+CS13,2023-12-14T00:00:00Z,4,Blue Flag 95th percentile Compliance.xlsx
+CS13,2023-12-20T00:00:00Z,4,Blue Flag 95th percentile Compliance.xlsx
+CS13,2024-01-04T00:00:00Z,7,Blue Flag 95th percentile Compliance.xlsx
+CS13,2024-01-10T00:00:00Z,6,Blue Flag 95th percentile Compliance.xlsx
+CS13,2024-01-16T00:00:00Z,10,Blue Flag 95th percentile Compliance.xlsx
+CS13,2024-01-24T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CS13,2024-01-31T00:00:00Z,47,Blue Flag 95th percentile Compliance.xlsx
+CS13,2024-02-06T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CS13,2024-02-13T00:00:00Z,16,Blue Flag 95th percentile Compliance.xlsx
+CS13,2024-02-27T00:00:00Z,150,Blue Flag 95th percentile Compliance.xlsx
+CS13,2024-03-04T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx
+CS13,2024-03-05T00:00:00Z,14,Blue Flag 95th percentile Compliance.xlsx
+CS13,2024-03-13T00:00:00Z,150,Blue Flag 95th percentile Compliance.xlsx
+CS13,2024-03-18T00:00:00Z,52,Blue Flag 95th percentile Compliance.xlsx
+CS13,2024-03-19T00:00:00Z,45,Blue Flag 95th percentile Compliance.xlsx
+CS13,2024-03-27T00:00:00Z,1,Blue Flag 95th percentile Compliance.xlsx

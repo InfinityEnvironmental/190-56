@@ -3,57 +3,61 @@ BEGIN;
 SELECT * FROM coastal.sites;
 
 -- LIMS sites not in WALAB
-INSERT INTO coastal.sites (site_id, site_description, category, geom)
+INSERT INTO coastal.sites (site_id, site_description, category, active)
 VALUES
-	('CN02A', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CN03', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CN05A', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CN06A', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CN08I', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CN12B', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CN15', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CN20O', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CN32', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CS01', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CS05', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CS08', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CS12', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CS24E', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CS24W', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('XCN03A', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('XCN15', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('XCS33', '', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326));
+	('CN02A', 'TABLE BAY DOCKS BREAKWATER END', 'Coastal Monitoring Point', false),
+	('CN03', 'GRANGER BAY WEST BEACH', 'Coastal Monitoring Point', false),
+	('CN05A', 'GREEN POINT OPPOSITE PARK ROAD', 'Coastal Monitoring Point', false),
+	('CN06A', 'ROCKLANDS OPPOSITE SHOREHAM FLATS', 'Coastal Monitoring Point', false),
+	('CN08I', 'SUNSET BEACH TIDAL POOL INSIDE', 'Recreational Node', false),
+	('CN12B', 'CAMPS BAY TIDAL POOL NEAR PUMP STATION', 'Recreational Node', false),
+	('CN15', 'BAKOVEN BUNGALOWS NW ROCKS', 'Recreational Node', false),
+	('CN20O', 'MAIDENS COVE TIDAL POOL 2 OUTSIDE', 'Coastal Monitoring Point', false),
+	('CN32', 'OUTSIDE THREE ANCHOR BAY', 'Coastal Monitoring Point', false),
+	('CS01', 'KALK BAY ROCKS NEAR TIDAL POOL', 'Coastal Monitoring Point', false),
+	('CS05', 'OLD SANDOWN HOTEL SITE OFF ROCKS', 'Coastal Monitoring Point', false),
+	('CS08', 'LIFEBOX 21', 'Coastal Monitoring Point', false),
+	('CS12', 'LIFEBOX 30', 'Coastal Monitoring Point', false),
+	('CS24E', 'MITCHELLS PLAIN EAST STW SURF 50M EAST', 'Coastal Monitoring Point', false),
+	('CS24W', 'MITCHELLS PLAIN EAST STW SURF 50M WEST', 'Coastal Monitoring Point', false),
+	('XCN03A', 'LLANDUDNO BEACH AT CONFLUENCE WITH STREAM', 'Coastal Monitoring Point', false),
+	('XCN15', 'MELKBOSSTRAND BEACH SOUTH', 'Recreational Node', false),
+	('XCS33', 'LOURENS RIVER SEA NEAR MOUTH', 'Coastal Monitoring Point', false);
+
+SAVEPOINT lims;
 
 -- Can these be mapped to current sites?
 
 -- SABS Weekly Samples
-INSERT INTO coastal.sites (site_id, site_description, category, geom)
+INSERT INTO coastal.sites (site_id, site_description, category, active)
 VALUES
-	('ICS01', 'DIEP RIVER ESTUARY MOUTH', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('ICS03', 'CAMPS BAY TIDAL POOL STREAM', 'Recreational Node', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('ICS06', 'GLENCAIRN ELSA RIVER MOUTH', 'Recreational Node', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('ICS09', 'GORDONS BAY', 'Recreational Node', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('ICS08', 'ZANDVLEI MOUTH', 'Recreational Node', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('CS12', 'STRANDFONTEIN POINT EAST OF TIDAL POOL', 'Recreational Node', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('ICS14', 'SAUNDERS ROCKS', 'Recreational Node', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326));
+	('ICS01', 'DIEP RIVER ESTUARY MOUTH', 'Coastal Monitoring Point', false),
+	('ICS03', 'CAMPS BAY TIDAL POOL STREAM', 'Coastal Monitoring Point', false),
+	('ICS06', 'GLENCAIRN ELSA RIVER MOUTH', 'Coastal Monitoring Point', false),
+	('ICS09', 'GORDONS BAY PARKING AREA', 'Coastal Monitoring Point', false),
+	('ICS08', 'ZANDVLEI MOUTH', 'Coastal Monitoring Point', false),
+	('ICS14', 'SAUNDERS ROCKS', 'Coastal Monitoring Point', false);
+
+SAVEPOINT sabs;
 
 -- Daily samples for SABS
-INSERT INTO coastal.sites (site_id, site_description, category, geom)
+INSERT INTO coastal.sites (site_id, site_description, category, active)
 VALUES
-	('ICS12', 'CAMPS BAY IN FRONT OF LIFESAVING TOWER', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326));
+	('ICS12', 'CAMPS BAY IN FRONT OF LIFESAVING TOWER', 'Coastal Monitoring Point', true);
+
+SAVEPOINT sabs_daily;
 
 -- Daily samples for Atlantic
-INSERT INTO coastal.sites (site_id, site_description, category, geom)
+INSERT INTO coastal.sites (site_id, site_description, category, active)
 VALUES
-	('ICS10', 'CAMPS BAY CENTRAL', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326)),
-	('ICS15', 'MOUILLE POINT', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326));
+	('ICS10', 'CAMPS BAY CENTRAL', 'Coastal Monitoring Point', true),
+	('ICS15', 'MOUILLE POINT', 'Coastal Monitoring Point', false);
 
--- Daily samples for Strand (do we need to add sites or use current sites)
-INSERT INTO coastal.sites (site_id, site_description, category, geom)
-VALUES
-	('CS', 'CAMPS BAY IN FRONT OF LIFESAVING TOWER', 'Coastal Monitoring Point', st_setsrid(st_makepoint(18.43298333, -34.1403), 4326));
+SAVEPOINT walab_daily;
 
-SELECT * FROM coastal.sites;
+SELECT * FROM coastal.sites
+WHERE active
+ORDER BY site_description;
 
 ROLLBACK;
 COMMIT;
