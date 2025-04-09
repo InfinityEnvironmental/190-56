@@ -1,0 +1,38 @@
+---
+title: "historical_coastal_water_quality"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+```{r message = FALSE}
+library(tidyverse)
+library(dbplyr)
+library(DBI)
+library(pdftools)
+library(readxl)
+```
+
+```{r db connection}
+# Enter credentials when prompted
+con <- dbConnect(RPostgres::Postgres(),
+  host = "aws-0-eu-central-1.pooler.supabase.com",
+  port = 5432,
+  user = str_c(rstudioapi::askForPassword(prompt = "Username: "), "wnrvdvesovnkmqbhkhjz", sep = "."),
+  password = rstudioapi::askForPassword(),
+  dbname = "postgres"
+)
+```
+
+```{r}
+dbGetInfo(con)
+```
+
+```{r data-import}
+results <- tbl(con, I("coastal.results")) |> collect()
+```
+
+
