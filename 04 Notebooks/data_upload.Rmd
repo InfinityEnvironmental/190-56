@@ -44,8 +44,9 @@ dbGetInfo(con)
 ```
 
 # Data Import
+## Weekly Samples
 
-## Check which pdf files have not yet been imported
+### Check which pdf files have not yet been imported
 
 ```{r not-yet-imported}
 # List of files in folder
@@ -78,7 +79,7 @@ files |>
   filter(is.na(sample_date.y))
 ```
 
-## Extract data from pdf
+### Extract data from pdf
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
@@ -175,7 +176,7 @@ tbl
 copy_to(con, tbl, name = "coastal", overwrite = TRUE)
 ```
 
-## Upload to database
+### Upload to database
 
 ```{sql, connection = con}
 BEGIN;
@@ -203,6 +204,376 @@ SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
 WHERE sample_date = '2025-04-03';
+```
+
+```{sql, connection = con}
+ROLLBACK;
+```
+
+```{sql, connection = con}
+COMMIT;
+```
+
+### Upload single sample values
+
+```{sql connection = con}
+BEGIN;
+```
+
+```{sql connection = con}
+INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code, monitoring_group)
+SELECT
+  'CS34' AS site_id,
+  '2025-04-03'::date AS sample_date,
+  '09:23'::time AS sample_time,
+  '2025-04-05'::date AS analysis_completed,
+  7.1 AS sample_temp_c,
+  '8' AS enterococci_cfu_per_100ml,
+  'Infinity Environmental AD.94(CS).pdf' AS filename,
+  'WLAB'::coastal.lab AS lab_code,
+  'routine'::coastal.monitoring_group AS monitoring_group;
+  
+```
+
+```{sql connection = con}
+SELECT * FROM coastal.results WHERE sample_date = '2025-04-03' AND monitoring_group = 'routine';
+```
+
+```{sql connection = con}
+ROLLBACK;
+```
+
+```{sql connection = con}
+COMMIT;
+```
+
+
+## Daily Samples Strand
+
+### Check which pdf files have not yet been imported
+
+```{r not-yet-imported}
+# List of files in folder
+files_list <- list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/", pattern = "*.pdf")
+
+extract_sample_date <- function(filename){
+  sample_date <- pdf_text(paste("../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/", filename, sep = "")) |>
+    str_split("\\n") |>
+    unlist() |>
+    keep(~str_detect(.x, "Sample taken")) |>
+    str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+    pluck(1) |>
+    dmy()
+  
+  tibble(filename = filename, sample_date = sample_date)
+}
+
+# Map the function across the list of files in the directory
+files <- map_df(files_list, ~extract_sample_date(.x))
+
+# Retrieve a list of sample dates from the results table in database
+database <- tbl(con, I("coastal.results")) |>
+  filter(monitoring_group == "daily") |>
+  distinct(filename) |>
+  collect() |>
+  arrange(desc(filename))
+
+# Check which files are not yet in database
+files |>
+  left_join(database, by = c("filename" = "filename"), keep = TRUE) |>
+  filter(is.na(filename.y))
+```
+
+### Extract data from pdf
+
+```{r extract-pdf}
+# Select the pdf that you want to import
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/2025-04-04 Strand WALAB.pdf"
+filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/")
+
+# Extract the pdf data
+pdf_data <- pdf_text(path) |>
+  str_split("\n")
+
+# Extract the sample date
+sample_date <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Sample taken")) |>
+  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+  pluck(1) |>
+  dmy()
+
+# Extract the analysis date
+analysis_completed <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Analysis completed")) |>
+  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+  pluck(1) |>
+  dmy()
+
+# Extract the sample temperature
+sample_temp_c <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Sample temperature:")) |>
+  str_extract("(?<=(Sample temperature:\\s))\\d{1,2}\\.\\d") |>
+  pluck(1) |>
+  as.numeric()
+
+# Extract tabular data
+extract_table <- function(page){
+  page |>
+    unlist() |> 
+    head_while(~!str_detect(.x, "colony forming units")) |>
+    tail_while(~!str_detect(.x, "Sample number")) |>
+    discard(~.x == "") |>
+    unlist()
+}
+
+# Extract table from all pages of pdf
+table <- map(pdf_data, ~extract_table(.x)) |>
+  unlist()
+
+# Extract sample number
+sample_number <- table |>
+  str_sub(1,15) |>
+  str_trim()
+
+# Extract sample text
+sample_text <- table |>
+  str_sub(15,95) |>
+  str_trim()
+
+# Extract result
+sample_result <- table |>
+  str_sub(100) |>
+  str_trim()
+
+# Make a table with the extracted data
+tbl <- tibble(number = sample_number,
+       text = sample_text,
+       result = sample_result) |> 
+  mutate(number = if_else(number == "", NA, number)) |>
+  fill(number, .direction = "down") |> 
+  group_by(number) |>
+  summarise(text = str_c(text, collapse = ""), result = first(result)) |>
+  select(text, result) |>
+  mutate(
+      site_id = case_when(
+        text |> str_to_lower() |> str_detect("cape|sands") ~ "XCS34",
+        text |> str_to_lower() |> str_detect("blue|building") ~ "XCS26",
+        .default = text
+      ),
+      sample_time = str_extract(text, "\\d{1,2}h\\d{2}") |> str_replace("h", ":"),
+      sample_date = sample_date,
+      analysis_completed = analysis_completed,
+      sample_temp_c = sample_temp_c,
+      filename = filename |> str_remove(path)
+      ) |>
+  select(-text) |>
+  rename(enterococci_cfu_per_100ml = result) |>
+  mutate(enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "None found", "ND"))
+
+# Check data
+tbl
+
+# Copy to database
+copy_to(con, tbl, name = "coastal", overwrite = TRUE)
+```
+
+### Upload to database
+
+```{sql, connection = con}
+BEGIN;
+```
+
+```{sql, connection = con}
+WITH cte AS 
+(SELECT
+  site_id,
+  sample_date,
+  sample_time::time,
+  analysis_completed,
+  sample_temp_c,
+  enterococci_cfu_per_100ml,
+  filename,
+  'WLAB'::coastal.lab AS lab_code,
+  'daily'::coastal.monitoring_group
+FROM coastal)
+INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code, monitoring_group)
+SELECT * FROM cte;
+```
+
+```{sql, connection = con}
+SELECT
+  site_id, sample_date, sample_time, enterococci_cfu_per_100ml
+FROM coastal.results
+WHERE monitoring_group = 'daily' AND sample_date = '2025-04-04';
+```
+
+```{sql, connection = con}
+ROLLBACK;
+```
+
+```{sql, connection = con}
+COMMIT;
+```
+
+## Daily Samples Atlantic
+
+### Check which pdf files have not yet been imported
+
+```{r not-yet-imported}
+# List of files in folder
+files_list <- list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/", pattern = "*.pdf")
+
+extract_sample_date <- function(filename){
+  sample_date <- pdf_text(paste("../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/", filename, sep = "")) |>
+    str_split("\\n") |>
+    unlist() |>
+    keep(~str_detect(.x, "Sample taken")) |>
+    str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+    pluck(1) |>
+    dmy()
+  
+  tibble(filename = filename, sample_date = sample_date)
+}
+
+# Map the function across the list of files in the directory
+files <- map_df(files_list, ~extract_sample_date(.x))
+
+# Retrieve a list of sample dates from the results table in database
+database <- tbl(con, I("coastal.results")) |>
+  filter(monitoring_group == "daily") |>
+  distinct(filename) |>
+  collect() |>
+  arrange(desc(filename))
+
+# Check which files are not yet in database
+files |>
+  left_join(database, by = c("filename" = "filename"), keep = TRUE) |>
+  filter(is.na(filename.y))
+```
+
+### Extract data from pdf
+
+```{r extract-pdf}
+# Select the pdf that you want to import
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/2025-04-04_WALAB_Atlantic.pdf"
+filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/")
+
+# Extract the pdf data
+pdf_data <- pdf_text(path) |>
+  str_split("\n")
+
+# Extract the sample date
+sample_date <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Sample taken")) |>
+  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+  pluck(1) |>
+  dmy()
+
+# Extract the analysis date
+analysis_completed <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Analysis completed")) |>
+  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+  pluck(1) |>
+  dmy()
+
+# Extract the sample temperature
+sample_temp_c <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Sample temperature:")) |>
+  str_extract("(?<=(Sample temperature:\\s))\\d{1,2}\\.\\d") |>
+  pluck(1) |>
+  as.numeric()
+
+# Extract tabular data
+extract_table <- function(page){
+  page |>
+    unlist() |> 
+    head_while(~!str_detect(.x, "colony forming units")) |>
+    tail_while(~!str_detect(.x, "Sample number")) |>
+    discard(~.x == "") |>
+    unlist()
+}
+
+# Extract table from all pages of pdf
+table <- map(pdf_data, ~extract_table(.x)) |>
+  unlist()
+
+# Extract sample number
+sample_number <- table |>
+  str_sub(1,15) |>
+  str_trim()
+
+# Extract sample text
+sample_text <- table |>
+  str_sub(15,95) |>
+  str_trim()
+
+# Extract result
+sample_result <- table |>
+  str_sub(100) |>
+  str_trim()
+
+# Make a table with the extracted data
+tbl <- tibble(number = sample_number,
+       text = sample_text,
+       result = sample_result) |> 
+  mutate(number = if_else(number == "", NA, number)) |>
+  fill(number, .direction = "down") |> 
+  group_by(number) |>
+  summarise(text = str_c(text, collapse = ""), result = first(result)) |>
+  select(text, result) |>
+  mutate(
+      site_id = str_extract(text, "[:upper:]{2,3}\\s?\\d{2}\\d?[AOIWETC]?") |> str_remove_all("\\s"),
+      sample_time = str_extract(text, "\\d{1,2}h\\d{2}") |> str_replace("h", ":"),
+      sample_date = sample_date,
+      analysis_completed = analysis_completed,
+      sample_temp_c = sample_temp_c,
+      filename = filename |> str_remove(path)
+      ) |>
+  select(-text) |>
+  rename(enterococci_cfu_per_100ml = result) |>
+  mutate(enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "None found", "ND"))
+
+# Check data
+tbl
+
+# Copy to database
+copy_to(con, tbl, name = "coastal", overwrite = TRUE)
+```
+
+### Upload to database
+
+```{sql, connection = con}
+BEGIN;
+```
+
+```{sql, connection = con}
+WITH cte AS 
+(SELECT
+  site_id,
+  sample_date,
+  sample_time::time,
+  analysis_completed,
+  sample_temp_c,
+  enterococci_cfu_per_100ml,
+  filename,
+  'WLAB'::coastal.lab AS lab_code,
+  'daily'::coastal.monitoring_group
+FROM coastal)
+INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code, monitoring_group)
+SELECT * FROM cte;
+```
+
+```{sql, connection = con}
+SELECT
+  site_id, sample_date, sample_time, enterococci_cfu_per_100ml
+FROM coastal.results
+WHERE monitoring_group = 'daily' AND sample_date = '2025-04-04';
 ```
 
 ```{sql, connection = con}
@@ -319,7 +690,8 @@ blue_flag |>
   count() |>
   ggplot(aes(x = month, y = n, facet = site_id)) +
   geom_col() +
-  scale_x_date(minor_breaks = "1 year")
+  scale_x_date(minor_breaks = "1 year") +
+  facet_wrap(facets = vars(site_id))
 
 # Which sample is by itself in 2011?
 blue_flag |>

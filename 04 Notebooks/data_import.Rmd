@@ -610,7 +610,7 @@ blue_flag_data <- blue_flag_data |>
     sheet |> str_to_lower() |> str_detect("muiz") ~ "CS34",
     sheet |> str_to_lower() |> str_detect("seaforth") ~ "XCS13",
     sheet |> str_to_lower() |> str_detect("silwer") ~ "XCN14",
-    sheet |> str_to_lower() |> str_detect("strandf") ~ "CS13",
+    sheet |> str_to_lower() |> str_detect("strandf") ~ "CS45",
     .default = site
   )) |>
   arrange(sheet)

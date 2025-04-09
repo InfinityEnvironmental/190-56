@@ -210,6 +210,8 @@ BEGIN;
 
 DROP VIEW coastal.blue_flag;
 
+SELECT * FROM coastal.sites_view ORDER BY site_description;
+
 CREATE OR REPLACE VIEW coastal.blue_flag AS
 WITH rank_table AS 
 (SELECT
