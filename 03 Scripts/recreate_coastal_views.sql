@@ -1,13 +1,13 @@
 -- Recreate all coastal water quality views
 -- Need to drop all views first
--- To Do List:
+
+-- To do list:
 -- Add order number to sites table
--- Add action column to most_recent_results table
 -- Add Atlantic or False Bay column to sites table
 
 BEGIN;
 
--- Drop all VIEWS
+-- Drop all views
 
 DROP VIEW coastal.action_required;
 DROP VIEW coastal.blue_flag;
@@ -21,7 +21,7 @@ DROP VIEW coastal.sites_view;
 
 SAVEPOINT drop_views;
 
--- Update sites table
+-- Update sites table with site order and coastline columns
 
 ALTER TABLE coastal.sites ADD COLUMN site_order integer;
 
@@ -32,6 +32,8 @@ WHERE a.site_id = b.site_id;
 
 SELECT * FROM coastal.sites ORDER BY site_order;
 
+-- Set daily sites to inactive
+
 UPDATE coastal.sites
 SET active = false
 WHERE site_id = 'ICS12';
@@ -40,9 +42,12 @@ UPDATE coastal.sites
 SET active = false
 WHERE site_id = 'ICS10';
 
-ALTER TABLE coastal.sites ADD COLUMN coastline text;
+ROLLBACK TO drop_views;
+SAVEPOINT switch_off_sites;
 
-SAVEPOINT add_coastline;
+-- Add coastline column
+
+ALTER TABLE coastal.sites ADD COLUMN coastline text;
 
 UPDATE coastal.sites
 SET coastline = CASE
@@ -53,49 +58,58 @@ SET coastline = CASE
 
 SELECT * FROM coastal.sites ORDER BY site_order;
 
+ROLLBACK TO switch_off_sites;
+SAVEPOINT add_coastline;
+
+-- Update GPS points in sites table
+
+UPDATE coastal.sites
+SET
+  geom = CASE WHEN site_id = 'CN15' THEN st_setsrid(st_makepoint(18.37342417, -33.95924611), 4326)
+  	WHEN site_id = 'CN03' THEN st_setsrid(st_makepoint(18.41041667, -33.89903333), 4326)
+  	WHEN site_id = 'CN05A' THEN st_setsrid(st_makepoint(18.3979825, -33.90372583), 4326)
+  	WHEN site_id = 'CN06A' THEN st_setsrid(st_makepoint(18.39363333, -33.90838333), 4326)
+  	WHEN site_id = 'CN12B' THEN st_setsrid(st_makepoint(18.37583194, -33.95507917), 4326)
+  	WHEN site_id = 'CN20O' THEN st_setsrid(st_makepoint(18.37458333, -33.94523333), 4326)
+  	WHEN site_id = 'CN32' THEN st_setsrid(st_makepoint(18.39706667, -33.90541667), 4326)
+  	WHEN site_id = 'CS01' THEN st_setsrid(st_makepoint(18.44993333, -34.12678333), 4326)
+  	WHEN site_id = 'CS05' THEN st_setsrid(st_makepoint(18.46766667, -34.11068333), 4326)
+  	WHEN site_id = 'CS08' THEN st_setsrid(st_makepoint(18.49395, -34.10061667), 4326)
+  	WHEN site_id = 'CS12' THEN st_setsrid(st_makepoint(18.53956667, -34.0903), 4326)
+  	WHEN site_id = 'XCS33' THEN st_setsrid(st_makepoint(18.81283333, -34.10166667), 4326)
+  	WHEN site_id = 'XCS33' THEN st_setsrid(st_makepoint(18.81283333, -34.10166667), 4326)
+	 ELSE geom END;
+
+SELECT * FROM coastal.sites;
+
 ROLLBACK TO add_coastline;
+SAVEPOINT update_sites;
 
 -- Sites view
 
-BEGIN;
-
-SAVEPOINT sites_table_edited;
-
-SELECT * FROM coastal.site_order;
-
-DROP VIEW coastal.sites_view;
-
 CREATE OR REPLACE VIEW coastal.sites_view
- AS
- SELECT
- 	sites.site_order,
- 	sites.site_description,
-    sites.site_id,
-    sites.category,
-    st_x(sites.geom) AS long,
-    st_y(sites.geom) AS lat,
-    sites.active,
-	sites.coastline
-   FROM coastal.sites
-  ORDER BY site_order;
+AS
+SELECT
+  sites.site_order,
+  sites.site_description,
+  sites.site_id,
+  sites.category,
+  sites.coastline,
+  st_x(sites.geom) AS long,
+  st_y(sites.geom) AS lat,
+  sites.active
+FROM coastal.sites
+ORDER BY site_order;
 
-ROLLBACK TO add_coastline;
+ROLLBACK TO update_sites;
+SAVEPOINT sites_view;
 
 SELECT * FROM coastal.sites_view;
 
 GRANT SELECT ON TABLE coastal.sites_view TO anon;
 GRANT ALL ON TABLE coastal.sites_view TO technician;
 
-SAVEPOINT sites_view_done;
-
-ROLLBACK;
-COMMIT;
-
 -- Results view
-
-BEGIN;
-
-DROP VIEW coastal.results_view;
 
 CREATE OR REPLACE VIEW coastal.results_view
  AS
@@ -126,32 +140,17 @@ CREATE OR REPLACE VIEW coastal.results_view
     results.lab_code,
     results.monitoring_group
    FROM coastal.results
-  ORDER BY results.sample_date DESC, results.monitoring_group, (
-        CASE
-            WHEN results.site_id::text = 'XCS16'::text THEN 'CS41'::character varying
-            WHEN results.site_id::text = 'ICS14'::text THEN 'CN16O'::character varying
-            WHEN results.site_id::text = 'ICS12'::text THEN 'CN11'::character varying
-            WHEN results.site_id::text = 'ICS10'::text THEN 'CN41'::character varying
-            WHEN results.site_id::text = 'ICS15'::text THEN 'CN05'::character varying
-            WHEN results.site_id::text = 'ICS01'::text THEN 'CN22'::character varying
-            WHEN results.site_id::text = 'ICS09'::text THEN 'XCS04'::character varying
-            WHEN results.site_id::text = 'XCN05'::text THEN 'CN37'::character varying
-            ELSE results.site_id
-        END);
+  ORDER BY results.sample_date DESC, results.monitoring_group;
+
+SELECT * FROM coastal.results_view;
+
+ROLLBACK TO sites_view;
+SAVEPOINT results_view;
 
 GRANT SELECT ON TABLE coastal.results_view TO anon;
 GRANT SELECT ON TABLE coastal.results_view TO technician;
 
-SAVEPOINT results_view_done;
-
-ROLLBACK;
-COMMIT;
-
 -- Blue flag view
-
-BEGIN;
-
-DROP VIEW coastal.blue_flag;
 
 CREATE OR REPLACE VIEW coastal.blue_flag
  AS
@@ -169,6 +168,7 @@ CREATE OR REPLACE VIEW coastal.blue_flag
           ORDER BY b.sample_date DESC
         )
  SELECT
+    rank_table.site_order,
         CASE
             WHEN rank_table.site_id::text = 'CN11'::text THEN 'Camps Bay'::text
             WHEN rank_table.site_id::text = 'CN09'::text THEN 'Clifton Fourth'::text
@@ -192,19 +192,13 @@ CREATE OR REPLACE VIEW coastal.blue_flag
 
 SELECT * FROM coastal.blue_flag;
 
+ROLLBACK TO results_view;
 SAVEPOINT blue_flag_done;
 
 GRANT SELECT ON TABLE coastal.blue_flag TO anon;
 GRANT SELECT ON TABLE coastal.blue_flag TO technician;
 
-ROLLBACK;
-COMMIT;
-
 -- Last eight weeks view
-
-BEGIN;
-
-DROP VIEW coastal.last_eight_weeks;
 
 CREATE OR REPLACE VIEW coastal.last_eight_weeks
  AS
@@ -230,23 +224,17 @@ CREATE OR REPLACE VIEW coastal.last_eight_weeks
     cte.censored_value
    FROM cte
   WHERE cte.week >= (date_trunc('week'::text, CURRENT_DATE::timestamp with time zone) - '49 days'::interval)
-  ORDER BY cte.category DESC, cte.week DESC;
+  ORDER BY cte.category DESC, cte.site_order, cte.week DESC;
 
 SELECT * FROM coastal.last_eight_weeks;
 
+ROLLBACK TO blue_flag_done;
 SAVEPOINT last_eight_weeks_done;
 
 GRANT SELECT ON TABLE coastal.last_eight_weeks TO anon;
 GRANT SELECT ON TABLE coastal.last_eight_weeks TO technician;
 
-ROLLBACK;
-COMMIT;
-
 -- Most recent results view
-
-BEGIN;
-
-DROP VIEW coastal.most_recent_results;
 
 CREATE OR REPLACE VIEW coastal.most_recent_results
  AS
@@ -278,19 +266,13 @@ CREATE OR REPLACE VIEW coastal.most_recent_results
 
 SELECT * FROM coastal.most_recent_results;
 
-GRANT SELECT ON TABLE coastal.most_recent_results TO anon;
-GRANT ALL ON TABLE coastal.most_recent_results TO technician;
-
+ROLLBACK TO last_eight_weeks_done;
 SAVEPOINT most_recent_done;
 
-ROLLBACK;
-COMMIT;
+GRANT SELECT ON TABLE coastal.most_recent_results TO anon;
+GRANT SELECT ON TABLE coastal.most_recent_results TO technician;
 
 -- Action required view
-
-BEGIN;
-
-DROP VIEW coastal.action_required;
 
 CREATE OR REPLACE VIEW coastal.action_required
  AS
@@ -309,6 +291,7 @@ WITH action_required AS
            FROM coastal.sites a
              JOIN coastal.results_view b ON a.site_id::text = b.site_id::text
           WHERE a.active AND b.monitoring_group = 'routine'::coastal.monitoring_group
+		  ORDER BY a.site_order
         )
  SELECT
  	cte.site_order,
@@ -336,20 +319,11 @@ FROM action_required a
 SELECT * FROM coastal.action_required;
 
 GRANT SELECT ON TABLE coastal.action_required TO anon;
-GRANT ALL ON TABLE coastal.action_required TO technician;
+GRANT SELECT ON TABLE coastal.action_required TO technician;
 
 SAVEPOINT action_required;
 
-SELECT * FROM coastal.action_required;
-
-ROLLBACK;
-COMMIT;
-
 -- Percentage exceedances view
-
-BEGIN;
-
-DROP VIEW coastal.percentage_exceedances_5years;
 
 CREATE OR REPLACE VIEW coastal.percentage_exceedances_5years
  AS
@@ -387,33 +361,31 @@ CREATE OR REPLACE VIEW coastal.percentage_exceedances_5years
 SELECT * FROM coastal.percentage_exceedances_5years;
 
 GRANT SELECT ON TABLE coastal.percentage_exceedances_5years TO anon;
-GRANT ALL ON TABLE coastal.percentage_exceedances_5years TO postgres;
 GRANT SELECT ON TABLE coastal.percentage_exceedances_5years TO technician;
 
-ROLLBACK;
-COMMIT;
+SAVEPOINT percentage_exceedances_done;
 
 -- Rolling 5 year view
-
-BEGIN;
-
-DROP VIEW coastal.rolling5year;
 
 CREATE OR REPLACE VIEW coastal.rolling5year
  AS
  WITH cte AS (
-         SELECT b.site_id,
+         SELECT
+		 	b.site_order,
             b.site_description,
+		 	b.site_id,
             count(*) AS number_of_samples,
             coastal.hazen90(a.numeric_value) AS hazen90,
             coastal.hazen95(a.numeric_value) AS hazen95
            FROM coastal.results_view a
              JOIN coastal.sites b ON a.site_id::text = b.site_id::text
           WHERE a.sample_date > (CURRENT_DATE - '7 years'::interval) AND b.active AND (a.monitoring_group = ANY (ARRAY['routine'::coastal.monitoring_group, 'daily'::coastal.monitoring_group]))
-          GROUP BY b.site_id, b.site_description
-          ORDER BY b.site_description
+          GROUP BY b.site_order, b.site_id, b.site_description
+          ORDER BY b.site_order
         )
- SELECT cte.site_description,
+ SELECT
+ 	cte.site_order,
+ 	cte.site_description,
     cte.site_id,
     cte.number_of_samples,
     cte.hazen90,
@@ -426,38 +398,38 @@ CREATE OR REPLACE VIEW coastal.rolling5year
             WHEN cte.hazen95 > 200::numeric AND cte.hazen90 < 185::numeric THEN 'Sufficient'::text
             ELSE NULL::text
         END AS water_quality_category
-   FROM cte;
+   FROM cte
+   ORDER BY cte.site_order;
 
-ALTER TABLE coastal.rolling5year
-    OWNER TO postgres;
+SELECT * FROM coastal.rolling5year;
+
+ROLLBACK TO action_required;
+SAVEPOINT rolling5year;
 
 GRANT SELECT ON TABLE coastal.rolling5year TO anon;
-GRANT ALL ON TABLE coastal.rolling5year TO postgres;
-
-ROLLBACK;
-COMMIT;
+GRANT SELECT ON TABLE coastal.rolling5year TO technician;
 
 -- Rolling 365 day view
-
-BEGIN;
-
-DROP VIEW coastal.rolling365day;
 
 CREATE OR REPLACE VIEW coastal.rolling365day
  AS
  WITH cte AS (
-         SELECT b.site_id,
+         SELECT
+		 	b.site_order,
             b.site_description,
+			b.site_id,
             count(*) AS number_of_samples,
             coastal.hazen90(a.numeric_value) AS hazen90,
             coastal.hazen95(a.numeric_value) AS hazen95
            FROM coastal.results_view a
              JOIN coastal.sites b ON a.site_id::text = b.site_id::text
           WHERE a.sample_date > (CURRENT_DATE - '1 year'::interval) AND b.active AND (a.monitoring_group = ANY (ARRAY['routine'::coastal.monitoring_group, 'daily'::coastal.monitoring_group]))
-          GROUP BY b.site_id, b.site_description
-          ORDER BY b.site_description
+          GROUP BY b.site_order, b.site_id, b.site_description
+          ORDER BY b.site_order
         )
- SELECT cte.site_description,
+ SELECT
+ 	cte.site_order,
+ 	cte.site_description,
     cte.site_id,
     cte.number_of_samples,
     cte.hazen90,
@@ -472,12 +444,13 @@ CREATE OR REPLACE VIEW coastal.rolling365day
         END AS water_quality_category
    FROM cte;
 
-ALTER TABLE coastal.rolling365day
-    OWNER TO postgres;
+SELECT * FROM coastal.rolling365day;
+SELECT * FROM coastal.results WHERE site_id = 'XCN08' AND monitoring_group IN ('routine', 'daily') AND sample_date > current_date - '1 year'::interval;
 
 GRANT SELECT ON TABLE coastal.rolling365day TO anon;
-GRANT ALL ON TABLE coastal.rolling365day TO postgres;
-GRANT ALL ON TABLE coastal.rolling365day TO technician;
+GRANT SELECT ON TABLE coastal.rolling365day TO technician;
+
+SAVEPOINT rolling365day;
 
 ROLLBACK;
 COMMIT;
