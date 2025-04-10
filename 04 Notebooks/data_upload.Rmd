@@ -82,7 +82,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_62(02.04.2025).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_2024-12-03.pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 # Extract the pdf data
@@ -169,7 +169,8 @@ tbl <- tibble(number = sample_number,
   mutate(enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "None found", "ND"))
 
 # Check data
-tbl
+tbl |>
+  arrange(site_id)
 
 # Copy to database
 copy_to(con, tbl, name = "coastal", overwrite = TRUE)
@@ -182,6 +183,12 @@ BEGIN;
 ```
 
 ```{sql, connection = con}
+DELETE FROM coastal.results
+WHERE sample_date = '2024-12-03';
+```
+
+
+```{sql, connection = con}
 WITH cte AS 
 (SELECT
   site_id,
@@ -191,9 +198,10 @@ WITH cte AS
   sample_temp_c,
   enterococci_cfu_per_100ml,
   filename,
-  'WLAB'::coastal.lab AS lab_code
+  'WLAB'::coastal.lab AS lab_code,
+  'routine'::coastal.monitoring_group AS monitoring_group
 FROM coastal)
-INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code)
+INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code, monitoring_group)
 SELECT * FROM cte;
 ```
 
@@ -201,7 +209,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
-WHERE sample_date = '2025-04-02';
+WHERE sample_date = '2024-12-03';
 ```
 
 ```{sql, connection = con}
