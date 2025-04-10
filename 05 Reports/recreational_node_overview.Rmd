@@ -1,0 +1,128 @@
+---
+title: "Recreational Node Summary Page"
+author: "Francois van Schalkwyk"
+date: "`r Sys.Date()`"
+output:
+  bookdown::word_document2:
+    reference_docx: recreational_node_overview_style_template.docx
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  include = FALSE
+  #dpi = 600
+  )
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+```{r load-packages}
+library(tidyverse)
+library(dbplyr)
+library(DBI)
+library(pdftools)
+library(readxl)
+library(extrafont)
+library(sf)
+library(basemaps)
+```
+```{r}
+# Standard figure sizes:
+# Full page width = 6.4, half page width = 3.2
+# Full page height = 9.8, half page heigth = 4.9
+```
+
+
+```{r db-connection}
+# Connect to the Postgres database
+# Enter credentials when prompted
+con <- dbConnect(RPostgres::Postgres(),
+  host = "aws-0-eu-central-1.pooler.supabase.com",
+  port = 5432,
+  user = str_c(rstudioapi::askForPassword(prompt = "Username: "), "wnrvdvesovnkmqbhkhjz", sep = "."),
+  password = rstudioapi::askForPassword(),
+  dbname = "postgres"
+)
+```
+
+# Create map for each site
+
+```{r read-in-site-data}
+sites <- st_read(con, query = "SELECT * FROM coastal.sites", as_tibble = TRUE) |>
+  st_cast("POINT") |>
+  filter(active) |>
+  arrange(site_description)
+```
+
+```{r read-results-data}
+results <- tbl(con, I("coastal.results")) |>
+  collect()
+```
+
+```{r read-basemaps, fig.cap = "Map of coastal water quality monitoring sites in Cape Town", fig.width = 6.4, fig.height = 9.8, dpi = 600}
+cct <- st_read("../../Infinity/Infinity GIS - Server/base_data/sa/WC/cape_town/CPT Metropolitan/metropolitan municipality cpt.shp", as_tibble = TRUE)
+
+cct |>
+  st_set_crs("EPSG:4326") |>
+  ggplot() +
+  labs(
+    title = "Coastal Water Quality Monitoring Stations",
+    subtitle = "City of Cape Town"
+  ) +
+  geom_sf() +
+  geom_sf(data = sites, aes(colour = category, size = category)) +
+  theme(
+    legend.position = "bottom",
+    # axis.ticks = element_blank(),
+    # axis.text = element_blank(),
+    plot.background = element_blank(),
+    panel.background = element_blank(),
+    text = element_text(family = "Century Gothic"),
+    legend.title = element_blank(),
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  ) +
+  scale_colour_manual(values = c("Recreational Node" = "orange", "Coastal Monitoring Point" = "darkgrey")) +
+  scale_size_manual(values = c("Recreational Node" = 2, "Coastal Monitoring Point" = 1))
+```
+
+```{r plot-zoomed-data}
+# Get coordinates for specific site
+sites |>
+  filter(site_id == "CN22") |>
+  st_coordinates()
+
+cct |>
+  st_set_crs("EPSG:4326") |>
+  ggplot() +
+  labs(
+    title = "Coastal Water Quality Monitoring Stations",
+    subtitle = "City of Cape Town"
+  ) +
+  geom_sf() +
+  geom_sf(data = sites, aes(colour = category, size = category)) +
+  theme(
+    legend.position = "bottom",
+    # axis.ticks = element_blank(),
+    # axis.text = element_blank(),
+    plot.background = element_blank(),
+    panel.background = element_blank(),
+    text = element_text(family = "Century Gothic"),
+    legend.title = element_blank(),
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  ) +
+  scale_colour_manual(values = c("Recreational Node" = "orange", "Coastal Monitoring Point" = "darkgrey")) +
+  scale_size_manual(values = c("Recreational Node" = 2, "Coastal Monitoring Point" = 1)) +
+  coord_sf(xlim = c(18.3, 18.6), ylim = c(-34.0, -33.7))
+```
+
+
+
+```{r map-sites}
+ggplot(sites, aes(colour = category)) +
+  geom_sf()
+```
+
+
+
