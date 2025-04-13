@@ -83,7 +83,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_65(08.04.2025).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_66(09.04.2025).pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 # Extract the pdf data
@@ -153,7 +153,7 @@ tbl <- tibble(number = sample_number,
   summarise(text = str_c(text, collapse = ""), result = first(result)) |>
   select(text, result) |>
   mutate(
-    site_id = str_extract(text, "[:upper:]{2,3}\\s?\\d{2}\\d?[AOIWETC]?") |> str_remove_all("\\s"),
+    site_id = str_extract(text, "[:upper:]{2,3}\\d{2}\\d?[AOIWETC]?") |> str_remove_all("\\s"),
     sample_time = str_extract(text, "\\d{1,2}h\\d{2}") |> str_replace("h", ":"),
     sample_date = sample_date,
     analysis_completed = analysis_completed,
@@ -170,8 +170,7 @@ tbl <- tibble(number = sample_number,
   mutate(enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "None found", "ND"))
 
 # Check data
-tbl |>
-  arrange(site_id)
+tbl
 
 # Copy to database
 copy_to(con, tbl, name = "coastal", overwrite = TRUE)
@@ -182,12 +181,6 @@ copy_to(con, tbl, name = "coastal", overwrite = TRUE)
 ```{sql, connection = con}
 BEGIN;
 ```
-
-```{sql, connection = con}
-DELETE FROM coastal.results
-WHERE sample_date = '2024-12-03';
-```
-
 
 ```{sql, connection = con}
 WITH cte AS 
@@ -210,7 +203,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
-WHERE sample_date = '2025-04-08' AND monitoring_group = 'routine';
+WHERE sample_date = '2025-04-09' AND monitoring_group = 'routine';
 ```
 
 ```{sql, connection = con}
@@ -295,7 +288,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/2025-04-08 Strand WALAB.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/2025-04-09 Strand WALAB.pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/")
 
 # Extract the pdf data
@@ -414,7 +407,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2025-04-08';
+WHERE monitoring_group = 'daily' AND sample_date = '2025-04-09';
 ```
 
 ```{sql, connection = con}
@@ -465,7 +458,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/2025-04-08_WALAB_Atlantic.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/2025-04-09_WALAB_Atlantic.pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/")
 
 # Extract the pdf data
@@ -580,8 +573,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2025-04-08';
->>>>>>> c3eba6e53417a632fbc38c8ed5a43e215240b916
+WHERE monitoring_group = 'daily' AND sample_date = '2025-04-09';
 ```
 
 ```{sql, connection = con}
