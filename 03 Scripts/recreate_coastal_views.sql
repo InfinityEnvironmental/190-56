@@ -456,5 +456,48 @@ GRANT SELECT ON TABLE coastal.rolling365day TO technician;
 
 SAVEPOINT rolling365day;
 
+-- Category for summer 2024/2025
+
+CREATE OR REPLACE VIEW coastal.summer_category
+ AS
+ WITH cte AS (
+         SELECT
+		 	b.site_order,
+            b.site_description,
+			b.site_id,
+            count(*) AS number_of_samples,
+            coastal.hazen90(a.numeric_value) AS hazen90,
+            coastal.hazen95(a.numeric_value) AS hazen95
+           FROM coastal.results_view a
+             JOIN coastal.sites b ON a.site_id::text = b.site_id::text
+          WHERE a.sample_date BETWEEN '2024-10-24' AND '2025-03-25' AND b.active AND (a.monitoring_group = ANY (ARRAY['routine'::coastal.monitoring_group, 'daily'::coastal.monitoring_group]))
+          GROUP BY b.site_order, b.site_id, b.site_description
+          ORDER BY b.site_order
+        )
+ SELECT
+ 	cte.site_order,
+ 	cte.site_description,
+    cte.site_id,
+    cte.number_of_samples,
+    cte.hazen90,
+    cte.hazen95,
+        CASE
+            WHEN cte.number_of_samples < 10 THEN 'Not enough samples'::text
+            WHEN cte.hazen95 <= 100::numeric THEN 'Excellent'::text
+            WHEN cte.hazen95 <= 200::numeric THEN 'Good'::text
+            WHEN cte.hazen95 > 200::numeric AND cte.hazen90 > 185::numeric THEN 'Poor'::text
+            WHEN cte.hazen95 > 200::numeric AND cte.hazen90 < 185::numeric THEN 'Sufficient'::text
+            ELSE NULL::text
+        END AS water_quality_category
+   FROM cte;
+
+SELECT * FROM coastal.summer_category;
+SELECT * FROM coastal.results WHERE site_id = 'XCN08' AND monitoring_group IN ('routine', 'daily') AND sample_date > current_date - '1 year'::interval;
+
+GRANT SELECT ON TABLE coastal.summer_category TO anon;
+GRANT SELECT ON TABLE coastal.summer_category TO technician;
+
+SAVEPOINT rolling365day;
+
 ROLLBACK;
 COMMIT;
