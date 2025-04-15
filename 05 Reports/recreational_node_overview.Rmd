@@ -27,10 +27,15 @@ library(sf)
 library(basemaps)
 ```
 
-```{r}
-# Standard figure sizes:
-# Full page width = 6.4, half page width = 3.2
-# Full page height = 9.8, half page heigth = 4.9
+```{r prepare-city-colours}
+city_blue <- "#0098c5"
+city_green <- "#bacf00"
+city_pink <- "#c8006f"
+city_teal <- "#005870"
+city_dark_green <- "#446414"
+city_red <- "#9d2235"
+city_brown <- "#47292e"
+city_tan <- "#98871f"
 ```
 
 
@@ -63,7 +68,7 @@ results <- tbl(con, I("coastal.results")) |>
 ```{r read-basemaps, fig.cap = "Map of coastal water quality monitoring sites in Cape Town", fig.width = 6.4, fig.height = 9.8, dpi = 600}
 cct <- st_read("../../Infinity/Infinity GIS - Server/base_data/sa/WC/cape_town/CPT Metropolitan/metropolitan municipality cpt.shp", as_tibble = TRUE)
 
-cct |>
+cct_sites <- cct |>
   st_set_crs("EPSG:4326") |>
   ggplot() +
   labs(
@@ -83,8 +88,10 @@ cct |>
     plot.title = element_text(hjust = 0.5),
     plot.subtitle = element_text(hjust = 0.5)
   ) +
-  scale_colour_manual(values = c("Recreational Node" = "orange", "Coastal Monitoring Point" = "darkgrey")) +
+  scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "darkgrey")) +
   scale_size_manual(values = c("Recreational Node" = 2, "Coastal Monitoring Point" = 1))
+
+ggsave("coastal_water_quality_sites.jpg", plot = cct_sites, path = "02 Output Data/", width = 5, height = 6.7, dpi = 600)
 ```
 
 ```{r plot-zoomed-data}
@@ -120,9 +127,36 @@ cct |>
 
 
 
-```{r map-sites}
-ggplot(sites, aes(colour = category)) +
-  geom_sf()
+```{r temporary}
+cold_chain <- read_csv("../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/05_Data/01 Cold Chain/2025-01-28_12-34-27_1401414828.csv", col_names = c("id", "time", "temperature", "high_alarm", "low_alarm", "comments", "serial_no"), skip = 1)
+
+cold_chain <- cold_chain |>
+  mutate(sample_date = date(time),
+         sample_time = hms::as_hms(time)) |>
+  fill(serial_no) |>
+  select(serial_no, time, sample_date, sample_time, temperature, high_alarm, low_alarm)
+
+sample_temperatures <- cross_join(
+  tbl(con, I("coastal.results")) |>
+  filter(sample_date == "2025-01-31" & monitoring_group == "routine") |>
+  collect(),
+  cold_chain |> filter(sample_date == "2025-01-31")) |>
+  mutate(diff = abs(sample_time.x - sample_time.y)) |>
+  group_by(site_id) |>
+  arrange(diff, .by_group = TRUE) |>
+  slice(1) |>
+  select(site_id, sample_time.y, temperature)
+
+cold_chain |>
+  filter(sample_date == "2025-01-31") |>
+  ggplot(aes(x = time, y = temperature, group = serial_no)) +
+  labs(title = "Example Cold Chain 31 January 2025",
+       x = "Time") +
+  geom_line(aes(colour = "Measured Temperature"), size = 1) +
+  geom_hline(yintercept = 8, colour = city_red, size = 1, linetype = 2) +
+  geom_hline(yintercept = 2, colour = city_red, size = 1, linetype = 2) +
+  geom_point(data = sample_temperatures, aes(x = sample_time.y, y = temperature)) +
+  coord_cartesian(xlim = c(ymd_hms("2025-01-31 08:00:00"), ymd_hms("2025-01-31 17:00:00")))
 ```
 
 
