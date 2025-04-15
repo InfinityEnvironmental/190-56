@@ -892,3 +892,15 @@ sabs_daily <- sabs_daily |>
 write_csv(sabs_daily, "02 Output Data/sabs_daily_clean.csv")
 ```
 
+# Site Order
+
+```{r read-excel}
+site_order <- read_excel("01 Input Data/CWQ sites numbered.xlsx",
+           skip = 2,
+           col_names = c("site_order", "site_name", "site_id", "sample_frequency")) |>
+  filter(!if_any(everything(), is.na)) |>
+  select(site_id, site_order)
+
+copy_to(con, site_order, name = I("coastal.site_order"), temporary = FALSE)
+```
+
