@@ -26,6 +26,7 @@ library(extrafont)
 library(sf)
 library(basemaps)
 ```
+
 ```{r}
 # Standard figure sizes:
 # Full page width = 6.4, half page width = 3.2

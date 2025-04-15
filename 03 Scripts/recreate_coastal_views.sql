@@ -77,7 +77,6 @@ SET
   	WHEN site_id = 'CS08' THEN st_setsrid(st_makepoint(18.49395, -34.10061667), 4326)
   	WHEN site_id = 'CS12' THEN st_setsrid(st_makepoint(18.53956667, -34.0903), 4326)
   	WHEN site_id = 'XCS33' THEN st_setsrid(st_makepoint(18.81283333, -34.10166667), 4326)
-  	WHEN site_id = 'XCS33' THEN st_setsrid(st_makepoint(18.81283333, -34.10166667), 4326)
 	 ELSE geom END;
 
 SELECT * FROM coastal.sites;
@@ -95,8 +94,8 @@ SELECT
   sites.site_id,
   sites.category,
   sites.coastline,
-  st_x(sites.geom) AS long,
   st_y(sites.geom) AS lat,
+  st_x(sites.geom) AS long,
   sites.active
 FROM coastal.sites
 ORDER BY site_order;
@@ -209,7 +208,8 @@ CREATE OR REPLACE VIEW coastal.last_eight_weeks
             a.site_id,
             a.category,
             date_trunc('week'::text, b.sample_date::timestamp with time zone)::date AS week,
-            b.censored_value
+            b.censored_value,
+			b.numeric_value
            FROM coastal.sites_view a
              JOIN coastal.results_view b USING (site_id)
           WHERE b.monitoring_group = 'routine'::coastal.monitoring_group AND a.active
@@ -221,7 +221,8 @@ CREATE OR REPLACE VIEW coastal.last_eight_weeks
     cte.site_id,
     cte.category,
     cte.week,
-    cte.censored_value
+    cte.censored_value,
+	cte.numeric_value
    FROM cte
   WHERE cte.week >= (date_trunc('week'::text, CURRENT_DATE::timestamp with time zone) - '49 days'::interval)
   ORDER BY cte.category DESC, cte.site_order, cte.week DESC;
@@ -252,6 +253,7 @@ CREATE OR REPLACE VIEW coastal.most_recent_results
            FROM coastal.sites a
              JOIN coastal.results_view b ON a.site_id::text = b.site_id::text
           WHERE a.active AND b.monitoring_group = 'routine'::coastal.monitoring_group
+		  ORDER BY site_order, sample_date DESC, sample_time DESC
         )
  SELECT
  	cte.site_order,
@@ -259,6 +261,7 @@ CREATE OR REPLACE VIEW coastal.most_recent_results
     cte.site_id,
     cte.sample_date,
     cte.censored_value,
+	cte.numeric_value,
     cte.numeric_value > 240::numeric AS exceeds_240_cfu_per_100ml
    FROM cte
   WHERE cte.row_number = 1
@@ -291,8 +294,8 @@ WITH action_required AS
            FROM coastal.sites a
              JOIN coastal.results_view b ON a.site_id::text = b.site_id::text
           WHERE a.active AND b.monitoring_group = 'routine'::coastal.monitoring_group
-		  ORDER BY a.site_order
-        )
+		  ORDER BY a.site_order, sample_date DESC, sample_time DESC
+		  )
  SELECT
  	cte.site_order,
  	cte.site_description,
@@ -308,6 +311,7 @@ WITH action_required AS
 	a.site_id,
 	b.sample_date,
 	b.censored_value,
+	b.numeric_value,
 	CASE
 		WHEN NOT red AND NOT exceeds_240_cfu_per_100ml THEN 'Green'
 		WHEN NOT red AND exceeds_240_cfu_per_100ml THEN 'Amber'
