@@ -804,3 +804,50 @@ sites_overlap_wider |>
   filter(walab) |>
   plot_site_overlap()
 ```
+
+# Overview of data quantity
+
+```{r prepare-city-colours}
+city_blue <- "#0098c5"
+city_green <- "#bacf00"
+city_pink <- "#c8006f"
+city_teal <- "#005870"
+city_dark_green <- "#446414"
+city_red <- "#9d2235"
+city_brown <- "#47292e"
+city_tan <- "#98871f"
+```
+
+```{r plot-all-data}
+sample_counts <- tbl(con, I("coastal.results_view")) |>
+  collect() |>
+  mutate(year = year(sample_date), month = month(sample_date, label = TRUE)) |>
+  group_by(year, month, monitoring_group) |>
+  count()
+
+sample_counts_plot <- sample_counts |>
+  mutate(monitoring_group = case_when(
+    monitoring_group == "blue_flag" ~ "Blue Flag",
+    monitoring_group == "daily" ~ "Daily",
+    monitoring_group == "routine" ~ "Routine",
+  )) |>
+  ggplot(aes(x = month, y = n, fill = monitoring_group)) +
+  labs(title = "Sample Frequency for Coastal Water Quality",
+       y = "Number of samples",
+       fill = "Monitoring Group",
+       subtitle = "City of Cape Town") +
+  geom_col() +
+  facet_wrap(facets = vars(year), nrow = 3) +
+  scale_fill_manual(values = c("Blue Flag" = city_blue, "Routine" = city_green, "Daily" = city_pink)) +
+  theme(
+    text = element_text(family = "Century Gothic"),
+    legend.position = "bottom",
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
+    axis.text.x = element_text(angle = 90),
+    axis.title.x = element_blank()
+  )
+
+ggsave("sample_frequency.jpg", path = "../02 Output Data/", plot = sample_counts_plot, width = 8, height = 4, dpi = 600)
+```
+

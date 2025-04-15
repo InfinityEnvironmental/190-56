@@ -25,6 +25,7 @@ library(readxl)
 library(extrafont)
 library(sf)
 library(basemaps)
+library(ggrepel)
 ```
 
 ```{r prepare-city-colours}
@@ -147,16 +148,31 @@ sample_temperatures <- cross_join(
   slice(1) |>
   select(site_id, sample_time.y, temperature)
 
-cold_chain |>
+cold_chain_plot <- cold_chain |>
   filter(sample_date == "2025-01-31") |>
-  ggplot(aes(x = time, y = temperature, group = serial_no)) +
+  ggplot(aes(x = sample_time, y = temperature)) +
   labs(title = "Example Cold Chain 31 January 2025",
-       x = "Time") +
-  geom_line(aes(colour = "Measured Temperature"), size = 1) +
-  geom_hline(yintercept = 8, colour = city_red, size = 1, linetype = 2) +
-  geom_hline(yintercept = 2, colour = city_red, size = 1, linetype = 2) +
-  geom_point(data = sample_temperatures, aes(x = sample_time.y, y = temperature)) +
-  coord_cartesian(xlim = c(ymd_hms("2025-01-31 08:00:00"), ymd_hms("2025-01-31 17:00:00")))
+       x = "Time", y = "Temperature (\u00B0C)") +
+  geom_line(aes(colour = "Measured Temperature (\u00B0C)", group = serial_no), size = 1) +
+  geom_hline(aes(yintercept = 8, colour = "High Alarm (8\u00B0C)"), size = 1, linetype = 2) +
+  geom_hline(aes(yintercept = 2, colour = "Low Alarm (2\u00B0C)"), size = 1, linetype = 2) +
+  geom_point(data = sample_temperatures, aes(x = sample_time.y, y = temperature, colour = "Samples Collected")) +
+  geom_point(aes(colour = city_blue, x = hms::as_hms("10:41:00"), y = 7.5), show.legend = FALSE) +
+  geom_text(aes(colour = city_blue, x = hms::as_hms("10:41:00"), y = 8.5, label = "Received from Samplers"), family = "Century Gothic", show.legend = FALSE) +
+  geom_point(aes(colour = city_blue, x = hms::as_hms("15:00:00"), y = 6), show.legend = FALSE) +
+  geom_text(aes(colour = city_blue, x = hms::as_hms("15:15:00"), y = 7, label = "Sent to Lab"), family = "Century Gothic", show.legend = FALSE) +
+  geom_point(aes(colour = city_blue, x = hms::as_hms("15:41:00"), y = 5), show.legend = FALSE) +
+  geom_text(aes(colour = city_blue, x = hms::as_hms("15:41:00"), y = 4, label = "Received by Lab"), family = "Century Gothic", show.legend = FALSE) +
+  scale_colour_manual(values = c("Measured Temperature (\u00B0C)" = city_green, "High Alarm (8\u00B0C)" = city_red, "Low Alarm (2\u00B0C)" = city_blue, "Samples Collected" = city_pink, "Sample Received at Depot" = city_blue, "Sample Sent to Lab" = city_blue, "Sample Received by Lab" = city_blue)) +
+  theme(
+    text = element_text(family = "Century Gothic"),
+    legend.position = "bottom",
+    plot.title = element_text(hjust = 0.5),
+    legend.title = element_blank()
+  ) +
+  coord_cartesian(xlim = c(hms("08:00:00"), hms("16:30:00")))
+
+ggsave("cold_chain_plot.jpg", plot = cold_chain_plot, path = "../02 Output Data/", width = 7, height = 5, dpi = 600)
 ```
 
 
