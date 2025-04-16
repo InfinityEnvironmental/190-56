@@ -26,6 +26,7 @@ library(extrafont)
 library(sf)
 library(basemaps)
 library(ggrepel)
+library(basemaps)
 ```
 
 ```{r prepare-city-colours}
@@ -38,7 +39,6 @@ city_red <- "#9d2235"
 city_brown <- "#47292e"
 city_tan <- "#98871f"
 ```
-
 
 ```{r db-connection}
 # Connect to the Postgres database
@@ -58,7 +58,16 @@ con <- dbConnect(RPostgres::Postgres(),
 sites <- st_read(con, query = "SELECT * FROM coastal.sites", as_tibble = TRUE) |>
   st_cast("POINT") |>
   filter(active) |>
-  arrange(site_description)
+  arrange(site_description) |>
+  st_crs("EPSG: 3857")
+```
+
+```{r access-basemap}
+ext <- sites |>
+  st_transform(crs = "EPSG: 3857") |>
+  st_bbox()
+get_maptypes()
+basemap <- basemap(ext, map_service = "esri", map_type = "world_light_gray_base")
 ```
 
 ```{r read-results-data}
@@ -70,12 +79,13 @@ results <- tbl(con, I("coastal.results")) |>
 cct <- st_read("../../Infinity/Infinity GIS - Server/base_data/sa/WC/cape_town/CPT Metropolitan/metropolitan municipality cpt.shp", as_tibble = TRUE)
 
 cct_sites <- cct |>
-  st_set_crs("EPSG:4326") |>
+  st_set_crs("EPSG:3857") |>
   ggplot() +
   labs(
     title = "Coastal Water Quality Monitoring Stations",
     subtitle = "City of Cape Town"
   ) +
+  basemap +
   geom_sf() +
   geom_sf(data = sites, aes(colour = category, size = category)) +
   theme(
