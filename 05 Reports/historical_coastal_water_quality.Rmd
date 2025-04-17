@@ -44,6 +44,36 @@ dbGetInfo(con)
 
 ```{r data-import}
 results <- tbl(con, I("coastal.results_view")) |> collect()
+results_sorted <- results %>%
+  arrange(sample_date)
+view(results_sorted)
+
+#Check frequency of sampling
+results_frequency <- results %>%
+  group_by(site_id, monitoring_group) %>%
+  summarize(
+    n_samples = n_distinct(sample_date),
+    min_date = min(sample_date),
+    max_date = max(sample_date)
+  ) %>%
+  mutate(
+    date_range = as.numeric(max_date - min_date),
+    frequency = ifelse(n_samples > 1, date_range / (n_samples - 1), 0) # Calculate average interval
+  )
+
+# Clean the enterococci_cfu_per_100ml column
+#results_cleaned <- results_sorted %>%
+ # mutate(
+  #  enterococci_cfu_per_100ml_trimmed = trimws(enterococci_cfu_per_100ml),
+   # enterococci_numeric = round(case_when(
+    #  grepl("^ND$", enterococci_cfu_per_100ml_trimmed, ignore.case = TRUE) ~ 0,
+     # grepl("^>", enterococci_cfu_per_100ml_trimmed) ~ as.numeric(gsub(">", "", enterococci_cfu_per_100ml_trimmed)) * 3,
+      #grepl("^<", enterococci_cfu_per_100ml_trimmed) ~ as.numeric(gsub("<", "", enterococci_cfu_per_100ml_trimmed)) / 3,
+      #grepl(" ", enterococci_cfu_per_100ml_trimmed) ~ as.numeric(gsub(" ", "", enterococci_cfu_per_100ml_trimmed)),
+      #TRUE ~ as.numeric(enterococci_cfu_per_100ml_trimmed)
+  #  ), digits = 0) # Round to 0 decimal places
+#  ) %>%
+  #select(-enterococci_cfu_per_100ml_trimmed)
 ```
 
 # Analysis of effect of daily samples on water quality category
@@ -57,4 +87,360 @@ results |>
   summarise(number_of_samples = n(), min_value = min(numeric_value), max_value = max(value), hazen90 = quantile())
 
 ```
+
+```{R Calculate monthly/yearly 90th & 95th Hazen percentile values of routine monitoring group}
+
+# Filter routine monitoring group
+routine_data <- results_sorted %>%
+  filter(monitoring_group == "routine")
+unique(routine_data$numeric_value)
+
+#MONTHLY
+monthly_routine <- routine_data %>%
+  mutate(
+    year_month = format(sample_date, "%Y-%m") 
+  ) %>%
+  group_by(site_id, year_month, lab_code) %>%
+  summarize(
+    p90_enterococci = round(quantile(numeric_value, probs = 0.90, na.rm = TRUE, type = 5), 0),
+    p95_enterococci = round(quantile(numeric_value, probs = 0.95, na.rm = TRUE, type = 5), 0),
+    .groups = "drop"
+  )
+view(monthly_routine)
+
+#YEARLY
+yearly_routine <- routine_data %>%
+  mutate(
+    year = format(sample_date, "%Y")
+  ) %>%
+  group_by(site_id, year, lab_code) %>%
+  summarize(
+    p90_enterococci = round(quantile(numeric_value, probs = 0.90, na.rm = TRUE, type = 5), 0),
+    p95_enterococci = round(quantile(numeric_value, probs = 0.95, na.rm = TRUE, type = 5), 0),
+    .groups = "drop" # Ungroup after summarization
+  )
+view(yearly_routine)
+```
+
+
+```{R Plotting monthly/yearly 90th & 95th Hazen percentiles of routine monitoring group}
+
+#Monthly plots for each site are too cluttered, would prefer visualization on a yearly scale
+
+library(ggplot2)
+
+# Define colour palette for the labs
+lab_colours <- c("SABS" = "red", "SSVC" = "blue", "WLAB" = "green")
+
+#MONTHLY
+unique_sites1 <- unique(monthly_routine$site_id)
+
+for (site in unique_sites1) {
+  site_data <- monthly_routine %>%
+    filter(site_id == site) %>%
+    pivot_longer(cols = c(p90_enterococci, p95_enterococci),
+                 names_to = "percentile",
+                 values_to = "enterococci_value")
+
+  plot <- ggplot(site_data, aes(x = year_month, y = enterococci_value, group = interaction(lab_code, percentile), colour = lab_code, 
+    linetype =percentile)) +
+    geom_line(linewidth = 0.7)+
+    geom_point() +
+    scale_colour_manual(values = lab_colours) +
+    scale_linetype_manual(values = c("p90_enterococci" = "solid", "p95_enterococci" = "dashed"),
+                          labels = c("90th Percentile", "95th Percentile")) +
+    labs(
+      title = paste("Routine Monitoring Monthly Enterococci Percentiles - Site:", site),
+      x = "Sampling date",
+      y = "Enterococci (cfu/100ml)",
+      colour = "Lab",
+      linetype = "Percentile"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.line = element_line(colour = "black"),
+      axis.ticks = element_line(colour = "black"),
+      axis.ticks.length = unit(-0.15, "cm"),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      axis.text.x = element_text(angle = 45, hjust = 1))
+
+  print(plot) 
+}
+
+#YEARLY
+unique_sites2 <- unique(yearly_routine$site_id)
+
+for (site in unique_sites2) {
+  site_data <- yearly_routine %>%
+    filter(site_id == site)%>%
+    pivot_longer(cols = c(p90_enterococci, p95_enterococci),
+                 names_to = "percentile",
+                 values_to = "enterococci_value")
+
+  plot <- ggplot(site_data, aes(x = year, y = enterococci_value, group = interaction(lab_code, percentile), colour = lab_code, 
+    linetype =percentile)) +
+    geom_line(linewidth = 0.7) +
+    geom_point() +
+    scale_colour_manual(values = lab_colours) +
+    scale_linetype_manual(values = c("p90_enterococci" = "solid", "p95_enterococci" = "dashed"),
+                          labels = c("90th Percentile", "95th Percentile")) +
+    labs(
+      title = paste("Routine Monitoring Yearly Enterococci Percentiles - Site:", site),
+      x = "Year",
+      y = "Enterococci (cfu/100ml)",
+      colour = "Lab",
+      linetype = "Percentile"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.line = element_line(colour = "black"),
+      axis.ticks = element_line(colour = "black"),
+      axis.ticks.length = unit(-0.15, "cm"),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      axis.text.x = element_text(angle = 45, hjust = 1))
+
+  print(plot)
+}
+```
+
+
+```{R Calculate monthly/daily 90th & 95th Hazen percentiles for daily monitoring group}
+
+# Filter daily monitoring group
+daily_monitoring <- results_sorted %>%
+  filter(monitoring_group == "daily")
+unique(daily_monitoring$numeric_value)
+
+#MONTHLY
+monthly_daily_monitoring <- daily_monitoring %>%
+  mutate(
+    year_month = format(sample_date, "%Y-%m")
+  ) %>%
+  group_by(site_id, year_month, lab_code) %>%
+  summarize(
+    p90_enterococci = round(quantile(numeric_value, probs = 0.90, na.rm = TRUE, type = 5), 0),
+    p95_enterococci = round(quantile(numeric_value, probs = 0.95, na.rm = TRUE, type = 5), 0),
+    .groups = "drop"
+  )
+view(monthly_daily_monitoring)
+
+#DAILY
+daily_percentiles_daily_mon <- daily_monitoring %>%
+  group_by(site_id, sample_date, lab_code) %>%
+  summarize(
+    p90_enterococci = round(quantile(numeric_value, probs = 0.90, na.rm = TRUE, type = 5), 0),
+    p95_enterococci = round(quantile(numeric_value, probs = 0.95, na.rm = TRUE, type = 5), 0),
+    .groups = "drop"
+  )
+view(daily_percentiles_daily_mon)
+#Don't think its necessary to plot the daily monitoring data as yearly averages because we only have 2 years worth of data
+
+```
+
+
+```{r Plotting monthly/daily 90th & 95th Hazen percentiles for daily monitoring group}
+
+#MONTHLY
+unique_sites3 <- unique(monthly_daily_monitoring$site_id)
+
+for (site in unique_sites3) {
+  site_data <- monthly_daily_monitoring %>%
+    filter(site_id == site)%>%
+    pivot_longer(cols = c(p90_enterococci, p95_enterococci),
+                 names_to = "percentile",
+                 values_to = "enterococci_value")
+
+  plot <- ggplot(site_data, aes(x = year_month, y = enterococci_value, group = interaction(lab_code, percentile), colour = lab_code, 
+    linetype = percentile)) +
+    geom_line(linewidth = 0.7) +
+    geom_point() +
+    scale_colour_manual(values = lab_colours) +
+    labs(
+      title = paste("Monthly Enterococci Percentiles for daily monitoring - Site:", site),
+      x = "Sampling date",
+      y = "Enterococci (cfu/100ml)",
+      colour = "Lab",
+      linetype = "Percentile"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.line = element_line(colour = "black"),
+      axis.ticks = element_line(colour = "black"),
+      axis.ticks.length = unit(-0.15, "cm"),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      axis.text.x = element_text(angle = 45, hjust = 1))
+
+  print(plot) 
+}
+
+#DAILY 
+#(90th & 95th Percentiles =; only 1 unique data point for each site, for each lab, for each day)
+unique_sites4 <- unique(daily_percentiles_daily_mon$site_id)
+library(scales) # For date formatting
+
+for (site in unique_sites4) {
+  site_data <- daily_percentiles_daily_mon %>%
+    filter(site_id == site) %>%
+    pivot_longer(cols = c(p90_enterococci, p95_enterococci),
+                 names_to = "percentile",
+                 values_to = "enterococci_value")
+
+  plot <- ggplot(site_data, aes(x = sample_date, y = enterococci_value, group = interaction(lab_code, percentile), colour = lab_code, 
+    linetype = percentile)) +
+    geom_line(linewidth = 0.7) +
+    geom_point() +
+    scale_colour_manual(values = lab_colours) +
+    scale_linetype_manual(values = c("p90_enterococci" = "solid", "p95_enterococci" = "dashed"),
+                          labels = c("90th Percentile", "95th Percentile")) +
+    scale_x_date(
+      labels = date_format("%Y-%m-%d"),
+      breaks = "2 weeks"             
+    ) +
+    labs(
+      title = paste("Daily Enterococci Percentiles for daily monitoring - Site:", site),
+      x = "Sampling date",
+      y = "Enterococci (cfu/100ml)",
+      colour = "Lab",
+      linetype = "Percentile"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.line = element_line(colour = "black"),
+      axis.ticks = element_line(colour = "black"),
+      axis.ticks.length = unit(-0.15, "cm"),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      axis.text.x = element_text(angle = 45, hjust = 1))
+
+  print(plot) 
+}
+```
+
+
+```{R Calculating Blue flag monthly/yearly 90th & 95th Hazen percentiles}
+
+# Filter blue flag group
+blue_flag <- results_sorted %>%
+  filter(monitoring_group == "blue_flag")
+unique(blue_flag$numeric_value)
+
+#MONTHLY
+monthly_blue_flag <- blue_flag %>%
+  group_by(site_id, sample_date, lab_code) %>%
+  summarize(
+    p90_enterococci = round(quantile(numeric_value, probs = 0.90, na.rm = TRUE, type = 5), 0),
+    p95_enterococci = round(quantile(numeric_value, probs = 0.95, na.rm = TRUE, type = 5), 0),
+    .groups = "drop"
+  )
+view(monthly_blue_flag)
+#90th & 95th Hazen percentiles =; every month of blue flag data has only one data point for each month, for each site and each lab
+
+#YEARLY
+yearly_blue_flag <- blue_flag %>%
+  mutate(
+    year = format(sample_date, "%Y")
+  ) %>%
+  group_by(site_id, year, lab_code) %>%
+  summarize(
+    p90_enterococci = round(quantile(numeric_value, probs = 0.90, na.rm = TRUE, type = 5), 0),
+    p95_enterococci = round(quantile(numeric_value, probs = 0.95, na.rm = TRUE, type = 5), 0),
+    .groups = "drop"
+  )
+view(yearly_blue_flag)
+```
+
+
+```{R Plotting Blue flag monthly/yearly 90th & 95th Hazen percentiles}
+
+#MONTHLY
+unique_sites5 <- unique(monthly_blue_flag$site_id)
+
+for (site in unique_sites5) {
+  site_data <- monthly_blue_flag %>%
+    filter(site_id == site)%>%
+    pivot_longer(cols = c(p90_enterococci, p95_enterococci),
+                 names_to = "percentile",
+                 values_to = "enterococci_value")
+
+  plot <- ggplot(site_data, aes(x = sample_date, y = enterococci_value, group = interaction(lab_code, percentile), colour =
+    lab_code,linetype = percentile)) +
+    geom_line(linewidth = 0.7) +
+    geom_point() +
+    scale_colour_manual(values =lab_colours)+
+    scale_x_date(
+      labels = date_format("%Y-%m"),
+      breaks = "4 months"             
+    ) +
+    labs(
+      title = paste("Blue Flag Monthly Enterococci Percentiles - Site:", site),
+      x = "Sampling date",
+      y = "Enterococci (cfu/100ml)",
+      colour = "Lab",
+      linetype = "Percentile"
+    ) +
+    theme_minimal() +
+    theme(axis.line = element_line(colour = "black"),
+          axis.ticks = element_line(colour = "black"),
+      axis.ticks.length = unit(-0.15, "cm"),
+           panel.grid.major = element_blank(),
+           panel.grid.minor = element_blank(),
+           axis.text.x = element_text(angle = 45, hjust = 1))
+
+  print(plot) 
+}
+
+#YEARLY
+unique_sites6 <- unique(yearly_blue_flag$site_id)
+
+for (site in unique_sites6) {
+  site_data <- yearly_blue_flag %>%
+    filter(site_id == site)%>%
+    pivot_longer(cols = c(p90_enterococci, p95_enterococci),
+                 names_to = "percentile",
+                 values_to = "enterococci_value")
+
+  plot <- ggplot(site_data, aes(x = year, y = enterococci_value, group = interaction(lab_code, percentile), colour =
+    lab_code,linetype = percentile)) +
+    geom_line(linewidth = 0.7) +
+    geom_point() +
+    scale_colour_manual(values =lab_colours)+
+    labs(
+      title = paste("Blue Flag Yearly Enterococci Percentiles - Site:", site),
+      x = "Year",
+      y = "Enterococci (cfu/100ml)",
+      colour = "Lab",
+      linetype = "Percentile"
+    ) +
+    theme_minimal() +
+    theme(axis.line = element_line(colour = "black"),
+          axis.ticks = element_line(colour = "black"),
+          axis.ticks.length = unit(-0.15, "cm"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          axis.text.x = element_text(angle = 45, hjust = 1))
+
+  print(plot) 
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
