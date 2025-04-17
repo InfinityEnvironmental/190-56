@@ -27,6 +27,17 @@ con <- dbConnect(RPostgres::Postgres(),
 )
 ```
 
+```{r prepare-city-colours}
+city_blue <- "#0098c5"
+city_green <- "#bacf00"
+city_pink <- "#c8006f"
+city_teal <- "#005870"
+city_dark_green <- "#446414"
+city_red <- "#9d2235"
+city_brown <- "#47292e"
+city_tan <- "#98871f"
+```
+
 ```{r}
 dbGetInfo(con)
 ```
@@ -63,9 +74,19 @@ results_frequency <- results %>%
   #  ), digits = 0) # Round to 0 decimal places
 #  ) %>%
   #select(-enterococci_cfu_per_100ml_trimmed)
-
 ```
 
+# Analysis of effect of daily samples on water quality category
+
+```{r categories-including-dailies}
+results |>
+  filter(site_id %in% c("CN04", "CN41", "CN11", "XCS34", "XCS26")) |>
+  filter(sample_date > date(now()) - years(1)) |>
+  arrange(desc(sample_date)) |>
+  group_by(site_id) |>
+  summarise(number_of_samples = n(), min_value = min(numeric_value), max_value = max(value), hazen90 = quantile())
+
+```
 
 ```{R Calculate monthly/yearly 90th & 95th Hazen percentile values of routine monitoring group}
 

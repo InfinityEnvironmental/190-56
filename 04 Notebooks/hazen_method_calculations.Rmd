@@ -8,24 +8,41 @@ output: word_document
 # Workspace Set Up
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = TRUE,
-  root.dir = rprojroot::find_rstudio_root_file()
-  )
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 
 ```{r load-packages}
 library(tidyverse)
 library(readxl)
+library(DBI)
+library(extrafont)
+library(patchwork)
+```
+
+```{r db connection}
+# Enter credentials when prompted
+con <- dbConnect(RPostgres::Postgres(),
+  host = "aws-0-eu-central-1.pooler.supabase.com",
+  port = 5432,
+  user = str_c(rstudioapi::askForPassword(prompt = "Username: "), "wnrvdvesovnkmqbhkhjz", sep = "."),
+  password = rstudioapi::askForPassword(),
+  dbname = "postgres"
+)
+```
+
+```{r prepare-city-colours}
+city_blue <- "#0098c5"
+city_green <- "#bacf00"
+city_pink <- "#c8006f"
+city_teal <- "#005870"
+city_dark_green <- "#446414"
+city_red <- "#9d2235"
+city_brown <- "#47292e"
+city_tan <- "#98871f"
 ```
 
 # Hazen Method Set Up
-
-```{r read-excel-data}
-hout_bay <- read_excel("../../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/02_Working Directory/01 Input Data/From CCT/13_Hout_Bay_(XCN10) weekly.xlsm",
-           sheet = "Faecal streptococci") |>
-  rename(date = Date, faecal_streptococci_cfu_per_100ml = "Fecal Strep")
-```
 
 ```{r}
 hazen_method <- function(data){
@@ -95,16 +112,6 @@ hazen_annual <- results |>
   summarise(
     min_date = min(date),
     max_date = max(date),
-    n_ecoli = sum(!is.na(ecoli_cfu_per_100ml)),
-    hazen95_ecoli = quantile(ecoli_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
-    hazen90_ecoli = quantile(ecoli_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
-    hazen_category_ecoli = case_when(
-      n_ecoli < 10 ~ "Not enough samples",
-      hazen95_ecoli <= 100 ~ "Excellent",
-      hazen95_ecoli <= 200 ~ "Good",
-      hazen95_ecoli > 200 & hazen90_ecoli > 185 ~ "Poor",
-      hazen95_ecoli > 200 & hazen90_ecoli < 185 ~ "Sufficient"
-  ),
     n_faecal = sum(!is.na(faecal_streptococci_cfu_per_100ml)),
     hazen95_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
     hazen90_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
@@ -114,56 +121,140 @@ hazen_annual <- results |>
       hazen95_faecal <= 200 ~ "Good",
       hazen95_faecal > 200 & hazen90_faecal > 185 ~ "Poor",
       hazen95_faecal > 200 & hazen90_faecal < 185 ~ "Sufficient"
-  )
-  ) |>
-  mutate(hazen_category_ecoli = fct(hazen_category_ecoli, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent"))) |>
-  mutate(hazen_category_faecal = fct(hazen_category_faecal, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent")))
+  ))
 ```
 
-```{r test-hazen}
-hazen_annual_site <- results |>
-  group_by(year = year(date), site_id) |>
-  summarise(
-    min_date = min(date),
-    max_date = max(date),
-    n_ecoli = sum(!is.na(ecoli_cfu_per_100ml)),
-    hazen95_ecoli = quantile(ecoli_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
-    hazen90_ecoli = quantile(ecoli_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
-    hazen_category_ecoli = case_when(
-      n_ecoli < 10 ~ "Not enough samples",
-      hazen95_ecoli <= 100 ~ "Excellent",
-      hazen95_ecoli <= 200 ~ "Good",
-      hazen95_ecoli > 200 & hazen90_ecoli > 185 ~ "Poor",
-      hazen95_ecoli > 200 & hazen90_ecoli < 185 ~ "Sufficient"
-  ),
-    n_faecal = sum(!is.na(faecal_streptococci_cfu_per_100ml)),
-    hazen95_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
-    hazen90_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
-  hazen_category_faecal = case_when(
-      n_faecal < 10 ~ "Not enough samples",
-      hazen95_faecal <= 100 ~ "Excellent",
-      hazen95_faecal <= 200 ~ "Good",
-      hazen95_faecal > 200 & hazen90_faecal > 185 ~ "Poor",
-      hazen95_faecal > 200 & hazen90_faecal < 185 ~ "Sufficient"
-  )
-  ) |>
-  mutate(hazen_category_ecoli = fct(hazen_category_ecoli, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent"))) |>
-  mutate(hazen_category_faecal = fct(hazen_category_faecal, levels = c("Not enough samples", "Poor", "Sufficient", "Good", "Excellent")))
-```
+# Analysis of effect of daily samples on water quality category
 
-```{r plot-hazen}
-hazen_annual |>
-  ggplot(aes(x = year)) +
-  labs(x = "Year") +
-  geom_tile(aes(fill = hazen_category_ecoli)) +
-  scale_fill_brewer(name = "Water Quality Category", type = "div", palette = "RdYlGn")
+```{r categories-including-dailies}
+# 365-day Rolling Period including daily samples
+rolling365day <- results |>
+  filter(site_id %in% c("CN04", "CN41", "CN11", "XCS34", "XCS26")) |>
+  filter(monitoring_group %in% c("routine", "daily")) |>
+  filter(sample_date > date(now()) - years(1)) |>
+  arrange(desc(sample_date)) |>
+  group_by(site_id) |>
+  summarise(n = n(), min_value = min(numeric_value), max_value = max(numeric_value), hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE), hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE)) |>
+  mutate(
+    hazen_category = case_when(
+      n < 10 ~ "Not enough samples",
+      hazen95 <= 100 ~ "Excellent",
+      hazen95 <= 200 ~ "Good",
+      hazen95 > 200 & hazen90 > 185 ~ "Poor",
+      hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+  ))
+
+# 365-day Rolling Period excluding daily samples
+rolling365day_no_daily <- results |>
+  filter(site_id %in% c("CN04", "CN41", "CN11", "XCS34", "XCS26")) |>
+  filter(monitoring_group %in% c("routine")) |>
+  filter(sample_date > date(now()) - years(1)) |>
+  arrange(desc(sample_date)) |>
+  group_by(site_id) |>
+  summarise(n = n(), min_value = min(numeric_value), max_value = max(numeric_value), hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE), hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE)) |>
+  mutate(
+    hazen_category = case_when(
+      n < 10 ~ "Not enough samples",
+      hazen95 <= 100 ~ "Excellent",
+      hazen95 <= 200 ~ "Good",
+      hazen95 > 200 & hazen90 > 185 ~ "Poor",
+      hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+  ))
+
+# Five-year rolling period
+rolling5year <- results |>
+  filter(site_id %in% c("CN04", "CN41", "CN11", "XCS34", "XCS26")) |>
+  filter(monitoring_group %in% c("routine", "daily")) |>
+  filter(sample_date > date(now()) - years(7)) |>
+  arrange(desc(sample_date)) |>
+  group_by(site_id) |>
+  summarise(n = n(), min_value = min(numeric_value), max_value = max(numeric_value), hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE), hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE)) |>
+  mutate(
+    hazen_category = case_when(
+      n < 10 ~ "Not enough samples",
+      hazen95 <= 100 ~ "Excellent",
+      hazen95 <= 200 ~ "Good",
+      hazen95 > 200 & hazen90 > 185 ~ "Poor",
+      hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+  ))
+
+# Five-year rolling period no daily
+rolling5year_no_daily <- results |>
+  filter(site_id %in% c("CN04", "CN41", "CN11", "XCS34", "XCS26")) |>
+  filter(monitoring_group %in% c("routine")) |>
+  filter(sample_date > date(now()) - years(7)) |>
+  arrange(desc(sample_date)) |>
+  group_by(site_id) |>
+  summarise(n = n(), min_value = min(numeric_value), max_value = max(numeric_value), hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE), hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE)) |>
+  mutate(
+    hazen_category = case_when(
+      n < 10 ~ "Not enough samples",
+      hazen95 <= 100 ~ "Excellent",
+      hazen95 <= 200 ~ "Good",
+      hazen95 > 200 & hazen90 > 185 ~ "Poor",
+      hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+  ))
+
+# Add the four tables together
+rolling365joined <- rolling365day |>
+  inner_join(rolling365day_no_daily, by = "site_id")
+
+rolling5yearjoined <- rolling5year |>
+  inner_join(rolling5year_no_daily, by = "site_id")
+
+# Compare categories
+rolling365day_plot <- rolling365joined |>
+  select(site_id, hazen_category.x, hazen_category.y) |>
+  pivot_longer(cols = hazen_category.x:hazen_category.y) |>
+  mutate(value = fct(value, levels = c("Excellent", "Good", "Sufficient", "Poor"))) |>
+  mutate(name = case_when(
+    name == "hazen_category.x" ~ "Including daily samples",
+    name == "hazen_category.y" ~ "Excluding daily samples"
+  )) |>
+  ggplot(aes(x = name, y = site_id, fill = value)) +
+  labs(
+    title = "365-day Rolling Period"
+  ) +
+  geom_tile(width = 0.95, height = 0.95) +
+  geom_text(aes(label = value), family = "Century Gothic", colour = "white") +
+  scale_fill_manual(name = "Water Colour Category", values = c("Excellent" = "#3288BD", "Good" = "#1A9850", "Sufficient" = "#A6D96A", "Poor" = "#D73027")) +
+  theme(
+    text = element_text(family = "Century Gothic"),
+    legend.position = "bottom",
+    axis.title = element_blank()
+  )
+
+# Compare categories
+rolling5yearplot <- rolling5yearjoined |>
+  select(site_id, hazen_category.x, hazen_category.y) |>
+  pivot_longer(cols = hazen_category.x:hazen_category.y) |>
+  mutate(value = fct(value, levels = c("Excellent", "Good", "Sufficient", "Poor"))) |>
+  mutate(name = case_when(
+    name == "hazen_category.x" ~ "Including daily samples",
+    name == "hazen_category.y" ~ "Excluding daily samples"
+  )) |>
+  ggplot(aes(x = name, y = site_id, fill = value)) +
+  labs(
+    title = "5-year Rolling Period"
+  ) +
+  geom_tile(width = 0.95, height = 0.95) +
+  geom_text(aes(label = value), family = "Century Gothic", colour = "white") +
+  scale_fill_manual(name = "Water Colour Category", values = c("Excellent" = "#3288BD", "Good" = "#1A9850", "Sufficient" = "#A6D96A", "Poor" = "#D73027")) +
+  theme(
+    text = element_text(family = "Century Gothic"),
+    legend.position = "bottom",
+    axis.title = element_blank()
+  )
 
 RColorBrewer::display.brewer.all()
-```
+RColorBrewer::brewer.pal(10, "Spectral")
+RColorBrewer::display.brewer.pal(10, "Spectral")
+RColorBrewer::display.brewer.pal(8, "RdYlGn")
+RColorBrewer::brewer.pal(8, "RdYlGn")
 
-```{r}
-sites |>
-  inner_join(hazen_annual)
+daily_comparison_plot <- rolling365day_plot + rolling5yearplot + plot_layout(guides = "collect") & theme(legend.position = "bottom", plot.title = element_text(hjust = 0.5))
+
+ggsave("daily_sample_comparison.jpg", plot = daily_comparison_plot, path = "02 Output Data/", width = 8, height = 5, dpi = 600)
 ```
 
 

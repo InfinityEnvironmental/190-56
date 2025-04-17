@@ -1,0 +1,189 @@
+---
+title: "Recreational Node Summary Page"
+author: "Francois van Schalkwyk"
+date: "`r Sys.Date()`"
+output:
+  bookdown::word_document2:
+    reference_docx: recreational_node_overview_style_template.docx
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  include = FALSE
+  #dpi = 600
+  )
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+```{r load-packages}
+library(tidyverse)
+library(dbplyr)
+library(DBI)
+library(pdftools)
+library(readxl)
+library(extrafont)
+library(sf)
+library(basemaps)
+library(ggrepel)
+library(basemaps)
+```
+
+```{r prepare-city-colours}
+city_blue <- "#0098c5"
+city_green <- "#bacf00"
+city_pink <- "#c8006f"
+city_teal <- "#005870"
+city_dark_green <- "#446414"
+city_red <- "#9d2235"
+city_brown <- "#47292e"
+city_tan <- "#98871f"
+```
+
+```{r db-connection}
+# Connect to the Postgres database
+# Enter credentials when prompted
+con <- dbConnect(RPostgres::Postgres(),
+  host = "aws-0-eu-central-1.pooler.supabase.com",
+  port = 5432,
+  user = str_c(rstudioapi::askForPassword(prompt = "Username: "), "wnrvdvesovnkmqbhkhjz", sep = "."),
+  password = rstudioapi::askForPassword(),
+  dbname = "postgres"
+)
+```
+
+# Create map for each site
+
+```{r read-in-site-data}
+sites <- st_read(con, query = "SELECT * FROM coastal.sites", as_tibble = TRUE) |>
+  st_cast("POINT") |>
+  filter(active) |>
+  arrange(site_description) |>
+  st_crs("EPSG: 3857")
+```
+
+```{r access-basemap}
+ext <- sites |>
+  st_transform(crs = "EPSG: 3857") |>
+  st_bbox()
+get_maptypes()
+basemap <- basemap(ext, map_service = "esri", map_type = "world_light_gray_base")
+```
+
+```{r read-results-data}
+results <- tbl(con, I("coastal.results")) |>
+  collect()
+```
+
+```{r read-basemaps, fig.cap = "Map of coastal water quality monitoring sites in Cape Town", fig.width = 6.4, fig.height = 9.8, dpi = 600}
+cct <- st_read("../../Infinity/Infinity GIS - Server/base_data/sa/WC/cape_town/CPT Metropolitan/metropolitan municipality cpt.shp", as_tibble = TRUE)
+
+cct_sites <- cct |>
+  st_set_crs("EPSG:3857") |>
+  ggplot() +
+  labs(
+    title = "Coastal Water Quality Monitoring Stations",
+    subtitle = "City of Cape Town"
+  ) +
+  basemap +
+  geom_sf() +
+  geom_sf(data = sites, aes(colour = category, size = category)) +
+  theme(
+    legend.position = "bottom",
+    # axis.ticks = element_blank(),
+    # axis.text = element_blank(),
+    plot.background = element_blank(),
+    panel.background = element_blank(),
+    text = element_text(family = "Century Gothic"),
+    legend.title = element_blank(),
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  ) +
+  scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "darkgrey")) +
+  scale_size_manual(values = c("Recreational Node" = 2, "Coastal Monitoring Point" = 1))
+
+ggsave("coastal_water_quality_sites.jpg", plot = cct_sites, path = "02 Output Data/", width = 5, height = 6.7, dpi = 600)
+```
+
+```{r plot-zoomed-data}
+# Get coordinates for specific site
+sites |>
+  filter(site_id == "CN22") |>
+  st_coordinates()
+
+cct |>
+  st_set_crs("EPSG:4326") |>
+  ggplot() +
+  labs(
+    title = "Coastal Water Quality Monitoring Stations",
+    subtitle = "City of Cape Town"
+  ) +
+  geom_sf() +
+  geom_sf(data = sites, aes(colour = category, size = category)) +
+  theme(
+    legend.position = "bottom",
+    # axis.ticks = element_blank(),
+    # axis.text = element_blank(),
+    plot.background = element_blank(),
+    panel.background = element_blank(),
+    text = element_text(family = "Century Gothic"),
+    legend.title = element_blank(),
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  ) +
+  scale_colour_manual(values = c("Recreational Node" = "orange", "Coastal Monitoring Point" = "darkgrey")) +
+  scale_size_manual(values = c("Recreational Node" = 2, "Coastal Monitoring Point" = 1)) +
+  coord_sf(xlim = c(18.3, 18.6), ylim = c(-34.0, -33.7))
+```
+
+
+
+```{r temporary}
+cold_chain <- read_csv("../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/05_Data/01 Cold Chain/2025-01-28_12-34-27_1401414828.csv", col_names = c("id", "time", "temperature", "high_alarm", "low_alarm", "comments", "serial_no"), skip = 1)
+
+cold_chain <- cold_chain |>
+  mutate(sample_date = date(time),
+         sample_time = hms::as_hms(time)) |>
+  fill(serial_no) |>
+  select(serial_no, time, sample_date, sample_time, temperature, high_alarm, low_alarm)
+
+sample_temperatures <- cross_join(
+  tbl(con, I("coastal.results")) |>
+  filter(sample_date == "2025-01-31" & monitoring_group == "routine") |>
+  collect(),
+  cold_chain |> filter(sample_date == "2025-01-31")) |>
+  mutate(diff = abs(sample_time.x - sample_time.y)) |>
+  group_by(site_id) |>
+  arrange(diff, .by_group = TRUE) |>
+  slice(1) |>
+  select(site_id, sample_time.y, temperature)
+
+cold_chain_plot <- cold_chain |>
+  filter(sample_date == "2025-01-31") |>
+  ggplot(aes(x = sample_time, y = temperature)) +
+  labs(title = "Example Cold Chain 31 January 2025",
+       x = "Time", y = "Temperature (\u00B0C)") +
+  geom_line(aes(colour = "Measured Temperature (\u00B0C)", group = serial_no), size = 1) +
+  geom_hline(aes(yintercept = 8, colour = "High Alarm (8\u00B0C)"), size = 1, linetype = 2) +
+  geom_hline(aes(yintercept = 2, colour = "Low Alarm (2\u00B0C)"), size = 1, linetype = 2) +
+  geom_point(data = sample_temperatures, aes(x = sample_time.y, y = temperature, colour = "Samples Collected")) +
+  geom_point(aes(colour = city_blue, x = hms::as_hms("10:41:00"), y = 7.5), show.legend = FALSE) +
+  geom_text(aes(colour = city_blue, x = hms::as_hms("10:41:00"), y = 8.5, label = "Received from Samplers"), family = "Century Gothic", show.legend = FALSE) +
+  geom_point(aes(colour = city_blue, x = hms::as_hms("15:00:00"), y = 6), show.legend = FALSE) +
+  geom_text(aes(colour = city_blue, x = hms::as_hms("15:15:00"), y = 7, label = "Sent to Lab"), family = "Century Gothic", show.legend = FALSE) +
+  geom_point(aes(colour = city_blue, x = hms::as_hms("15:41:00"), y = 5), show.legend = FALSE) +
+  geom_text(aes(colour = city_blue, x = hms::as_hms("15:41:00"), y = 4, label = "Received by Lab"), family = "Century Gothic", show.legend = FALSE) +
+  scale_colour_manual(values = c("Measured Temperature (\u00B0C)" = city_green, "High Alarm (8\u00B0C)" = city_red, "Low Alarm (2\u00B0C)" = city_blue, "Samples Collected" = city_pink, "Sample Received at Depot" = city_blue, "Sample Sent to Lab" = city_blue, "Sample Received by Lab" = city_blue)) +
+  theme(
+    text = element_text(family = "Century Gothic"),
+    legend.position = "bottom",
+    plot.title = element_text(hjust = 0.5),
+    legend.title = element_blank()
+  ) +
+  coord_cartesian(xlim = c(hms("08:00:00"), hms("16:30:00")))
+
+ggsave("cold_chain_plot.jpg", plot = cold_chain_plot, path = "../02 Output Data/", width = 7, height = 5, dpi = 600)
+```
+
+
+
