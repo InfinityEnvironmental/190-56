@@ -196,7 +196,7 @@ ggplot(data = exceedances) +
 ```{r}
 sites |>
   inner_join(results, by = "site_id") |>
-  filter(site_id == "CN22", between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
+  filter(site_id == "CN11", between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
   collect() |>
   summarise(
     min_date = min(sample_date),
@@ -223,7 +223,7 @@ sites |>
     axis.title = element_blank(),
     axis.text = element_blank(),
     axis.ticks = element_blank()
-  )
+  ) +
   scale_fill_manual(name = "Hazen Water Quality Category", values = c("Poor" = "red", "Sufficient" = "orange", "Good" = "green", "Excellent" = "darkblue"))
 ```
 
