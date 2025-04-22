@@ -59,19 +59,6 @@ sites <- st_read(con, query = "SELECT * FROM coastal.sites", as_tibble = TRUE) |
   arrange(site_description)
 ```
 
-```{r read-osm}
-streets <- sites |>
-  st_bbox() |>
-  opq(timeout = 50) |>
-  add_osm_feature(key = "highway", value = c("motorway", "primary", "secondary", "tertiary", "residential", "unclassified")) |>
-  osmdata_sf()
-
-ggplot() +
-  geom_sf(data = cct, colour = NA) +
-  geom_sf(data = streets$osm_lines, colour = "white")
-
-```
-
 ```{r city-overview, fig.cap = "Map of coastal water quality monitoring sites in Cape Town", fig.width = 6.4, fig.height = 9.8, dpi = 600}
 cct <- st_read("../../Infinity/Infinity GIS - Server/base_data/sa/WC/cape_town/CPT Metropolitan/metropolitan municipality cpt.shp", as_tibble = TRUE) |>
   st_set_crs("EPSG: 4326")
@@ -107,7 +94,7 @@ ggsave("coastal_water_quality_sites.jpg", plot = cct_sites, path = "02 Output Da
 
 ```{r plot-zoomed-data, fig.width = 6.4, fig.height = 9.8, dpi = 600}
 # Select site_id
-site <- "CN38"
+site <- "XCN04"
 
 # Choose a specific site to plot
 sites_overview <- cct_sites +
@@ -122,20 +109,36 @@ sites_overview <- cct_sites +
 # Set the extent for each site
 circle <- sites |>
   filter(site_id == site) |>
-  st_buffer(1500, nQuadSegs = 1000)
+  st_buffer(1500, nQuadSegs = 10000)
+
+# Get OpenStreetMap for the circle
+cropped_streets <- circle |>
+  st_bbox() |>
+  opq(timeout = 50) |>
+  add_osm_feature(key = "highway", value = c("motorway", "primary", "secondary", "tertiary", "residential", "unclassified")) |>
+  osmdata_sf()
+
+# Get rivers from OSM
+cropped_water <- circle |>
+  st_bbox() |>
+  opq(timeout = 50) |>
+  add_osm_feature(key = "water", value = c("river", "")) |>
+  osmdata_sf()
+
+available_features()
+available_tags("water")
+available_tags("natural")
 
 # Crop the cct basemap with the circle
 cropped_basemap <- st_intersection(cct, circle)
 
-# Crop the streets data to the circle
-cropped_streets <- st_intersection(streets$osm_lines, circle)
-
 # Plot the data
 site_map <- ggplot() +
-  geom_sf(data = circle, colour = city_pink, fill = "white") +
+  geom_sf(data = circle, colour = NA, fill = "lightblue", size = 2) +
   geom_sf(data = cropped_basemap, colour = NA) +
-  geom_sf(data = cropped_streets, colour = "white") +
-  geom_sf(data = circle, colour = city_pink, fill = NA) +
+  geom_sf(data = cropped_streets$osm_lines, colour = "white") +
+  geom_sf(data = cropped_water$osm_polygons, colour = "lightblue") +
+  geom_sf(data = circle, colour = city_pink, fill = NA, size = 5) +
   geom_sf(data = sites |> filter(site_id == site) |> st_transform("EPSG: 3857") |> st_buffer(50), fill = city_pink, colour = NA, alpha = 0.5, size = 2) +
   theme(
     panel.background = element_blank(),
@@ -144,9 +147,7 @@ site_map <- ggplot() +
     axis.ticks = element_blank(),
     plot.background = element_blank(),
     panel.grid = element_blank()
-  ) +
-  scale_fill_identity() +
-  coord_sf()
+  )
 ```
 
 # Inset the site map onto the overview map
@@ -196,7 +197,7 @@ ggplot(data = exceedances) +
 ```{r}
 sites |>
   inner_join(results, by = "site_id") |>
-  filter(site_id == "CN11", between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
+  filter(site_id == "CN22", between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
   collect() |>
   summarise(
     min_date = min(sample_date),
@@ -214,8 +215,8 @@ sites |>
   
   # Create a simple plot showing the category
   ggplot() +
-  geom_rect(aes(xmin = 0.950, xmax = 1.050, ymin = 0.99, ymax = 1.01, fill = hazen_category)) +
-  geom_text(aes(x = 1, y = 1, label = hazen_category), family = "Century Gothic", size = 50, hjust = 0.5, colour = "white") +
+  geom_rect(aes(xmin = 0.995, xmax = 1.005, ymin = 0.995, ymax = 1.005, fill = hazen_category)) +
+  geom_text(aes(x = 1, y = 1, label = hazen_category), family = "Century Gothic", size = 35, hjust = 0.5, colour = "white") +
   theme(
     legend.position = "none",
     panel.background = element_blank(),
