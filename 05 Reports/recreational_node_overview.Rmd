@@ -23,6 +23,7 @@ library(sf)
 library(basemaps)
 library(raster)
 library(patchwork)
+library(units)
 ```
 
 ```{r db-connection}
@@ -70,7 +71,9 @@ cct_sites <- cct |>
   geom_sf(colour = NA) +
   geom_sf(data = sites, aes(colour = category, size = category)) +
   theme(
-    legend.position = "bottom",
+    legend.position = "inside",
+    legend.position.inside = c(0.6, 0.9),
+    legend.background = element_blank(),
     axis.ticks = element_blank(),
     axis.text = element_blank(),
     plot.background = element_blank(),
@@ -81,7 +84,7 @@ cct_sites <- cct |>
     plot.subtitle = element_text(hjust = 0.5)
   ) +
   scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "darkgrey")) +
-  scale_size_manual(values = c("Recreational Node" = 2, "Coastal Monitoring Point" = 1))
+  scale_size_manual(values = c("Recreational Node" = 1, "Coastal Monitoring Point" = 0.5))
 
 ggsave("coastal_water_quality_sites.jpg", plot = cct_sites, path = "02 Output Data/", width = 5, height = 6.7, dpi = 600)
 ```
@@ -89,9 +92,16 @@ ggsave("coastal_water_quality_sites.jpg", plot = cct_sites, path = "02 Output Da
 # Create map of specific site
 
 ```{r plot-zoomed-data, fig.width = 6.4, fig.height = 9.8, dpi = 600}
+# Select site_id
+site <- "CN09"
+
 # Choose a specific site to plot
 sites_overview <- cct_sites +
-  geom_sf(data = sites |> filter(site_id == site), colour = city_pink, size = 10, shape = 16, alpha = 0.5)
+  geom_sf(data = sites |> filter(site_id == site), colour = city_pink, size = 5, shape = 16, alpha = 0.5) +
+  theme(
+    plot.title = element_blank(),
+    plot.subtitle = element_blank()
+  )
 ```
 
 ```{r access-basemap, fig.height = 6, fig.width=6, dpi = 1000}
@@ -99,32 +109,32 @@ sites_overview <- cct_sites +
 get_maptypes()
 
 # Set defaults
-set_defaults(map_service = "esri", map_type = "world_light_gray_base")
-
-# Select site_id
-site <- "XCN12"
+set_defaults(map_service = "esri", map_type = "world_light_gray_base", map_res = 1)
 
 # Set the extent for each site
 circle <- sites |>
   filter(site_id == site) |>
-  st_buffer(1500) |>
-  st_transform("EPSG: 3857")
+  st_buffer(1500, nQuadSegs = 1000)
 
-# Create a spatial object from the circle
-circle_sp <- as(circle, "Spatial")
+ggplot() + geom_sf(data = cct)
 
-# Create base map per site
-basemap <- basemap_gglayer(circle)
+# Crop the cct basemap with the circle
+
+cropped_basemap <- st_intersection(cct, circle)
 
 # Plot the data
 site_map <- ggplot() +
-  basemap +
-  geom_sf(data = sites |> filter(site_id == site) |> st_transform("EPSG: 3857") |> st_buffer(50), fill = city_pink, colour = NA, alpha = 0.5) +
+  geom_sf(data = circle, colour = city_pink, fill = "white") +
+  geom_sf(data = cropped_basemap, colour = NA) +
+  geom_sf(data = circle, colour = city_pink, fill = NA) +
+  geom_sf(data = sites |> filter(site_id == site) |> st_transform("EPSG: 3857") |> st_buffer(50), fill = city_pink, colour = NA, alpha = 0.5, size = 2) +
   theme(
     panel.background = element_blank(),
     axis.title = element_blank(),
     axis.text = element_blank(),
-    axis.ticks = element_blank()
+    axis.ticks = element_blank(),
+    plot.background = element_blank(),
+    panel.grid = element_blank()
   ) +
   scale_fill_identity() +
   coord_sf()
@@ -132,7 +142,8 @@ site_map <- ggplot() +
 
 # Inset the site map onto the overview map
 
-```{r inset-map}
-sites_overview |>
+```{r inset-map, fig.width = 6, fig.height = 6, dpi = 600}
+sites_overview + inset_element(site_map, left = 0.4, right = 1, bottom = 0.4, top = 1)
+sites_overview + site_map
 ```
 
