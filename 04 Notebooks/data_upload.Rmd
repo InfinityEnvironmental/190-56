@@ -83,7 +83,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_69(14.04.2025).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_72(17.04.2025).pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 # Extract the pdf data
@@ -207,7 +207,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml, sample_temp_c, filename
 FROM coastal.results
-WHERE sample_date = '2025-04-14';
+WHERE sample_date = '2025-04-17';
 ```
 
 ```{sql, connection = con}
@@ -291,7 +291,11 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
+<<<<<<< HEAD
 path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/2025-04-16 Strand WALAB.pdf"
+=======
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/2025-04-17 Strand WALAB.pdf"
+>>>>>>> 613aa77519cbb4d61e3fa2665ce84befe6c4512b
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/")
 
 # Extract the pdf data
@@ -410,7 +414,11 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml, monitoring_group
 FROM coastal.results
+<<<<<<< HEAD
 WHERE monitoring_group = 'daily' AND sample_date = '2025-04-16';
+=======
+WHERE monitoring_group = 'daily' AND sample_date = '2025-04-17';
+>>>>>>> 613aa77519cbb4d61e3fa2665ce84befe6c4512b
 ```
 
 ```{sql, connection = con}
@@ -461,7 +469,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/2025-04-14 WALAB Atlantic.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/2025-04-17 WALAB Atlantic.pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/")
 
 # Extract the pdf data
@@ -576,7 +584,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2025-04-14';
+WHERE monitoring_group = 'daily' AND sample_date = '2025-04-17';
 ```
 
 ```{sql, connection = con}
