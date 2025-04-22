@@ -251,7 +251,6 @@ ROLLBACK;
 COMMIT;
 ```
 
-
 ## Daily Samples Strand
 
 ### Check which pdf files have not yet been imported
