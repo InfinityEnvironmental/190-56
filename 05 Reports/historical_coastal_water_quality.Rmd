@@ -42,6 +42,8 @@ city_tan <- "#98871f"
 dbGetInfo(con)
 ```
 
+# Data import
+
 ```{r data-import}
 results <- tbl(con, I("coastal.results_view")) |> collect()
 results_sorted <- results %>%
@@ -74,18 +76,6 @@ results_frequency <- results %>%
   #  ), digits = 0) # Round to 0 decimal places
 #  ) %>%
   #select(-enterococci_cfu_per_100ml_trimmed)
-```
-
-# Analysis of effect of daily samples on water quality category
-
-```{r categories-including-dailies}
-results |>
-  filter(site_id %in% c("CN04", "CN41", "CN11", "XCS34", "XCS26")) |>
-  filter(sample_date > date(now()) - years(1)) |>
-  arrange(desc(sample_date)) |>
-  group_by(site_id) |>
-  summarise(number_of_samples = n(), min_value = min(numeric_value), max_value = max(value), hazen90 = quantile())
-
 ```
 
 ```{R Calculate monthly/yearly 90th & 95th Hazen percentile values of routine monitoring group}
@@ -426,21 +416,27 @@ for (site in unique_sites6) {
 }
 ```
 
+# Calculate the water quality category for each site for each year and plot a violin plot with the data points shown, with the violin coloured by Hazen category
 
+1. Calculate the Hazen category for each site for each year (check with Francois, the code for the Hazen category is in Notebooks/hazen_calculation)
+2. Plot a violin plot for each year (geom_violin) and colour the violins based on the water colour category (check with Francois)
+3. Add the original points on top of the violin plots with alpha quite low (0.3) and the points scattered slightly (position_jitter())
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```{r hazen-method}
+results |>
+  filter(site_id == "CN12") |>
+  group_by(year = year(date)) |>
+  summarise(
+    min_date = min(date),
+    max_date = max(date),
+    nl = sum(!is.na(numeric_value_cfu_per_100ml)),
+    hazen95_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
+    hazen90_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
+  hazen_category_faecal = case_when(
+      n_faecal < 10 ~ "Not enough samples",
+      hazen95_faecal <= 100 ~ "Excellent",
+      hazen95_faecal <= 200 ~ "Good",
+      hazen95_faecal > 200 & hazen90_faecal > 185 ~ "Poor",
+      hazen95_faecal > 200 & hazen90_faecal < 185 ~ "Sufficient"
+  ))
+```
