@@ -438,27 +438,69 @@ for (site in unique_sites6) {
 }
 ```
 
-# Calculate the water quality category for each site for each year and plot a violin plot with the data points shown, with the violin coloured by Hazen category
+# Calculate the water quality category for each site for each year
 
 1. Calculate the Hazen category for each site for each year (check with Francois, the code for the Hazen category is in Notebooks/hazen_calculation)
 2. Plot a violin plot for each year (geom_violin) and colour the violins based on the water colour category (check with Francois)
 3. Add the original points on top of the violin plots with alpha quite low (0.3) and the points scattered slightly (position_jitter())
 
 ```{r hazen-method}
-results |>
-  filter(site_id == "CN12") |>
-  group_by(year = year(date)) |>
+library(lubridate)
+
+results_hazen <- results_sorted %>%
+  group_by(site_id, year = year(sample_date)) %>%
   summarise(
-    min_date = min(date),
-    max_date = max(date),
-    nl = sum(!is.na(numeric_value_cfu_per_100ml)),
-    hazen95_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.95, type = 5, na.rm = TRUE),
-    hazen90_faecal = quantile(faecal_streptococci_cfu_per_100ml, 0.9, type = 5, na.rm = TRUE),
-  hazen_category_faecal = case_when(
-      n_faecal < 10 ~ "Not enough samples",
-      hazen95_faecal <= 100 ~ "Excellent",
-      hazen95_faecal <= 200 ~ "Good",
-      hazen95_faecal > 200 & hazen90_faecal > 185 ~ "Poor",
-      hazen95_faecal > 200 & hazen90_faecal < 185 ~ "Sufficient"
+    min_date = min(sample_date, na.rm = TRUE),
+    max_date = max(sample_date, na.rm = TRUE),
+    n_enterococci = sum(!is.na(numeric_value)),
+    hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
+    hazen90 = quantile(numeric_value, 0.90, type = 5, na.rm = TRUE),
+  hazen_category_enterococci = case_when(
+      n_enterococci < 10 ~ "Not enough samples",
+      hazen95 <= 100 ~ "Excellent",
+      hazen95 <= 200 ~ "Good",
+      hazen95 > 200 & hazen90 > 185 ~ "Poor",
+      hazen95 > 200 & hazen90 < 185 ~ "Sufficient",
+      TRUE ~ NA_character_
   ))
+```
+#  Violin plot, coloured by Hazen category, points jittered
+
+```{r Violin plots}
+
+#Merge categories back into the original data frame
+violin_data <- results_sorted %>%
+  mutate(year = year(sample_date)) %>%
+  left_join(results_hazen, by = c("site_id", "year"))
+
+# Get unique site IDs
+unique_sites <- unique(violin_data$site_id)
+
+for (site in unique_sites) {
+  site_violin_data <- violin_data %>%
+    filter(site_id == site)
+
+plot <- ggplot(site_violin_data, aes(x = factor(year), y = numeric_value, fill = hazen_category_enterococci))+
+    geom_violin(trim = TRUE) +
+    geom_point(aes(group = factor(year)), # Group points within each violin
+               position = position_jitter(width = 0.2), # Add slight horizontal jitter
+               alpha = 0.3,
+               size = 1) +
+    scale_y_log10() +
+    labs(
+      title = paste("Enterococci Distribution by Year - Site:", site),
+      x = "Year",
+      y = "Enterococci (log10 scale)",
+      fill = "Hazen Category"
+    ) +
+    theme_minimal() + 
+    theme(axis.line = element_line(colour = "black"),
+          axis.ticks = element_line(colour = "black"),
+          axis.ticks.length = unit(-0.15, "cm"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          axis.text.x = element_text(angle = 45, hjust = 1))
+
+  print(plot)
+}
 ```
