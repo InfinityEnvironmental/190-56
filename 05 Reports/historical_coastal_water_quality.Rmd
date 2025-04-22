@@ -3,10 +3,14 @@ title: "historical_coastal_water_quality"
 output: html_document
 ---
 
+# Set working directory for all code chunks to project root directory
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
+
+# Load required packages
 
 ```{r message = FALSE}
 library(tidyverse)
@@ -15,6 +19,7 @@ library(DBI)
 library(pdftools)
 library(readxl)
 ```
+# Database Connection
 
 ```{r db connection}
 # Enter credentials when prompted
@@ -62,30 +67,18 @@ results_frequency <- results %>%
     date_range = as.numeric(max_date - min_date),
     frequency = ifelse(n_samples > 1, date_range / (n_samples - 1), 0) # Calculate average interval
   )
-
-# Clean the enterococci_cfu_per_100ml column
-#results_cleaned <- results_sorted %>%
- # mutate(
-  #  enterococci_cfu_per_100ml_trimmed = trimws(enterococci_cfu_per_100ml),
-   # enterococci_numeric = round(case_when(
-    #  grepl("^ND$", enterococci_cfu_per_100ml_trimmed, ignore.case = TRUE) ~ 0,
-     # grepl("^>", enterococci_cfu_per_100ml_trimmed) ~ as.numeric(gsub(">", "", enterococci_cfu_per_100ml_trimmed)) * 3,
-      #grepl("^<", enterococci_cfu_per_100ml_trimmed) ~ as.numeric(gsub("<", "", enterococci_cfu_per_100ml_trimmed)) / 3,
-      #grepl(" ", enterococci_cfu_per_100ml_trimmed) ~ as.numeric(gsub(" ", "", enterococci_cfu_per_100ml_trimmed)),
-      #TRUE ~ as.numeric(enterococci_cfu_per_100ml_trimmed)
-  #  ), digits = 0) # Round to 0 decimal places
-#  ) %>%
-  #select(-enterococci_cfu_per_100ml_trimmed)
 ```
 
-```{R Calculate monthly/yearly 90th & 95th Hazen percentile values of routine monitoring group}
+# Calculating routine monitoring group percentiles
 
+## Monthly Scale
+
+```{R Calculate monthly/yearly 90th & 95th Hazen percentile values of routine monitoring group}
 # Filter routine monitoring group
 routine_data <- results_sorted %>%
   filter(monitoring_group == "routine")
 unique(routine_data$numeric_value)
 
-#MONTHLY
 monthly_routine <- routine_data %>%
   mutate(
     year_month = format(sample_date, "%Y-%m") 
@@ -97,8 +90,12 @@ monthly_routine <- routine_data %>%
     .groups = "drop"
   )
 view(monthly_routine)
+```
 
-#YEARLY
+## Yearly Scale
+
+```{R Calculate monthly/yearly 90th & 95th Hazen percentile values of routine monitoring group}
+
 yearly_routine <- routine_data %>%
   mutate(
     year = format(sample_date, "%Y")
@@ -112,9 +109,11 @@ yearly_routine <- routine_data %>%
 view(yearly_routine)
 ```
 
+#Plotting routine monitoring group percentiles
 
-```{R Plotting monthly/yearly 90th & 95th Hazen percentiles of routine monitoring group}
+## Monthly Scale
 
+```{R Plotting 90th & 95th Hazen percentiles of routine monitoring group}
 #Monthly plots for each site are too cluttered, would prefer visualization on a yearly scale
 
 library(ggplot2)
@@ -122,7 +121,6 @@ library(ggplot2)
 # Define colour palette for the labs
 lab_colours <- c("SABS" = "red", "SSVC" = "blue", "WLAB" = "green")
 
-#MONTHLY
 unique_sites1 <- unique(monthly_routine$site_id)
 
 for (site in unique_sites1) {
@@ -157,8 +155,12 @@ for (site in unique_sites1) {
 
   print(plot) 
 }
+```
 
-#YEARLY
+## Yearly Scale
+
+```{R Plotting 90th & 95th Hazen percentiles of routine monitoring group}
+
 unique_sites2 <- unique(yearly_routine$site_id)
 
 for (site in unique_sites2) {
@@ -195,15 +197,16 @@ for (site in unique_sites2) {
 }
 ```
 
+# Calculating daily monitoring group percentiles
 
-```{R Calculate monthly/daily 90th & 95th Hazen percentiles for daily monitoring group}
+## Monthly Scale
 
+```{R Calculate 90th & 95th Hazen percentiles for daily monitoring group}
 # Filter daily monitoring group
 daily_monitoring <- results_sorted %>%
   filter(monitoring_group == "daily")
 unique(daily_monitoring$numeric_value)
 
-#MONTHLY
 monthly_daily_monitoring <- daily_monitoring %>%
   mutate(
     year_month = format(sample_date, "%Y-%m")
@@ -215,8 +218,12 @@ monthly_daily_monitoring <- daily_monitoring %>%
     .groups = "drop"
   )
 view(monthly_daily_monitoring)
+```
 
-#DAILY
+## Daily Scale
+
+```{R Calculate 90th & 95th Hazen percentiles for daily monitoring group}
+
 daily_percentiles_daily_mon <- daily_monitoring %>%
   group_by(site_id, sample_date, lab_code) %>%
   summarize(
@@ -229,10 +236,11 @@ view(daily_percentiles_daily_mon)
 
 ```
 
+#Plotting daily monitoring group percentiles
 
-```{r Plotting monthly/daily 90th & 95th Hazen percentiles for daily monitoring group}
+## Monthly Scale
 
-#MONTHLY
+```{r Plotting 90th & 95th Hazen percentiles for daily monitoring group}
 unique_sites3 <- unique(monthly_daily_monitoring$site_id)
 
 for (site in unique_sites3) {
@@ -265,9 +273,13 @@ for (site in unique_sites3) {
 
   print(plot) 
 }
+```
 
-#DAILY 
-#(90th & 95th Percentiles =; only 1 unique data point for each site, for each lab, for each day)
+## Daily Scale
+
+```{r Plotting 90th & 95th Hazen percentiles for daily monitoring group}
+#90th & 95th Percentiles are equal; only 1 unique data point for each site, for each lab, for each day
+
 unique_sites4 <- unique(daily_percentiles_daily_mon$site_id)
 library(scales) # For date formatting
 
@@ -309,15 +321,16 @@ for (site in unique_sites4) {
 }
 ```
 
+# Calculating blue flag percentiles
 
-```{R Calculating Blue flag monthly/yearly 90th & 95th Hazen percentiles}
+## Monthly Scale
 
+```{R Calculating Blue flag 90th & 95th Hazen percentiles}
 # Filter blue flag group
 blue_flag <- results_sorted %>%
   filter(monitoring_group == "blue_flag")
 unique(blue_flag$numeric_value)
 
-#MONTHLY
 monthly_blue_flag <- blue_flag %>%
   group_by(site_id, sample_date, lab_code) %>%
   summarize(
@@ -326,9 +339,13 @@ monthly_blue_flag <- blue_flag %>%
     .groups = "drop"
   )
 view(monthly_blue_flag)
-#90th & 95th Hazen percentiles =; every month of blue flag data has only one data point for each month, for each site and each lab
+#90th & 95th Hazen percentiles  are equal; every month of blue flag data has only one data point for each month, for each site and each lab
+```
 
-#YEARLY
+## Yearly Scale
+
+```{R Calculating Blue flag 90th & 95th Hazen percentiles}
+
 yearly_blue_flag <- blue_flag %>%
   mutate(
     year = format(sample_date, "%Y")
@@ -342,10 +359,11 @@ yearly_blue_flag <- blue_flag %>%
 view(yearly_blue_flag)
 ```
 
+# Plotting blue flag percentiles
 
-```{R Plotting Blue flag monthly/yearly 90th & 95th Hazen percentiles}
+## Monthly Scale
 
-#MONTHLY
+```{R Plotting Blue flag 90th & 95th Hazen percentiles}
 unique_sites5 <- unique(monthly_blue_flag$site_id)
 
 for (site in unique_sites5) {
@@ -381,8 +399,12 @@ for (site in unique_sites5) {
 
   print(plot) 
 }
+```
 
-#YEARLY
+## Yearly Scale
+
+```{R Plotting Blue flag 90th & 95th Hazen percentiles}
+
 unique_sites6 <- unique(yearly_blue_flag$site_id)
 
 for (site in unique_sites6) {
