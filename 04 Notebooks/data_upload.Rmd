@@ -291,11 +291,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-<<<<<<< HEAD
 path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/2025-04-16 Strand WALAB.pdf"
-=======
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/2025-04-17 Strand WALAB.pdf"
->>>>>>> 613aa77519cbb4d61e3fa2665ce84befe6c4512b
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/")
 
 # Extract the pdf data
@@ -414,11 +410,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml, monitoring_group
 FROM coastal.results
-<<<<<<< HEAD
 WHERE monitoring_group = 'daily' AND sample_date = '2025-04-16';
-=======
-WHERE monitoring_group = 'daily' AND sample_date = '2025-04-17';
->>>>>>> 613aa77519cbb4d61e3fa2665ce84befe6c4512b
 ```
 
 ```{sql, connection = con}

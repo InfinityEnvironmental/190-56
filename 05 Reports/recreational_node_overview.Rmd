@@ -24,6 +24,7 @@ library(basemaps)
 library(raster)
 library(patchwork)
 library(units)
+library(osmdata)
 ```
 
 ```{r db-connection}
@@ -56,6 +57,19 @@ sites <- st_read(con, query = "SELECT * FROM coastal.sites", as_tibble = TRUE) |
   st_cast("POINT") |>
   filter(active) |>
   arrange(site_description)
+```
+
+```{r read-osm}
+streets <- sites |>
+  st_bbox() |>
+  opq(timeout = 50) |>
+  add_osm_feature(key = "highway", value = c("motorway", "primary", "secondary", "tertiary", "residential", "unclassified")) |>
+  osmdata_sf()
+
+ggplot() +
+  geom_sf(data = cct, colour = NA) +
+  geom_sf(data = streets$osm_lines, colour = "white")
+
 ```
 
 ```{r city-overview, fig.cap = "Map of coastal water quality monitoring sites in Cape Town", fig.width = 6.4, fig.height = 9.8, dpi = 600}
@@ -93,7 +107,7 @@ ggsave("coastal_water_quality_sites.jpg", plot = cct_sites, path = "02 Output Da
 
 ```{r plot-zoomed-data, fig.width = 6.4, fig.height = 9.8, dpi = 600}
 # Select site_id
-site <- "CN09"
+site <- "CN38"
 
 # Choose a specific site to plot
 sites_overview <- cct_sites +
@@ -104,28 +118,23 @@ sites_overview <- cct_sites +
   )
 ```
 
-```{r access-basemap, fig.height = 6, fig.width=6, dpi = 1000}
-# Have a look at the options for map types
-get_maptypes()
-
-# Set defaults
-set_defaults(map_service = "esri", map_type = "world_light_gray_base", map_res = 1)
-
+```{r build-basemap, fig.height = 6, fig.width=6, dpi = 1000}
 # Set the extent for each site
 circle <- sites |>
   filter(site_id == site) |>
   st_buffer(1500, nQuadSegs = 1000)
 
-ggplot() + geom_sf(data = cct)
-
 # Crop the cct basemap with the circle
-
 cropped_basemap <- st_intersection(cct, circle)
+
+# Crop the streets data to the circle
+cropped_streets <- st_intersection(streets$osm_lines, circle)
 
 # Plot the data
 site_map <- ggplot() +
   geom_sf(data = circle, colour = city_pink, fill = "white") +
   geom_sf(data = cropped_basemap, colour = NA) +
+  geom_sf(data = cropped_streets, colour = "white") +
   geom_sf(data = circle, colour = city_pink, fill = NA) +
   geom_sf(data = sites |> filter(site_id == site) |> st_transform("EPSG: 3857") |> st_buffer(50), fill = city_pink, colour = NA, alpha = 0.5, size = 2) +
   theme(
@@ -145,5 +154,76 @@ site_map <- ggplot() +
 ```{r inset-map, fig.width = 6, fig.height = 6, dpi = 600}
 sites_overview + inset_element(site_map, left = 0.4, right = 1, bottom = 0.4, top = 1)
 sites_overview + site_map
+```
+
+# Create a figure percentage of samples that have exceeded the threshold
+
+```{r perc-exceedance-plot}
+sites <- tbl(con, I("coastal.sites_view"))
+results <- tbl(con, I("coastal.results_view"))
+
+# Choose the site
+site <- "CN11"
+
+# Join the tables
+exceedances <- sites |>
+  inner_join(results, by = "site_id") |>
+  filter(site_id == "CN22", between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
+  collect() |>
+  summarise(
+    all_samples = n(),
+    samples_exceed = sum(numeric_value > 240),
+    samples_exceed_pct = round(sum(numeric_value > 240) / n() * 100, 0)
+  ) |>
+  mutate(
+    label = str_c("of ", all_samples, " samples taken\nexceeded\nthe threshold\nvalue for\nEnterococci\nof 240 cfu per 100 mL", sep = "")
+    )
+
+ggplot(data = exceedances) +
+  geom_text(aes(x = 2, y = 1, label = label), family = "Century Gothic", size = 10, colour = "white", hjust = 1) +
+  geom_text(aes(x = 1, y = 1, label = str_c(samples_exceed_pct, "%", sep = "")), family = "Century Gothic", colour = "white", size = 50, hjust = 0) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    panel.background = element_rect(fill = city_teal),
+    panel.grid = element_blank()
+  )
+```
+
+# Hazen Categories
+
+```{r}
+sites |>
+  inner_join(results, by = "site_id") |>
+  filter(site_id == "CN22", between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
+  collect() |>
+  summarise(
+    min_date = min(sample_date),
+    max_date = max(sample_date),
+    n = sum(!is.na(numeric_value)),
+    hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
+    hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
+  hazen_category = case_when(
+      n < 10 ~ "Not enough samples",
+      hazen95 <= 100 ~ "Excellent",
+      hazen95 <= 200 ~ "Good",
+      hazen95 > 200 & hazen90 > 185 ~ "Poor",
+      hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+  )) |>
+  
+  # Create a simple plot showing the category
+  ggplot() +
+  geom_rect(aes(xmin = 0.950, xmax = 1.050, ymin = 0.99, ymax = 1.01, fill = hazen_category)) +
+  geom_text(aes(x = 1, y = 1, label = hazen_category), family = "Century Gothic", size = 50, hjust = 0.5, colour = "white") +
+  theme(
+    legend.position = "none",
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+  scale_fill_manual(name = "Hazen Water Quality Category", values = c("Poor" = "red", "Sufficient" = "orange", "Good" = "green", "Excellent" = "darkblue"))
 ```
 
