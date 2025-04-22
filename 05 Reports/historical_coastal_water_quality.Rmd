@@ -117,7 +117,7 @@ yearly_routine <- routine_data %>%
   summarize(
     p90_enterococci = round(quantile(numeric_value, probs = 0.90, na.rm = TRUE, type = 5), 0),
     p95_enterococci = round(quantile(numeric_value, probs = 0.95, na.rm = TRUE, type = 5), 0),
-    .groups = "drop" # Ungroup after summarization
+    .groups = "drop"
   )
 view(yearly_routine)
 ```
