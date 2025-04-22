@@ -21,6 +21,8 @@ library(readxl)
 library(extrafont)
 library(sf)
 library(basemaps)
+library(raster)
+library(patchwork)
 ```
 
 ```{r db-connection}
@@ -46,7 +48,7 @@ city_brown <- "#47292e"
 city_tan <- "#98871f"
 ```
 
-# Create map for each site
+# Create a map of all sites
 
 ```{r read-in-site-data}
 sites <- st_read(con, query = "SELECT * FROM coastal.sites", as_tibble = TRUE) |>
@@ -55,43 +57,7 @@ sites <- st_read(con, query = "SELECT * FROM coastal.sites", as_tibble = TRUE) |
   arrange(site_description)
 ```
 
-```{r access-basemap, }
-bbox_sites <- sites |>
-  st_transform(crs = "EPSG: 3857") |>
-  st_bbox()
-
-get_maptypes()
-basemap <- basemap(ext, map_service = "esri", map_type = "world_light_gray_base")
-
-sites_web <- sites |>
-  st_transform("EPSG: 3857")
-
-ext <- sites |>
-  filter(site_id == "CN11") |>
-  st_buffer(1500) |>
-  st_transform("EPSG: 3857") |>
-  st_bbox()
-
-basemap(ext, map_service = "esri", map_type = "world_light_gray_base")
-
-basemap_ggplot(ext, map_service = "esri", map_type = "world_light_gray_base", map_res = 1) +
-  geom_sf(data = sites |> filter(site_id == "CN11") |> st_transform("EPSG: 3857") |> st_buffer(50), fill = city_pink, colour = NA) +
-  geom_sf(data = sites |> filter(site_id == "CN11") |> st_transform("EPSG: 3857") |> st_buffer(300), fill = city_pink, alpha = 0.3, colour = NA) +
-  theme(
-    panel.background = element_blank(),
-    axis.title = element_blank(),
-    axis.text = element_blank(),
-    axis.ticks = element_blank()
-  )
-  
-```
-
-```{r read-results-data}
-results <- tbl(con, I("coastal.results")) |>
-  collect()
-```
-
-```{r read-basemaps, fig.cap = "Map of coastal water quality monitoring sites in Cape Town", fig.width = 6.4, fig.height = 9.8, dpi = 600}
+```{r city-overview, fig.cap = "Map of coastal water quality monitoring sites in Cape Town", fig.width = 6.4, fig.height = 9.8, dpi = 600}
 cct <- st_read("../../Infinity/Infinity GIS - Server/base_data/sa/WC/cape_town/CPT Metropolitan/metropolitan municipality cpt.shp", as_tibble = TRUE) |>
   st_set_crs("EPSG: 4326")
 
@@ -120,8 +86,53 @@ cct_sites <- cct |>
 ggsave("coastal_water_quality_sites.jpg", plot = cct_sites, path = "02 Output Data/", width = 5, height = 6.7, dpi = 600)
 ```
 
+# Create map of specific site
+
 ```{r plot-zoomed-data, fig.width = 6.4, fig.height = 9.8, dpi = 600}
-site <- filter(sites, site_id == "CN09")
-cct_sites +
-  geom_sf(data = site, colour = city_pink, size = 2)
+# Choose a specific site to plot
+sites_overview <- cct_sites +
+  geom_sf(data = sites |> filter(site_id == site), colour = city_pink, size = 10, shape = 16, alpha = 0.5)
 ```
+
+```{r access-basemap, fig.height = 6, fig.width=6, dpi = 1000}
+# Have a look at the options for map types
+get_maptypes()
+
+# Set defaults
+set_defaults(map_service = "esri", map_type = "world_light_gray_base")
+
+# Select site_id
+site <- "XCN12"
+
+# Set the extent for each site
+circle <- sites |>
+  filter(site_id == site) |>
+  st_buffer(1500) |>
+  st_transform("EPSG: 3857")
+
+# Create a spatial object from the circle
+circle_sp <- as(circle, "Spatial")
+
+# Create base map per site
+basemap <- basemap_gglayer(circle)
+
+# Plot the data
+site_map <- ggplot() +
+  basemap +
+  geom_sf(data = sites |> filter(site_id == site) |> st_transform("EPSG: 3857") |> st_buffer(50), fill = city_pink, colour = NA, alpha = 0.5) +
+  theme(
+    panel.background = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  scale_fill_identity() +
+  coord_sf()
+```
+
+# Inset the site map onto the overview map
+
+```{r inset-map}
+sites_overview |>
+```
+
