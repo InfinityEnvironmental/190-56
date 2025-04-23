@@ -59,17 +59,13 @@ sites <- st_read(con, query = "SELECT * FROM coastal.sites", as_tibble = TRUE) |
   arrange(site_description)
 ```
 
-```{r city-overview, fig.cap = "Map of coastal water quality monitoring sites in Cape Town", fig.width = 6.4, fig.height = 9.8, dpi = 600}
+```{r}
 cct <- st_read("../../Infinity/Infinity GIS - Server/base_data/sa/WC/cape_town/CPT Metropolitan/metropolitan municipality cpt.shp", as_tibble = TRUE) |>
   st_set_crs("EPSG: 4326")
+```
 
--- temporary
-
-cct <- st_read("../../Downloads/OneDrive_1_2025-04-22/metropolitan municipality cpt.shp", as_tibble = TRUE) |>
-  st_set_crs("EPSG: 4326")
-
--- 
-
+```{r city-overview, fig.cap = "Map of coastal water quality monitoring sites in Cape Town", fig.width = 6.4, fig.height = 9.8, dpi = 600}
+# Plot city of Cape Town with sites
 cct_sites <- cct |>
   ggplot() +
   labs(
@@ -109,6 +105,7 @@ sites_overview <- cct_sites +
   theme(
     plot.title = element_blank(),
     plot.subtitle = element_blank()
+    #plot.background = element_rect(fill = city_teal)
   )
 ```
 
@@ -184,7 +181,7 @@ site_map <- ggplot() +
 # Inset the site map onto the overview map
 
 ```{r inset-map, fig.width = 6, fig.height = 6, dpi = 600}
-sites_overview + inset_element(site_map, left = 0.4, right = 1, bottom = 0.4, top = 1) & theme(plot.background = element_rect(fill = city_teal))
+sites_overview + inset_element(site_map, left = 0.4, right = 1, bottom = 0.4, top = 1)
 sites_overview + site_map
 ```
 
@@ -195,12 +192,12 @@ sites <- tbl(con, I("coastal.sites_view"))
 results <- tbl(con, I("coastal.results_view"))
 
 # Choose the site
-site <- "CN11"
+site <- "XCS34"
 
 # Join the tables
 exceedances <- sites |>
   inner_join(results, by = "site_id") |>
-  filter(site_id == "CN22", between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
+  filter(site_id == "XCS34", between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
   collect() |>
   summarise(
     all_samples = n(),
@@ -257,5 +254,18 @@ sites |>
     axis.ticks = element_blank()
   ) +
   scale_fill_manual(name = "Hazen Water Quality Category", values = c("Poor" = "red", "Sufficient" = "orange", "Good" = "green", "Excellent" = "darkblue"))
+
+RColorBrewer::display.brewer.all()
 ```
+
+# Sample frequency plots
+
+```{r}
+# Plot sample frequency in the reporting period
+sample_frequency <- sites |>
+  inner_join(results, by = "site_id") |>
+  filter(site_id == "XCS34" & between(sample_date, "2024-01-01", "2025-01-01")) |>
+  collect() |>
+  ggplot(aes(x = sample_date)) +
+  geom_col(stat = "count")
 
