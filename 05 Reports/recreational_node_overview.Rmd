@@ -60,6 +60,7 @@ sites <- st_read(con, query = "SELECT * FROM coastal.sites", as_tibble = TRUE) |
 ```
 
 ```{r}
+# Read in coastline of Cape Town
 cct <- st_read("../../Infinity/Infinity GIS - Server/base_data/sa/WC/cape_town/CPT Metropolitan/metropolitan municipality cpt.shp", as_tibble = TRUE) |>
   st_set_crs("EPSG: 4326")
 ```
@@ -104,8 +105,8 @@ sites_overview <- cct_sites +
   geom_sf(data = sites |> filter(site_id == site), colour = city_pink, size = 5, shape = 16, alpha = 0.5) +
   theme(
     plot.title = element_blank(),
-    plot.subtitle = element_blank()
-    #plot.background = element_rect(fill = city_teal)
+    plot.subtitle = element_blank(),
+    plot.background = element_rect(fill = city_teal)
   )
 ```
 
@@ -121,56 +122,23 @@ imagery <- sites |>
 ggplot() +
   imagery
 
-# Set the extent for each site
-circle <- sites |>
-  filter(site_id == site) |>
-  st_buffer(1500) |>
-  st_simplify(dTolerance = 25)
+# Create bounding box of rectangle
+bbox <- sites |>
+  filter(site_id == "CN09") |>
+  st_transform("EPSG:3857") |>
+  st_bbox()
 
-# Get OpenStreetMap for the circle
-cropped_streets <- circle |>
-  st_bbox() |>
-  opq(timeout = 50) |>
-  add_osm_feature(key = "highway", value = c("motorway", "primary", "secondary", "tertiary", "residential", "unclassified")) |>
-  osmdata_sf()
+# Set limits for bounding box
+bbox <- bbox + c(-1000, -500, 1000, 500)
 
-# Get beaches from OSM
-cropped_beach <- circle |>
-  st_bbox() |>
-  opq(timeout = 50) |>
-  add_osm_feature(key = "natural", value = c(
-    "beach",
-    "bay",
-    "coastline",
-    "dune",
-    "sand"
-    )) |>
-  osmdata_sf()
+# Add sites to basemap
+site <- sites |>
+  filter(site_id == "CN09") |>
+  st_transform("EPSG:3857")
 
-available_features()
-available_tags("water")
-available_tags("natural")
-
-# Crop the cct basemap with the circle
-cropped_basemap <- st_intersection(cct, circle)
-
-# Crop the water
-#cropped_water_lines <- st_intersection(cropped_water$osm_lines, circle)
-# cropped_water_polygons <- st_intersection(cropped_water$osm_polygons, circle)
-
-# Crop the streets
-cropped_streets <- st_intersection(cropped_streets$osm_lines, circle)
-
-# Plot the data
-site_map <- ggplot() +
-  geom_sf(data = circle, colour = NA, fill = "lightblue", size = 2) +
-  geom_sf(data = cropped_basemap, colour = NA) +
-  geom_sf(data = cropped_streets, colour = "white") +
-  #geom_sf(data = cropped_beach$osm_multipolygons, colour = NA, fill = "lightyellow") +
-  #geom_sf(data = cropped_water_lines, colour = "lightblue") +
-  #geom_sf(data = cropped_water_polygons, colour = "lightblue", fill = "lightblue") +
-  geom_sf(data = circle, colour = "grey", fill = NA, size = 5) +
-  geom_sf(data = sites |> filter(site_id == site) |> st_transform("EPSG: 3857") |> st_buffer(50), fill = city_pink, colour = NA, alpha = 0.5, size = 2) +
+# Build map
+site_map <- basemap_ggplot(bbox, alpha = 0.7) +
+  geom_sf(data = site, alpha = 0.5, colour = city_pink, size = 5, shape = 16) +
   theme(
     panel.background = element_blank(),
     axis.title = element_blank(),
@@ -185,7 +153,7 @@ site_map <- ggplot() +
 
 ```{r inset-map, fig.width = 6, fig.height = 6, dpi = 600}
 sites_overview + inset_element(site_map, left = 0.4, right = 1, bottom = 0.4, top = 1)
-sites_overview + site_map
+sites_overview / site_map
 ```
 
 # Create a figure percentage of samples that have exceeded the threshold
@@ -195,12 +163,12 @@ sites <- tbl(con, I("coastal.sites_view"))
 results <- tbl(con, I("coastal.results_view"))
 
 # Choose the site
-site <- "XCS34"
+site <- "CN22"
 
 # Join the tables
 exceedances <- sites |>
   inner_join(results, by = "site_id") |>
-  filter(site_id == "XCS34", between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
+  filter(site_id == "CN22", between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
   collect() |>
   summarise(
     all_samples = n(),
@@ -210,25 +178,32 @@ exceedances <- sites |>
   mutate(
     label = str_c("of ", all_samples, " samples taken\nexceeded\nthe threshold\nvalue for\nEnterococci\nof 240 cfu per 100 mL", sep = "")
     )
+```
 
+```{r exceedances-figure}
+# Create a figure for the percentage exceedances
 ggplot(data = exceedances) +
-  geom_text(aes(x = 2, y = 1, label = label), family = "Century Gothic", size = 10, colour = "white", hjust = 1) +
-  geom_text(aes(x = 1, y = 1, label = str_c(samples_exceed_pct, "%", sep = "")), family = "Century Gothic", colour = "white", size = 50, hjust = 0) +
+  geom_text(aes(x = 2, y = 1, label = label), family = "Century Gothic", size = 10, hjust = 1, colour = "white") +
+  geom_text(aes(x = 1, y = 1, label = str_c(samples_exceed_pct, "%", sep = ""), colour = samples_exceed_pct), family = "Century Gothic", size = 50, hjust = 0) +
   theme(
     axis.text = element_blank(),
     axis.ticks = element_blank(),
     axis.title = element_blank(),
     panel.background = element_rect(fill = city_teal),
-    panel.grid = element_blank()
-  )
+    panel.grid = element_blank(),
+    legend.position = "none"
+  ) +
+  scale_colour_distiller(type = "div", palette = "RdYlGn", limits = c(0, 50), direction = -1)
+
+RColorBrewer::display.brewer.all()
 ```
 
 # Hazen Categories
 
 ```{r}
-sites |>
+hazen <- sites |>
   inner_join(results, by = "site_id") |>
-  filter(site_id == "CN22", between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
+  filter(site_id == "CN11", between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
   collect() |>
   summarise(
     min_date = min(sample_date),
@@ -242,10 +217,12 @@ sites |>
       hazen95 <= 200 ~ "Good",
       hazen95 > 200 & hazen90 > 185 ~ "Poor",
       hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
-  )) |>
-  
+  ))
+```
+
+```{r hazen-figure}
   # Create a simple plot showing the category
-  ggplot() +
+  ggplot(data = hazen) +
   geom_rect(aes(xmin = 0.995, xmax = 1.005, ymin = 0.995, ymax = 1.005, fill = hazen_category)) +
   geom_text(aes(x = 1, y = 1, label = hazen_category), family = "Century Gothic", size = 35, hjust = 0.5, colour = "white") +
   theme(
@@ -256,19 +233,29 @@ sites |>
     axis.text = element_blank(),
     axis.ticks = element_blank()
   ) +
-  scale_fill_manual(name = "Hazen Water Quality Category", values = c("Poor" = "red", "Sufficient" = "orange", "Good" = "green", "Excellent" = "darkblue"))
+  scale_fill_manual(name = "Hazen Water Quality Category", values = c("Poor" = "#A50026", "Sufficient" = "#A6D96A", "Good" = "#006837", "Excellent" = "#4575B4"))
 
-RColorBrewer::display.brewer.all()
+RColorBrewer::display.brewer.all(type = "div")
+RColorBrewer::brewer.pal(10, "RdYlGn")
+RColorBrewer::brewer.pal(10, "RdYlBu")
+RColorBrewer::brewer.pal(10, "RdBu")
 ```
 
 # Sample frequency plots
 
 ```{r}
-# Plot sample frequency in the reporting period
-sample_frequency <- sites |>
-  inner_join(results, by = "site_id") |>
-  filter(site_id == "XCS34" & between(sample_date, "2024-01-01", "2025-01-01")) |>
-  collect() |>
-  ggplot(aes(x = sample_date)) +
-  geom_col(stat = "count")
+months <- seq(ymd("2024-01-01"), ymd("2025-01-01"), '1 month')
 
+# Plot sample frequency in the reporting period
+sites |>
+  inner_join(results, by = "site_id") |>
+  filter(between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
+  collect() |>
+  filter(site_id == "CN11") |>
+  group_by(month = floor_date(sample_date, "months"), site_id, monitoring_group) |>
+  count() |>
+  ggplot() +
+  geom_col(aes(x = month, y = n, fill = monitoring_group), position = position_dodge(preserve = "single")) +
+  scale_fill_discrete() +
+  scale_x_date(breaks = months, date_labels = "%b")
+```
