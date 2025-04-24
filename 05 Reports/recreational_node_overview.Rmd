@@ -112,11 +112,14 @@ sites_overview <- cct_sites +
 ```{r build-basemap, fig.height = 6, fig.width=6, dpi = 600}
 # Have a look at the types of basemaps
 basemaps::get_maptypes()
-set_defaults(map_service = "esri", map_type = "world_hillshade")
+set_defaults(map_service = "esri", map_type = "world_imagery")
 imagery <- sites |>
   filter(site_id == site) |>
   st_buffer(1500) |>
-  basemap()
+  basemap_gglayer()
+
+ggplot() +
+  imagery
 
 # Set the extent for each site
 circle <- sites |>
