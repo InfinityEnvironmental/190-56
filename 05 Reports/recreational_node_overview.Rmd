@@ -53,7 +53,7 @@ city_tan <- "#98871f"
 # Create a map of all sites
 
 ```{r read-in-site-data}
-sites <- st_read(con, query = "SELECT * FROM coastal.sites", as_tibble = TRUE) |>
+sites_sf <- st_read(con, query = "SELECT * FROM coastal.sites", as_tibble = TRUE) |>
   st_cast("POINT") |>
   filter(active) |>
   arrange(site_description)
@@ -63,18 +63,21 @@ sites <- st_read(con, query = "SELECT * FROM coastal.sites", as_tibble = TRUE) |
 # Read in coastline of Cape Town
 cct <- st_read("../../Infinity/Infinity GIS - Server/base_data/sa/WC/cape_town/CPT Metropolitan/metropolitan municipality cpt.shp", as_tibble = TRUE) |>
   st_set_crs("EPSG: 4326")
+
+-- temporary
+
+cct <- st_read("../../Downloads/OneDrive_1_2025-04-22/metropolitan municipality cpt.shp", as_tibble = TRUE) |>
+  st_set_crs("EPSG: 4326")
+
+--
 ```
 
 ```{r city-overview, fig.cap = "Map of coastal water quality monitoring sites in Cape Town", fig.width = 6.4, fig.height = 9.8, dpi = 600}
 # Plot city of Cape Town with sites
 cct_sites <- cct |>
   ggplot() +
-  labs(
-    title = "Coastal Water Quality Monitoring Stations",
-    subtitle = "City of Cape Town"
-  ) +
   geom_sf(colour = NA) +
-  geom_sf(data = sites, aes(colour = category, size = category)) +
+  geom_sf(data = sites_sf, aes(colour = category, size = category)) +
   theme(
     legend.position = "bottom",
     legend.background = element_blank(),
@@ -90,19 +93,17 @@ cct_sites <- cct |>
   ) +
   scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "darkgrey")) +
   scale_size_manual(values = c("Recreational Node" = 1, "Coastal Monitoring Point" = 0.5))
-
-ggsave("coastal_water_quality_sites.jpg", plot = cct_sites, path = "02 Output Data/", width = 5, height = 6.7, dpi = 600)
 ```
 
 # Create map of specific site
 
 ```{r plot-zoomed-data, fig.width = 6.4, fig.height = 9.8, dpi = 600}
 # Select site_id
-site <- "XCS34"
+site <- "CN09"
 
 # Choose a specific site to plot
 sites_overview <- cct_sites +
-  geom_sf(data = sites |> filter(site_id == site), colour = city_pink, size = 5, shape = 16, alpha = 0.5) +
+  geom_sf(data = sites_sf |> filter(site_id == site), colour = city_pink, size = 5, shape = 16, alpha = 0.5) +
   theme(
     plot.title = element_blank(),
     plot.subtitle = element_blank(),
@@ -114,16 +115,9 @@ sites_overview <- cct_sites +
 # Have a look at the types of basemaps
 basemaps::get_maptypes()
 set_defaults(map_service = "esri", map_type = "world_imagery")
-imagery <- sites |>
-  filter(site_id == site) |>
-  st_buffer(1500) |>
-  basemap_gglayer()
-
-ggplot() +
-  imagery
 
 # Create bounding box of rectangle
-bbox <- sites |>
+bbox <- sites_sf |>
   filter(site_id == "CN09") |>
   st_transform("EPSG:3857") |>
   st_bbox()
@@ -132,12 +126,12 @@ bbox <- sites |>
 bbox <- bbox + c(-1000, -500, 1000, 500)
 
 # Add sites to basemap
-site <- sites |>
+site <- sites_sf |>
   filter(site_id == "CN09") |>
   st_transform("EPSG:3857")
 
 # Build map
-site_map <- basemap_ggplot(bbox, alpha = 0.7) +
+site_map <- basemap_ggplot(bbox) +
   geom_sf(data = site, alpha = 0.5, colour = city_pink, size = 5, shape = 16) +
   theme(
     panel.background = element_blank(),
@@ -152,7 +146,6 @@ site_map <- basemap_ggplot(bbox, alpha = 0.7) +
 # Inset the site map onto the overview map
 
 ```{r inset-map, fig.width = 6, fig.height = 6, dpi = 600}
-sites_overview + inset_element(site_map, left = 0.4, right = 1, bottom = 0.4, top = 1)
 sites_overview / site_map
 ```
 
@@ -163,12 +156,12 @@ sites <- tbl(con, I("coastal.sites_view"))
 results <- tbl(con, I("coastal.results_view"))
 
 # Choose the site
-site <- "CN22"
+site <- "CN09"
 
 # Join the tables
 exceedances <- sites |>
   inner_join(results, by = "site_id") |>
-  filter(site_id == "CN22", between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
+  filter(site_id == "CN09", between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
   collect() |>
   summarise(
     all_samples = n(),
@@ -182,7 +175,7 @@ exceedances <- sites |>
 
 ```{r exceedances-figure}
 # Create a figure for the percentage exceedances
-ggplot(data = exceedances) +
+exceedance_plot <- ggplot(data = exceedances) +
   geom_text(aes(x = 2, y = 1, label = label), family = "Century Gothic", size = 10, hjust = 1, colour = "white") +
   geom_text(aes(x = 1, y = 1, label = str_c(samples_exceed_pct, "%", sep = ""), colour = samples_exceed_pct), family = "Century Gothic", size = 50, hjust = 0) +
   theme(
@@ -222,7 +215,7 @@ hazen <- sites |>
 
 ```{r hazen-figure}
   # Create a simple plot showing the category
-  ggplot(data = hazen) +
+hazen_plot <- ggplot(data = hazen) +
   geom_rect(aes(xmin = 0.995, xmax = 1.005, ymin = 0.995, ymax = 1.005, fill = hazen_category)) +
   geom_text(aes(x = 1, y = 1, label = hazen_category), family = "Century Gothic", size = 35, hjust = 0.5, colour = "white") +
   theme(
@@ -244,18 +237,134 @@ RColorBrewer::brewer.pal(10, "RdBu")
 # Sample frequency plots
 
 ```{r}
-months <- seq(ymd("2024-01-01"), ymd("2025-01-01"), '1 month')
-
 # Plot sample frequency in the reporting period
-sites |>
+samples_plot <- sites |>
   inner_join(results, by = "site_id") |>
-  filter(between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily")) |>
+  filter(between(sample_date, "2024-01-01", "2024-12-31"), monitoring_group %in% c("routine", "daily", "blue_flag")) |>
   collect() |>
-  filter(site_id == "CN11") |>
-  group_by(month = floor_date(sample_date, "months"), site_id, monitoring_group) |>
+  filter(site_id == "CN09") |>
+  group_by(month = floor_date(sample_date, "month"), site_id, monitoring_group) |>
   count() |>
+  
+  # Plot the data
   ggplot() +
-  geom_col(aes(x = month, y = n, fill = monitoring_group), position = position_dodge(preserve = "single")) +
-  scale_fill_discrete() +
-  scale_x_date(breaks = months, date_labels = "%b")
+  labs(title = "Number of samples taken per month") +
+  geom_point(aes(x = month, y = n, colour = monitoring_group), position = position_dodge(preserve = "single"), size = 5) +
+  geom_segment(aes(x = month, xend = month, y = 0, yend = n, colour = monitoring_group), size = 2) +
+  
+  # Scales
+  scale_colour_manual(values = c("routine" = city_green, "daily" = city_pink, "blue_flag" = city_blue)) +
+  scale_y_continuous(breaks = scales::breaks_pretty()) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  
+  coord_cartesian(xlim = c(ymd("2024-01-01"), ymd("2024-12-31"))) +
+  
+# Plot styling
+  theme(
+    legend.position = "bottom",
+    panel.background = element_blank(),
+    axis.title = element_blank(),
+    legend.title = element_blank(),
+    text = element_text(family = "Century Gothic"),
+    plot.background = element_rect(fill = city_teal),
+    axis.text = element_text(colour = "white"),
+    axis.ticks = element_line(colour = "white"),
+    panel.grid = element_blank(),
+    plot.title = element_text(colour = "white", hjust = 0.5, face = "bold"),
+    legend.background = element_blank(),
+    legend.text = element_text(colour = "white")
+  )
 ```
+
+```{r results-plot}
+results_plot <- sites |>
+  inner_join(results, by = "site_id") |>
+  filter(between(sample_date, "2024-01-01", "2024-12-31"), monitoring_group %in% c("routine", "daily", "blue_flag")) |>
+  collect() |>
+  filter(site_id == "CN09") |>
+  ggplot(aes(x = sample_date, colour = monitoring_group)) +
+  labs(title = "Enterococci results from water samples", y = "Enterococci (cfu per 100 mL)") +
+  geom_segment(aes(xend = sample_date, y = 0, yend = numeric_value)) +
+  geom_point(aes(y = numeric_value)) +
+  geom_hline(yintercept = 240, colour = "white", size = 0.5, linetype = 2) +
+  
+  # Scales
+  scale_colour_manual(values = c("routine" = city_green, "daily" = city_pink, "blue_flag" = city_blue)) +
+  
+  # Theme
+  theme(
+    legend.position = "bottom",
+    panel.background = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_text(colour = "white"),
+    legend.title = element_blank(),
+    text = element_text(family = "Century Gothic"),
+    plot.background = element_rect(fill = city_teal),
+    axis.text = element_text(colour = "white"),
+    axis.ticks = element_line(colour = "white"),
+    panel.grid = element_blank(),
+    plot.title = element_text(colour = "white", hjust = 0.5, face = "bold"),
+    legend.background = element_blank(),
+    legend.text = element_text(colour = "white")
+  )
+```
+
+```{r title-figure}
+coast <- sites |>
+  filter(site_id == "CN09") |>
+  mutate(coast_label = str_c(coastline, " Coast", sep = "")) |>
+  ggplot() +
+  geom_text(aes(x = 0, y = 1, label = coast_label), angle = 90, size.unit = "mm", size = 10, family = "Century Gothic", colour = "white", fontface = "bold") +
+  
+  # Styles
+  theme(
+    plot.background = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    axis.ticks = element_blank(),
+    panel.background = element_rect(city_blue)
+  )
+```
+
+```{r site-name}
+site_name <- sites |>
+  filter(site_id == "CN09") |>
+  mutate(coast_label = str_c(coastline, " Coast", sep = "")) |>
+  ggplot() +
+  geom_text(aes(x = 0, y = 1, label = site_description), angle = 90, size.unit = "mm", size = 10, family = "Century Gothic", colour = "white") +
+  
+  # Styles
+  theme(
+    plot.background = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    axis.ticks = element_blank(),
+    panel.background = element_rect(fill = city_blue)
+  )
+```
+
+```{r assemble-plot, fig.width = 6.4, fig.height = 9, dpi = 600}
+sites_overview + theme(legend.position = "none") +
+site_map +
+site_name +
+coast +
+results_plot +
+samples_plot +
+hazen_plot +
+exceedance_plot +
+plot_layout(design = "
+            CBBBB
+            CBBBB
+            CAAAA
+            CAAAA
+            DFFFF
+            DEEEE
+            ")
+
+
+
+
+```
+
