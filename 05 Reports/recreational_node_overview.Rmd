@@ -139,6 +139,44 @@ site_map <- basemap_ggplot(bbox) +
   )
 ```
 
+```{r alternative-site-map}
+# Create bounding box of rectangle
+bbox <- sites_sf |>
+  filter(site_id == "CN09") |>
+  st_transform("ESRI:102562") |>
+  st_bbox()
+
+# Set limits for bounding box
+bbox <- bbox + c(-1500, -750, 1500, 750)
+
+# Cropped coastline
+cct_cropped <- st_crop(cct |> st_transform("ESRI:102562"), bbox)
+
+# Cropped sites
+sites_sf_cropped <- st_crop(sites_sf |> st_transform("ESRI:102562"), bbox)
+
+# Plot the sites
+site_map <- ggplot() +
+  geom_sf(data = cct_cropped, colour = NA) +
+  geom_sf(data = sites_sf_cropped, aes(colour = category, size = category), shape = 16) +
+  geom_sf(data = sites_sf_cropped |> filter(site_id == "CN09"), colour = city_pink, size = 3) +
+  geom_rect(aes(xmin = bbox[1], ymin = bbox[2], xmax = bbox[3], ymax = bbox[4]), fill = NA, colour = "darkgrey") +
+  geom_sf_text(data = sites_sf_cropped, aes(label = site_description), colour = "white", family = "Century Gothic", hjust = 1, vjust = -1.5, nudge_x = -100, check_overlap = TRUE, size = 2) +
+  scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "darkgrey")) +
+  scale_size_manual(values = c("Recreational Node" = 2, "Coastal Monitoring Point" = 1)) +
+  
+  theme(
+    legend.position = "none",
+    plot.background = element_blank(),
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+```
+
+
 # Inset the site map onto the overview map
 
 ```{r inset-map, fig.width = 6, fig.height = 6, dpi = 600}
