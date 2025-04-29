@@ -95,7 +95,6 @@ cct_sites <- cct |>
 site_code <- "CN11"
 ```
 
-
 ```{r site_overview, fig.width = 6.4, fig.height = 9.8, dpi = 600}
 # Choose a specific site to plot
 (sites_overview <- cct_sites +
@@ -110,11 +109,36 @@ site_code <- "CN11"
   ))
 ```
 
-```{r build-basemap, fig.height = 6, fig.width=6, dpi = 600}
-# Have a look at the types of basemaps
-basemaps::get_maptypes()
-set_defaults(map_service = "esri", map_type = "world_light_gray_base")
+# Access Open Street Map data
 
+```{r open-street-map-data}
+coastline <- opq("Western Cape, South Africa") |>
+  add_osm_feature("natural", "coastline") |>
+  osmdata_sf()
+
+beaches <- opq("Western Cape, South Africa") |>
+  add_osm_feature("natural", "beach") |>
+  osmdata_sf()
+
+ggplot() + geom_sf(data = beaches$osm_polygons)
+
+ggplot() +
+  geom_sf(data = coastline$osm_lines) +
+  geom_sf(data = beaches$osm_polygons, colour = "lightyellow") +
+  geom_sf(data = beaches$osm_multipolygons, colour = "lightyellow") +
+ # geom_sf(data = sites_sf, aes(colour = category)) +
+  coord_sf(xlim = c(18.2, 19), ylim = c(-34.5, -33.3))
+
+# Choose a specific site and create a bounding box for that site
+sites_sf |>
+  filter(site_id == "CN09") |>
+  st_transform("ESRI: 102562") |>
+  st_bbox() + c(-1500, -750, 1500, 750)
+```
+
+# Create a local map of the site
+
+```{r build-basemap, fig.height = 6, fig.width=6, dpi = 600}
 # Create bounding box of rectangle
 bbox <- sites_sf |>
   filter(site_id == "CN09") |>
