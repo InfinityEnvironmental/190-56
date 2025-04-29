@@ -3,25 +3,20 @@ title: "historical_coastal_water_quality"
 output: html_document
 ---
 
-# Set working directory for all code chunks to project root directory
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 
-# Load required packages
-
-```{r message = FALSE}
+```{r import-packages, message = FALSE}
 library(tidyverse)
 library(dbplyr)
 library(DBI)
 library(pdftools)
 library(readxl)
 ```
-# Database Connection
 
-```{r db connection}
+```{r database-connection}
 # Enter credentials when prompted
 con <- dbConnect(RPostgres::Postgres(),
   host = "aws-0-eu-central-1.pooler.supabase.com",
@@ -43,19 +38,16 @@ city_brown <- "#47292e"
 city_tan <- "#98871f"
 ```
 
-```{r}
-dbGetInfo(con)
-```
-
-# Data import
-
 ```{r data-import}
+# Import the results and sites data from database
 results <- tbl(con, I("coastal.results_view")) |> collect()
+
+# Sort results
 results_sorted <- results %>%
   arrange(sample_date)
 view(results_sorted)
 
-#Check frequency of sampling
+# Check frequency of sampling
 results_frequency <- results %>%
   group_by(site_id, monitoring_group) %>%
   summarize(
@@ -68,6 +60,60 @@ results_frequency <- results %>%
     frequency = ifelse(n_samples > 1, date_range / (n_samples - 1), 0) # Calculate average interval
   )
 ```
+
+# Structure of our data
+
+- How many records?
+- At what frequency was data collected?
+- How many records for each site?
+- For what periods do we have data?
+- What is the source of the data for the different periods?
+- Is there any missing data?
+- Is there any data that we still need to get hold of?
+
+# Data distribution
+
+## Overall distribution
+
+## Overall distribution by coastline
+
+## Overall distribution over time
+
+# Hazen categories over time
+
+- How have the categories for each site changed over time?
+- Maps of water quality with sites coloured by category
+
+# Percentage exceedances over time
+
+- Maps of water quality with points sized by percentage exceedances
+
+# Distribution of the data by year for each site
+
+- Which sites are suitable for this analysis?
+
+# Seasonal trends in water quality across years
+
+- How do the data change over the year?
+
+# Time-series trends in water quality data
+
+- Changes in Hazen 95th and Hazen 90th over time for each site
+
+# Cumulative change in Hazen percentiles over time
+
+- On net, has the site improved or deteriorated?
+
+# Grouped analyses
+
+## Group sites by region
+
+## Group sites by features
+
+- Stormwater drains
+- River mouths
+- Natural features (algal blooms)
+- Marine outfalls
 
 # Calculating routine monitoring group percentiles
 
