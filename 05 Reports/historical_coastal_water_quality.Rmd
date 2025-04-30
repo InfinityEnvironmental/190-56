@@ -92,7 +92,7 @@ results_frequency <- results %>%
 
 - Which sites are suitable for this analysis?
 
-```{r Violin plots}
+```{r Violin-plots-yearly}
 library(lubridate)
 
 results_hazen <- results_sorted %>%
@@ -127,7 +127,7 @@ for (site in unique_sites) {
 plot <- ggplot(site_violin_data, aes(x = factor(year), y = numeric_value, fill = hazen_category_enterococci))+
     geom_violin(trim = TRUE) +
     geom_point(aes(group = factor(year)), # Group points within each violin
-               position = position_jitter(width = 0.2), # Add slight horizontal jitter
+               position = position_jitter(width = 0.2),
                alpha = 0.3,
                size = 1) +
     scale_y_log10() +
@@ -152,6 +152,63 @@ plot <- ggplot(site_violin_data, aes(x = factor(year), y = numeric_value, fill =
 # Seasonal trends in water quality across years
 
 - How do the data change over the year?
+```{r Seasonal-Climatology-monthly}
+
+#Calculate Hazen Categories based on monthly data
+results_hazen_monthly <- results_sorted %>%
+  group_by(site_id, month = month(sample_date, label = TRUE)) %>%
+  summarise(
+    min_date = min(sample_date, na.rm = TRUE),
+    max_date = max(sample_date, na.rm = TRUE),
+    n_samples = sum(!is.na(numeric_value)),
+    hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
+    hazen90 = quantile(numeric_value, 0.90, type = 5, na.rm = TRUE),
+    hazen_category = case_when(
+      n_samples < 10 ~ "Not enough samples",
+      hazen95 <= 10 ~ "Excellent",
+      hazen95 <= 20 ~ "Good",
+      hazen95 > 20 & hazen90 > 18 ~ "Poor",
+      hazen95 > 20 & hazen90 < 18 ~ "Sufficient",
+      TRUE ~ NA_character_
+    )
+  )
+
+#Merge with original data
+violin_data_monthly <- results_sorted %>%
+  mutate(month = month(sample_date, label = TRUE)) %>%
+  left_join(results_hazen_monthly, by = c("site_id", "month"))
+
+unique_sites <- unique(violin_data_monthly$site_id)
+
+for (site in unique_sites) {
+  site_violin_data_monthly <- violin_data_monthly %>%
+    filter(site_id == site)
+
+  plot <- ggplot(site_violin_data_monthly, aes(x = month, y = numeric_value, fill = hazen_category)) +
+    geom_violin(trim = TRUE) +
+    geom_point(aes(group = month), # Group points within each violin
+               position = position_jitter(width = 0.2),
+               alpha = 0.3,
+               size = 1) +
+    scale_y_log10() + 
+    labs(
+      title = paste("Monthly Climatology of Enterococci distribution - Site:", site),
+      x = "Month",
+      y = "Enterococci (log10 scale)",
+      fill = "Hazen Category"
+    ) +
+    theme_minimal() +
+    theme(axis.line = element_line(colour = "black"),
+          axis.ticks = element_line(colour = "black"),
+          axis.ticks.length = unit(-0.15, "cm"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          axis.text.x = element_text(angle = 45, hjust = 1))
+
+  print(plot)
+}
+```
+
 
 # Time-series trends in water quality data
 
