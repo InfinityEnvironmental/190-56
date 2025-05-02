@@ -9,8 +9,8 @@ WITH schedule_insert AS
 (SELECT
 	sample_date::date,
 	trim(initcap(to_char(sample_date, 'day')))::varchar(9) AS day,
-	((date_trunc('week', sample_date)::date - '2025-04-07') / 7 + 1)::varchar(1) AS week
-FROM generate_series('2025-04-07'::date, '2025-05-02'::date, '1 day'::interval) sample_date) -- Change start and end dates
+	((date_trunc('week', sample_date)::date - '2025-05-05') / 7 + 1)::varchar(1) AS week
+FROM generate_series('2025-05-05'::date, '2025-05-30'::date, '1 day'::interval) sample_date) -- Change start and end dates
 SELECT
 	a.sample_date,
 	a.week,
@@ -25,10 +25,35 @@ WHERE version = 3) -- Which version of the schedule do I want to use as a templa
 INSERT INTO coastal.schedule_planned (date, week, day, site_id, samplers)
 SELECT * FROM schedule_insert;
 
-SELECT * FROM coastal.schedule_planned;
+-- Delete the data from the schedule table
+DELETE FROM coastal.schedule_planned WHERE date >= '2025-05-05';
+
+-- Add the Silwerstroom and Oudekraal sites to week 4 of version 3 of planned schedule
+INSERT INTO coastal.schedule
+SELECT
+	site_id,
+	week,
+	day,
+	samplers,
+	3 as version
+FROM coastal.schedule
+WHERE version = 2 AND site_id IN ('XCN08', 'XCN14', 'XCN09') AND week IN ('4');
+
+SELECT * FROM coastal.schedule WHERE version = 3;
+
+SELECT * FROM coastal.planned_schedule_view
+ORDER BY date, samplers, site_id;
 
 ROLLBACK;
 COMMIT;
+
+GRANT SELECT ON coastal.planned_schedule_view TO technician;
+
+SELECT
+	*,
+	date || ':' || samplers AS group
+	FROM coastal.planned_schedule_view
+WHERE date >= '2025-05-05' ORDER BY date, samplers, site_id;
 
 -- Make changes to coastal schedule
 
