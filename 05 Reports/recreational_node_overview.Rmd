@@ -302,6 +302,35 @@ RColorBrewer::display.brewer.all(type = "div")
 RColorBrewer::brewer.pal(11, "RdYlGn")
 ```
 
+Create a battery plot showing the Hazen calculation
+
+```{r}
+# Create a tibble with the four different levels
+levels <- tibble(levels = c("Excellent", "Good", "Sufficient", "Poor")) |>
+  mutate(levels = fct(levels, levels = c("Excellent", "Good", "Sufficient", "Poor")))
+
+# Create a battery plot
+ggplot(data = levels) +
+  geom_tile(aes(y = fct_rev(levels), x = "Battery", fill = levels), height = 0.9, width = 0.5) +
+  geom_tile(data = hazen, aes(y = hazen_category, x = "Battery"), colour = "white", fill = NA, linewidth = 2, height = 1, width = 0.52, linejoin = "round") +
+  geom_text(aes(x = "Battery", y = fct_rev(levels), label = levels), colour = "white") +
+  scale_fill_manual(name = "Hazen Water Quality Category", values = c("Poor" = "red", "Sufficient" = "yellow", "Good" = "orange", "Excellent" = "green")) +
+  
+# Style components
+  theme(
+    plot.background = element_blank(),
+    panel.background = element_rect(fill = "navy"),
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    legend.position = "none"
+  )
+
+RColorBrewer::display.brewer.all()
+```
+
+
 # Sample frequency plots
 
 ```{r}
