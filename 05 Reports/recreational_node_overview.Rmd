@@ -205,6 +205,23 @@ site_map <- ggplot() +
 
 # Create a figure percentage of samples that have exceeded the threshold
 
+```{r create-donut-plot}
+tibble(
+  category = c("Exceedances", "Not exceedances"),
+  percentages = c(30, 70)
+) |>
+  ggplot(aes(x = "Site", y = percentages, fill = "Percentage Exceedance", alpha = category)) +
+  geom_col(fill = "green3") +
+  scale_alpha_manual(values = c("Exceedances" = 1, "Not exceedances" = 0.2)) +
+  scale_fill_brewer(type = "seq", palette = ) +
+  coord_radial(theta = "y", expand = FALSE, inner.radius = 0.7, direction = -1) +
+  theme(
+    plot.background = element_rect("darkblue"),
+    panel.background = element_blank()
+  )
+```
+
+
 ```{r perc-exceedance-plot}
 sites <- tbl(con, I("coastal.sites_view"))
 results <- tbl(con, I("coastal.results_view"))
@@ -329,7 +346,6 @@ ggplot(data = levels) +
 
 RColorBrewer::display.brewer.all()
 ```
-
 
 # Sample frequency plots
 
