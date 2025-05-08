@@ -25,6 +25,7 @@ library(raster)
 library(patchwork)
 library(units)
 library(osmdata)
+library(ggrepel)
 ```
 
 ```{r db-connection}
@@ -95,6 +96,11 @@ cct_sites <- cct |>
 site_code <- "CN11"
 ```
 
+```{r create-bounding-box}
+# Create bounding box for City of Cape Town area
+sites_bbox <- st_bbox(obj = c(xmin = 18.25, xmax = 18.9, ymin = -34.40, ymax = -33.6))
+```
+
 ```{r site_overview, fig.width = 6.4, fig.height = 9.8, dpi = 600}
 # Choose a specific site to plot
 (sites_overview <- cct_sites +
@@ -111,29 +117,63 @@ site_code <- "CN11"
 
 # Access Open Street Map data
 
-```{r open-street-map-data}
-coastline <- opq("Western Cape, South Africa") |>
+```{r open-street-map-data, fig.width = 8.3, fig.height = 11.7, dpi = 600}
+# Access coastline data
+coastline <- opq(sites_bbox) |>
   add_osm_feature("natural", "coastline") |>
   osmdata_sf()
 
-beaches <- opq("Western Cape, South Africa") |>
+# Crop to City of Cape Town
+coastline$osm_lines |>
+  ggplot() +
+  geom_sf() +
+  geom_sf(data = sites_sf, aes(colour = category)) +
+  scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "grey"))
+
+# Create a bounding box for one site (Camps Bay South)
+bbox <- sites_sf |>
+  filter(site_id == "CN11") |>
+  st_transform(crs = "ESRI: 102562") |>
+  st_bbox() + c(-1500, -1500, 1500, 1500)
+
+# Plot the coastline
+ggplot() +
+  geom_sf(data = coastline$osm_lines |> st_transform("ESRI: 102562")) +
+  geom_sf(data = sites_sf |> st_transform("ESRI: 102562")) +
+  coord_sf(xlim = c(bbox[1], bbox[3]), ylim = c(bbox[2], bbox[4]))
+```
+
+```{r access-beach-data, fig.width = 8.3, fig.height = 11.7, dpi = 600}
+# Access beach data
+beaches <- opq(sites_bbox) |>
   add_osm_feature("natural", "beach") |>
   osmdata_sf()
 
-ggplot() + geom_sf(data = beaches$osm_polygons)
-
+# Plot the beach data for a specific site
 ggplot() +
-  geom_sf(data = coastline$osm_lines) +
-  geom_sf(data = beaches$osm_polygons, colour = "lightyellow") +
-  geom_sf(data = beaches$osm_multipolygons, colour = "lightyellow") +
- # geom_sf(data = sites_sf, aes(colour = category)) +
-  coord_sf(xlim = c(18.2, 19), ylim = c(-34.5, -33.3))
+  geom_sf(data = beaches$osm_polygons |> st_transform("ESRI: 102562")) +
+  geom_sf(data = coastline$osm_lines |> st_transform("ESRI: 102562")) +
+  geom_sf(data = coastline$osm_polygons |> st_transform("ESRI: 102562")) +
+  geom_sf(data = sites_sf |> st_transform("ESRI: 102562")) +
+  coord_sf(xlim = c(bbox[1], bbox[3]), ylim = c(bbox[2], bbox[4]))
+```
 
-# Choose a specific site and create a bounding box for that site
-sites_sf |>
-  filter(site_id == "CN09") |>
-  st_transform("ESRI: 102562") |>
-  st_bbox() + c(-1500, -750, 1500, 750)
+```{r access-streets, fig.width = 8.3, fig.height = 11.7, dpi = 600}
+# Access street data from OSM
+streets <- opq(sites_bbox) |>
+  add_osm_feature("highway", c("motorway", "motorway_link", "primary", "primary_link", "secondary", "secondary_link")) |>
+  osmdata_sf()
+streets$osm_lines
+
+# Plot all data for a specific site
+ggplot() +
+  geom_sf(data = beaches$osm_polygons |> st_transform("ESRI: 102562"), fill = "grey", colour = NA, alpha = 0.5) +
+  geom_sf(data = coastline$osm_lines |> st_transform("ESRI: 102562"), colour = "white") +
+  geom_sf(data = coastline$osm_polygons |> st_transform("ESRI: 102562"), colour = NA, fill = "grey", alpha = 0.5) +
+  geom_sf(data = streets$osm_lines |> st_transform("ESRI: 102562"), colour = "white") +
+  geom_sf(data = sites_sf |> st_transform("ESRI: 102562"), aes(colour = category)) +
+  scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "grey")) +
+  coord_sf(xlim = c(bbox[1], bbox[3]), ylim = c(bbox[2], bbox[4]))
 ```
 
 # Create a local map of the site
