@@ -144,6 +144,13 @@ ggplot() +
 ```
 
 ```{r access-beach-data, fig.width = 8.3, fig.height = 11.7, dpi = 600}
+# Make the coastline a polygon
+coastline$osm_lines |>
+  ggplot() +
+  geom_sf()
+```
+
+```{r access-beach-data}
 # Access beach data
 beaches <- opq(sites_bbox) |>
   add_osm_feature("natural", "beach") |>
