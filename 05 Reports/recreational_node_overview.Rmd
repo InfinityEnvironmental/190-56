@@ -212,7 +212,42 @@ ggplot() +
 
 # Create a figure that shows percentage of samples that have exceeded the threshold
 
-```{r read-database-data}
+```{r create-donut-plot}
+# Create tibble
+wheel <- tibble(percentage_exceedance = 37) |>
+  ggplot(aes(x = "Site", y = percentage_exceedance, fill = percentage_exceedance)) +
+  geom_col() + scale_fill_distiller(palette = "RdYlGn", direction = -1, limits = c(0, 50)) +
+  coord_radial(theta = "y", start = 0, end = 2 * pi, inner.radius = 0.5, expand = FALSE) +
+  scale_y_continuous(limits = c(0, 100)) +
+  theme(
+    plot.background = element_rect(fill = city_teal),
+    legend.position = "none",
+    axis.ticks = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank()
+  )
+
+# Create the text
+text <- tibble(percentage_exceedance = 37) |>
+  ggplot() + 
+  geom_text(aes(x = 0, y = 0, label = str_c(percentage_exceedance, "%", sep = "")), colour = "white", size = 15, size.unit = "mm", family = "Century Gothic") +
+  theme(
+    plot.background = element_blank(),
+    legend.position = "none",
+    axis.ticks = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    panel.background = element_blank()
+  )
+
+# Combine
+wheel + inset_element(text, left = 0.35, bottom = 0.4, right = 0.65, top = 0.6, clip = FALSE)
+```
+
+
+```{r perc-exceedance-plot}
 sites <- tbl(con, I("coastal.sites_view"))
 results <- tbl(con, I("coastal.results_view"))
 ```
