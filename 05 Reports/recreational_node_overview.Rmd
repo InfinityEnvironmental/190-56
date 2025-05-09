@@ -91,188 +91,133 @@ cct_sites <- cct |>
 
 # Create map of specific site
 
-```{r}
-# Change the site code
-site_code <- "CN11"
+```{r create-bounding-box}
+# Create bounding box for City of Cape Town area
+sites_bbox <- st_bbox(obj = c(xmin = 18.25, xmax = 18.9, ymin = -34.40, ymax = -33.5))
+st_bbox(sites_sf)
+```
+
+## Access Open Street Map data
+
+```{r choose-site}
+site_code <- "XCS04"
 ```
 
 ```{r create-bounding-box}
-# Create bounding box for City of Cape Town area
-sites_bbox <- st_bbox(obj = c(xmin = 18.25, xmax = 18.9, ymin = -34.40, ymax = -33.6))
+# Create a bounding box for one site
+bbox <- sites_sf |>
+  filter(site_id == site_code) |>
+  st_bbox() + c(-0.015, -0.012, 0.015, 0.012)
+
+# Transform bounding box to 102562
+bbox_htb <- sites_sf |>
+  filter(site_id == site_code) |>
+  st_transform(crs = "ESRI: 102562") |>
+  st_bbox() + c(-1500, -1500, 1500, 1500)
 ```
 
-```{r site_overview, fig.width = 6.4, fig.height = 9.8, dpi = 600}
-# Choose a specific site to plot
-(sites_overview <- cct_sites +
-  geom_sf(data = sites_sf |> filter(site_id == site_code), colour = city_pink, size = 4, shape = 16, alpha = 0.5) +
-  theme(
-    plot.title = element_blank(),
-    plot.subtitle = element_blank(),
-    legend.position = "inside",
-    legend.position.inside = c(0.45, 0.25),
-    legend.text = element_text(colour = "white", size = 9),
-    panel.background = element_blank()
-  ))
-```
-
-# Access Open Street Map data
-
-```{r open-street-map-data, fig.width = 8.3, fig.height = 11.7, dpi = 600}
+```{r}
 # Access coastline data
-coastline <- opq(sites_bbox) |>
+coastline <- opq(bbox) |>
   add_osm_feature("natural", "coastline") |>
   osmdata_sf()
 
-# Crop to City of Cape Town
-coastline$osm_lines |>
-  ggplot() +
-  geom_sf() +
-  geom_sf(data = sites_sf, aes(colour = category)) +
-  scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "grey"))
-
-# Create a bounding box for one site (Camps Bay South)
-bbox <- sites_sf |>
-  filter(site_id == "CN11") |>
-  st_transform(crs = "ESRI: 102562") |>
-  st_bbox() + c(-1500, -1500, 1500, 1500)
-
-# Plot the coastline
-ggplot() +
-  geom_sf(data = coastline$osm_lines |> st_transform("ESRI: 102562")) +
-  geom_sf(data = sites_sf |> st_transform("ESRI: 102562")) +
-  coord_sf(xlim = c(bbox[1], bbox[3]), ylim = c(bbox[2], bbox[4]))
-```
-
-```{r access-beach-data, fig.width = 8.3, fig.height = 11.7, dpi = 600}
-# Make the coastline a polygon
-coastline$osm_lines |>
-  ggplot() +
-  geom_sf()
-```
-
-```{r access-beach-data}
 # Access beach data
-beaches <- opq(sites_bbox) |>
+beaches <- opq(bbox) |>
   add_osm_feature("natural", "beach") |>
   osmdata_sf()
 
-# Plot the beach data for a specific site
-ggplot() +
-  geom_sf(data = beaches$osm_polygons |> st_transform("ESRI: 102562")) +
-  geom_sf(data = coastline$osm_lines |> st_transform("ESRI: 102562")) +
-  geom_sf(data = coastline$osm_polygons |> st_transform("ESRI: 102562")) +
-  geom_sf(data = sites_sf |> st_transform("ESRI: 102562")) +
-  coord_sf(xlim = c(bbox[1], bbox[3]), ylim = c(bbox[2], bbox[4]))
+# Access street data from OSM
+streets <- opq(bbox) |>
+  add_osm_feature(key = "highway") |>
+  osmdata_sf()
+
+# Access buildings data
+buildings <- opq(bbox) |>
+  add_osm_feature(key = "building") |>
+  osmdata_sf()
+
+# Access water
+water <- opq(bbox) |>
+   add_osm_feature("natural", "water") |>
+   osmdata_sf()
+
+# Add rivers
+river <- opq(bbox) |>
+   add_osm_feature("waterway", c("river", "stream")) |>
+   osmdata_sf()
 ```
 
 ```{r access-streets, fig.width = 8.3, fig.height = 11.7, dpi = 600}
-# Access street data from OSM
-streets <- opq(sites_bbox) |>
-  add_osm_feature("highway", c("motorway", "motorway_link", "primary", "primary_link", "secondary", "secondary_link")) |>
-  osmdata_sf()
-streets$osm_lines
-
 # Plot all data for a specific site
 ggplot() +
-  geom_sf(data = beaches$osm_polygons |> st_transform("ESRI: 102562"), fill = "grey", colour = NA, alpha = 0.5) +
-  geom_sf(data = coastline$osm_lines |> st_transform("ESRI: 102562"), colour = "white") +
+  
+  # Add beaches
+  geom_sf(data = beaches$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
+  
+  # Add beaches that are multipolygons
+  # geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
+  
+  # Add rivers
+  geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
+  
+  # Add other water
+  geom_sf(data = water$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightblue", alpha = 0.7) +
+  geom_sf(data = water$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightblue", alpha = 0.7) +
+  
+  # Add the coastline
+  geom_sf(data = coastline$osm_lines |> st_transform("ESRI: 102562"), colour = "lightgrey") +
   geom_sf(data = coastline$osm_polygons |> st_transform("ESRI: 102562"), colour = NA, fill = "grey", alpha = 0.5) +
-  geom_sf(data = streets$osm_lines |> st_transform("ESRI: 102562"), colour = "white") +
+  
+  # Add streets
+  geom_sf(data = streets$osm_lines |>
+            st_transform("ESRI: 102562") |>
+            filter(highway %in% c("motorway",
+                                  "motorway_link",
+                                  "trunk",
+                                  "trunk_link",
+                                  "primary",
+                                  "primary_link",
+                                  "secondary",
+                                  "secondary_link",
+                                  "tertiary",
+                                  "tertiary_link",
+                                  "unclassified",
+                                  "residential",
+                                  "service")), colour = "lightgrey") +
+  # Add the monitoring sites with labels
   geom_sf(data = sites_sf |> st_transform("ESRI: 102562"), aes(colour = category)) +
+  geom_sf_text(data = sites_sf, aes(label = site_description), hjust = 1, check_overlap = TRUE, nudge_x = -50, colour = "white") +
+  
+  # Add buildings
+  geom_sf(data = buildings$osm_polygons |>
+            st_transform("ESRI: 102562"), fill = "lightgrey", colour = NA, alpha = 0.5) +
+  
+  # Add the current monitoring point
+  geom_sf(data = sites_sf |> filter(site_id == site_code) |> st_transform("ESRI: 102562"), colour = city_pink, size = 3) +
+  
   scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "grey")) +
-  coord_sf(xlim = c(bbox[1], bbox[3]), ylim = c(bbox[2], bbox[4]))
-```
-
-# Create a local map of the site
-
-```{r build-basemap, fig.height = 6, fig.width=6, dpi = 600}
-# Create bounding box of rectangle
-bbox <- sites_sf |>
-  filter(site_id == "CN09") |>
-  st_transform("EPSG:3857") |>
-  st_bbox()
-
-# Set limits for bounding box
-bbox <- bbox + c(-1500, -750, 1500, 750)
-
-# Add sites to basemap
-sites_filtered <- sites_sf |>
-  filter(site_id == "CN09") |>
-  st_transform("EPSG:3857")
-
-# Build map
-site_map <- basemap_ggplot(bbox) +
-  geom_sf(data = sites_filtered, alpha = 0.5, colour = city_pink, size = 5, shape = 16) +
-  theme(
-    panel.background = element_blank(),
-    axis.title = element_blank(),
-    axis.text = element_blank(),
-    axis.ticks = element_blank(),
-    plot.background = element_blank(),
-    panel.grid = element_blank()
-  )
-```
-
-```{r alternative-site-map}
-# Create bounding box of rectangle
-bbox <- sites_sf |>
-  filter(site_id == site_code) |>
-  st_transform("ESRI:102562") |>
-  st_bbox()
-
-# Set limits for bounding box
-bbox <- bbox + c(-1500, -750, 1500, 750)
-
-# Cropped coastline
-cct_cropped <- st_crop(cct |> st_transform("ESRI:102562"), bbox)
-
-# Cropped sites
-sites_sf_cropped <- st_crop(sites_sf |> st_transform("ESRI:102562"), bbox)
-
-# Plot the sites
-site_map <- ggplot() +
-  geom_sf(data = cct_cropped, colour = NA, fill = "lightgrey") +
-  geom_sf(data = sites_sf_cropped, aes(colour = category, size = category), shape = 16) +
-  geom_sf(data = sites_sf_cropped |> filter(site_id == site_code), colour = city_pink, size = 3) +
-  geom_rect(aes(xmin = bbox[1], ymin = bbox[2], xmax = bbox[3], ymax = bbox[4]), fill = NA, colour = "darkgrey") +
-  geom_sf_text(data = sites_sf_cropped, aes(label = site_description), colour = "white", family = "Century Gothic", hjust = 1, nudge_x = -100, check_overlap = TRUE, size = 2) +
-  scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "darkgrey")) +
-  scale_size_manual(values = c("Recreational Node" = 2, "Coastal Monitoring Point" = 1)) +
+  coord_sf(xlim = c(bbox_htb[1], bbox_htb[3]), ylim = c(bbox_htb[2], bbox_htb[4])) +
   
   theme(
-    legend.position = "none",
-    plot.background = element_blank(),
+    plot.background = element_rect(fill = city_teal),
     panel.background = element_blank(),
+    legend.position = "none",
     panel.grid = element_blank(),
     axis.title = element_blank(),
-    axis.text = element_blank(),
-    axis.ticks = element_blank()
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
   )
 ```
 
-# Create a figure percentage of samples that have exceeded the threshold
+# Create a figure that shows percentage of samples that have exceeded the threshold
 
-```{r create-donut-plot}
-tibble(
-  category = c("Exceedances", "Not exceedances"),
-  percentages = c(30, 70)
-) |>
-  ggplot(aes(x = "Site", y = percentages, fill = "Percentage Exceedance", alpha = category)) +
-  geom_col(fill = "green3") +
-  scale_alpha_manual(values = c("Exceedances" = 1, "Not exceedances" = 0.2)) +
-  scale_fill_brewer(type = "seq", palette = ) +
-  coord_radial(theta = "y", expand = FALSE, inner.radius = 0.7, direction = -1) +
-  theme(
-    plot.background = element_rect("darkblue"),
-    panel.background = element_blank()
-  )
-```
-
-
-```{r perc-exceedance-plot}
+```{r read-database-data}
 sites <- tbl(con, I("coastal.sites_view"))
 results <- tbl(con, I("coastal.results_view"))
+```
 
+```{r perc-exceedance-plot}
 # Join the tables
 exceedances <- sites |>
   inner_join(results, by = "site_id") |>
@@ -284,15 +229,14 @@ exceedances <- sites |>
     samples_exceed_pct = round(sum(numeric_value > 240) / n() * 100, 0)
   ) |>
   mutate(
-    label = str_c("of ", all_samples, " samples taken exceeded the\nthreshold value for Enterococci\nof 240 cfu per 100 mL", sep = "")
+    label = str_c(samples_exceed, " out of ", all_samples, " samples taken exceeded the\nthreshold value for Enterococci\nof 240 cfu per 100 mL", sep = "")
     )
 ```
 
 ```{r exceedances-figure}
 # Create a figure for the percentage exceedances
-(exceedance_plot <- ggplot(data = exceedances) +
-  geom_text(aes(x = 2, y = 1, label = label), family = "Century Gothic", size = 7, hjust = 1, colour = "white", lineheight = 1) +
-  geom_text(aes(x = 1, y = 1, label = str_c(samples_exceed_pct, "%", sep = ""), colour = samples_exceed_pct), family = "Century Gothic", size = 25, hjust = 0.2) +
+ggplot(data = exceedances) +
+  geom_text(aes(x = 0, y = 0, label = label), family = "Century Gothic", size = 7, colour = "white", lineheight = 1) +
   theme(
     axis.text = element_blank(),
     axis.ticks = element_blank(),
@@ -300,9 +244,42 @@ exceedances <- sites |>
     panel.grid = element_blank(),
     panel.background = element_blank(),
     legend.position = "none",
-    plot.background = element_blank()
-  ) +
-  scale_colour_distiller(type = "div", palette = "RdYlGn", limits = c(0, 50), direction = -1))
+    plot.background = element_rect(fill = city_teal)
+  )
+```
+
+```{r create-donut-plot}
+# Create tibble
+wheel <- tibble(percentage_exceedance = 37) |>
+  ggplot(aes(x = "Site", y = percentage_exceedance, fill = percentage_exceedance)) +
+  geom_col() + scale_fill_distiller(palette = "RdYlGn", direction = -1, limits = c(0, 50)) +
+  coord_radial(theta = "y", start = 0, end = 2 * pi, inner.radius = 0.5, expand = FALSE) +
+  scale_y_continuous(limits = c(0, 100)) +
+  theme(
+    plot.background = element_rect(fill = city_teal),
+    legend.position = "none",
+    axis.ticks = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank()
+  )
+
+# Create the text
+text <- tibble(percentage_exceedance = 37) |>
+  ggplot() + 
+  geom_text(aes(x = 0, y = 0, label = str_c(percentage_exceedance, "%", sep = "")), colour = "white", size = 15, size.unit = "mm", family = "Century Gothic") +
+  theme(
+    plot.background = element_blank(),
+    legend.position = "none",
+    axis.ticks = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    panel.background = element_blank()
+  )
+
+# Combine
+wheel + inset_element(text, left = 0.35, bottom = 0.4, right = 0.65, top = 0.6, clip = FALSE)
 ```
 
 # Hazen Categories
