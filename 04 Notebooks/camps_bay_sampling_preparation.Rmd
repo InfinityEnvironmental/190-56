@@ -1,0 +1,69 @@
+---
+title: "Camps Bay High-frequency Sampling"
+author: "Francois van Schalkwyk"
+date: "2025-03-19"
+output: html_document
+---
+
+# Workspace Set-Up
+
+Make sure that you are working in the outfalls project, found in the working directory.
+
+## Set working directory for all code chunks to project root directory
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## Load required packages
+
+```{r message = FALSE}
+library(tidyverse)
+library(dbplyr)
+library(DBI)
+library(pdftools)
+library(readxl)
+```
+
+## Database Connection
+
+```{r db connection}
+# Enter credentials when prompted
+con <- dbConnect(RPostgres::Postgres(),
+  host = "aws-0-eu-central-1.pooler.supabase.com",
+  port = 5432,
+  user = str_c(rstudioapi::askForPassword(prompt = "Username: "), "wnrvdvesovnkmqbhkhjz", sep = "."),
+  password = rstudioapi::askForPassword(),
+  dbname = "postgres"
+)
+```
+
+```{r}
+dbGetInfo(con)
+```
+
+# Create sample set
+
+```{r}
+# Sites
+site <- tibble(site_id = c("CN10", "CN11", "CN41", "CN31"))
+
+# Dates
+date <- tibble(date = seq(ymd("2025-05-19"), ymd("2025-05-30"), "1 day")) |>
+  mutate(day = wday(date, week_start = "Monday")) |>
+  filter(!(day %in% c(6, 7))) |>
+  select(-day)
+
+# Hours
+hour <- tibble(hour = seq(8, 17, 1))
+
+# Cross join
+site |>
+  cross_join(date) |>
+  arrange(date, site_id) |>
+  cross_join(hour) |>
+  write_csv("02 Output Data/camps_bay_sample_preparation.csv")
+```
+
+
