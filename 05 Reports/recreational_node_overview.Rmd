@@ -15,7 +15,7 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 
 ## Loading packages
 
-```{r load-packages}
+```{r load-packages, echo = FALSE}
 library(tidyverse)
 library(dbplyr)
 library(DBI)
@@ -23,7 +23,6 @@ library(pdftools)
 library(readxl)
 library(extrafont)
 library(sf)
-library(basemaps)
 library(patchwork)
 library(units)
 library(osmdata)
@@ -80,7 +79,7 @@ results <- tbl(con, I("coastal.results_view"))
 Select a site to work with and then access the Open Street Map spatial data using the OSM package.
 
 ```{r choose-site}
-site_code <- "XCN04"
+site_code <- "CN09"
 ```
 
 ```{r create-bounding-box}
@@ -147,7 +146,8 @@ river <- opq(site_bbox) |>
 (site_overview <- ggplot() +
   geom_sf(data = cct_coastline$osm_lines, colour = "white", linewidth = 0.4) +
   geom_sf(data = sites_sf, aes(colour = category, size = category)) +
-  geom_sf(data = sites_sf |> filter(site_id == site_code), colour = city_pink, size = 10, alpha = 0.7, shape = 1) +
+  geom_sf(data = sites_sf |> filter(site_id == site_code), colour = city_pink, size = 5, alpha = 0.6, shape = 16) +
+   geom_sf(data = bbox_htb |> st_as_sfc(), colour = "white", fill = NA) +
   
   # Plot styling
   theme(
@@ -180,17 +180,17 @@ river <- opq(site_bbox) |>
   geom_sf(data = beaches$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
   
   # Add beaches that are multipolygons
-  # geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
+  geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
   
   # Add rivers
   geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   
   # Add other water
-  geom_sf(data = water$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightblue", alpha = 0.7) +
-  # geom_sf(data = water$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightblue", alpha = 0.7) +
+  geom_sf(data = water$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightblue", alpha = 0.7, colour = NA) +
+  # geom_sf(data = water$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightblue", alpha = 0.7, colour = NA) +
   
   # Add the coastline
-  geom_sf(data = coastline$osm_lines |> st_transform("ESRI: 102562"), colour = "lightgrey") +
+  geom_sf(data = coastline$osm_lines |> st_transform("ESRI: 102562"), colour = "lightgrey", size = unit(1, "mm")) +
   geom_sf(data = coastline$osm_polygons |> st_transform("ESRI: 102562"), colour = NA, fill = "grey", alpha = 0.5) +
   
   # Add streets
@@ -208,23 +208,43 @@ river <- opq(site_bbox) |>
                                   "tertiary_link",
                                   "unclassified",
                                   "residential",
-                                  "service")), colour = "lightgrey") +
+                                  "service")),
+          aes(linewidth = highway),
+          colour = "lightgrey") +
+   
+   scale_linewidth_manual(values = c(
+    "motorway" = unit(0.5, "mm"),
+    "motorway_link" = unit(0.5, "mm"),
+    "trunk" = unit(0.5, "mm"),
+    "trunk_link" = unit(0.5, "mm"),
+    "primary" = unit(0.3, "mm"),
+    "primary_link" = unit(0.3, "mm"),
+    "secondary" = unit(0.2, "mm"),
+    "secondary_link" = unit(0.2, "mm"),
+    "tertiary" = unit(0.1, "mm"),
+    "tertiary_link" = unit(0.1, "mm"),
+    "unclassified" = unit(0.1, "mm"),
+    "residential" = unit(0.1, "mm"),
+    "service" = unit(0.1, "mm")
+  )) +
+   
   # Add the monitoring sites with labels
   geom_sf(data = sites_sf |> st_transform("ESRI: 102562"), aes(colour = category), size = 1) +
-  geom_sf_text(data = sites_sf, aes(label = site_description), hjust = 1, check_overlap = TRUE, nudge_x = -100, colour = "white", family = "Century Gothic", size = 1.5) +
+  geom_sf_text(data = sites_sf, aes(label = site_description), hjust = 1, check_overlap = TRUE, nudge_x = -100, colour = "white", family = "Century Gothic", size = unit(2.6, "mm")) +
   
   # Add buildings
   geom_sf(data = buildings$osm_polygons |>
             st_transform("ESRI: 102562"), fill = "lightgrey", colour = NA, alpha = 0.5) +
   
   # Add the current monitoring point
-  geom_sf(data = sites_sf |> filter(site_id == site_code) |> st_transform("ESRI: 102562"), colour = city_pink, size = 2) +
+  geom_sf(data = sites_sf |> filter(site_id == site_code) |> st_transform("ESRI: 102562"), colour = city_pink, size = 3, shape = 16) +
   
   scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "grey")) +
   coord_sf(xlim = c(bbox_htb[1], bbox_htb[3]), ylim = c(bbox_htb[2], bbox_htb[4])) +
   
   theme(
-    plot.background = element_blank(),
+    # plot.background = element_blank(),
+    plot.background = element_rect(fill = city_teal),
     panel.background = element_blank(),
     legend.position = "inside",
     legend.position.inside = c(unit(10, "mm"), unit(10, "mm")),
@@ -239,16 +259,45 @@ river <- opq(site_bbox) |>
 ## Percentage Exceedance
 
 ```{r perc-exceedance-plot}
-sites <- tbl(con, I("coastal.sites_view"))
-results <- tbl(con, I("coastal.results_view"))
-```
-
-```{r perc-exceedance-plot}
 # Join the tables
 exceedances <- sites |>
   inner_join(results, by = "site_id") |>
-  filter(site_id == site_code, between(sample_date, "2024-01-01", "2025-01-01"), monitoring_group %in% c("routine", "daily", "blue_flag")) |>
+  filter(site_id == site_code, between(sample_date, "2023-10-01", "2025-05-31"), monitoring_group %in% c("routine", "daily")) |>
   collect() |>
+  summarise(
+    all_samples = n(),
+    samples_exceed = sum(numeric_value > 240),
+    samples_exceed_pct = round(sum(numeric_value > 240) / n() * 100, 0)
+  ) |>
+  mutate(
+    label = str_c(samples_exceed, " out of ", all_samples, " samples taken\nexceeded the threshold\nvalue for Enterococci\nof 240 cfu per 100 mL", sep = "")
+    )
+
+# Winter and summer data
+seasonal_exceedances <- sites |>
+  inner_join(results, by = "site_id") |>
+  filter(site_id == site_code, between(sample_date, "2023-10-01", "2025-05-31"), monitoring_group %in% c("routine", "daily")) |>
+  collect() |>
+  mutate(season = if_else(month(sample_date) %in% c(10, 11, 12, 1, 2, 3), "Summer", "Winter")) |>
+group_by(season) |>
+  summarise(
+    all_samples = n(),
+    samples_exceed = sum(numeric_value > 240),
+    samples_exceed_pct = round(sum(numeric_value > 240) / n() * 100, 0)
+  ) |>
+  mutate(
+    label = str_c(samples_exceed, " out of ", all_samples, " samples taken\nexceeded the threshold\nvalue for Enterococci\nof 240 cfu per 100 mL", sep = "")
+    )
+```
+
+```{r seasonal-exceedances}
+# Winter and summer data
+seasonal_exceedances <- sites |>
+  inner_join(results, by = "site_id") |>
+  filter(site_id == site_code, between(sample_date, "2023-10-01", "2025-05-31"), monitoring_group %in% c("routine", "daily")) |>
+  collect() |>
+  mutate(season = if_else(month(sample_date) %in% c(10, 11, 12, 1, 2, 3), "Summer", "Winter")) |>
+group_by(season) |>
   summarise(
     all_samples = n(),
     samples_exceed = sum(numeric_value > 240),
@@ -272,11 +321,10 @@ exceed_text <- ggplot(data = exceedances) +
     legend.position = "none",
     plot.background = element_blank()
   )
-
 ```
 
 ```{r create-donut-plot, fig.width = 4, fig.height = 2, dpi = 600}
-# Create tibble
+# Create progress wheel for exceedances
 wheel <- exceedances |>
   ggplot(aes(x = "Site", y = samples_exceed_pct, fill = samples_exceed_pct)) +
   geom_col() + scale_fill_distiller(palette = "RdYlGn", direction = -1, limits = c(0, 50)) +
@@ -307,6 +355,44 @@ text <- exceedances |>
     panel.background = element_blank()
   )
 ```
+
+```{r create-seasonal-progress-wheel}
+wheel_seasonal <- seasonal_exceedances |>
+  ggplot(aes(x = "Site", y = samples_exceed_pct, fill = samples_exceed_pct)) +
+    geom_col() + scale_fill_distiller(palette = "RdYlGn", direction = -1, limits = c(0, 50)) +
+    coord_radial(theta = "y", start = 0, end = 2 * pi, inner.radius = 0.5, expand = FALSE) +
+  facet_grid(cols = vars(season), switch = "x") +
+    scale_y_continuous(limits = c(0, 100)) +
+    theme(
+      plot.background = element_blank(),
+      # plot.background = element_rect(fill = city_teal),
+      legend.position = "none",
+      axis.ticks = element_blank(),
+      axis.text = element_blank(),
+      axis.title = element_blank(),
+      panel.grid = element_blank(),
+      strip.background = element_blank(),
+      strip.text = element_text(family = "Century Gothic", colour = "white", vjust = 2)
+    )
+
+text_seasonal <- seasonal_exceedances |>
+  ggplot() + 
+  geom_text(aes(x = 0, y = 0, label = str_c(samples_exceed_pct, "%", sep = "")), colour = "white", size = unit(6, "mm"), family = "Century Gothic") +
+  facet_grid(cols = vars(season)) +
+  theme(
+    plot.background = element_blank(),
+    # plot.background = element_rect(fill = city_teal),
+    legend.position = "none",
+    axis.ticks = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    panel.background = element_blank(),
+    strip.background = element_blank(),
+    strip.text = element_blank()
+  )
+```
+
 
 ## Hazen Categories
 
@@ -387,7 +473,7 @@ winter <- sites |>
   ggplot() +
   geom_tile(aes(x = hazen_category, y = "Season", fill = hazen_category, alpha = alpha_value), height = 0.8, width = 0.9) +
   geom_text(aes(x = hazen_category, y = "Season", label = hazen_category), family = "Century Gothic", colour = "white", size = 3) +
-  scale_fill_manual(name = "Hazen Water Quality Category", values = c("Poor" = "#D73027", "Sufficient" = "#FEE08B", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
+  scale_fill_manual(name = "Hazen Water Quality Category", values = c("Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
   facet_grid(rows = vars(str_to_title(season)), switch = "y") +
   
 # Style components
@@ -404,6 +490,12 @@ winter <- sites |>
   ))
 ```
 
+```{r}
+RColorBrewer::display.brewer.all(5)
+RColorBrewer::brewer.pal(5, "YlOrRd")
+```
+
+
 ## Sample frequency plots
 
 ```{r sample-frequency-plot, fig.width = 8.3, fig.height = 2.5, dpi = 600}
@@ -414,46 +506,50 @@ dotplot_data <- sites |>
   collect() |>
   mutate(
     monitoring_group = str_to_title(monitoring_group),
-    year = year(sample_date))
+    year = year(sample_date),
+    month_day = format(sample_date, "2025-%m-%d") |> ymd())
+
+# Create a function that takes only the first letter of the text
+first_letter <- function(x){
+  return(str_sub(format(x, "%b"), 1, 1))
+}
 
 # Plot the data
-(dotplot <- ggplot(data = dotplot_data, aes(x = sample_date, fill = monitoring_group)) +
-  labs(
-    caption = "Each point represents one sample",
-    title = "Number of samples collected"
-  ) +
+(dotplot <- ggplot(data = dotplot_data, aes(x = month_day, fill = monitoring_group)) +
+    labs(title = "Samples Collected") +
   geom_dotplot(
     colour = NA,
     method = "histodot",
     stackgroups = TRUE,
     dotsize = 0.9,
-    binwidth = 4,
     stackratio = 1.1
   ) +
-  scale_fill_manual(values = c("Routine" = city_green, "Daily" = city_pink)) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b %Y") +
-  scale_y_continuous(breaks = NULL) +
+  scale_fill_manual(values = c("Routine" = city_green, "Daily" = city_blue)) +
+  scale_x_date(date_breaks = "1 month", labels = first_letter) +
+  scale_y_continuous(NULL, breaks = NULL) +
+    facet_wrap(~year, ncol = 3, scales = "free_y", switch = "x") +
   theme(
-    plot.title = element_text(colour = "white", hjust = 0.5, face = "bold", vjust = -3),
+    plot.title = element_text(colour = "white", hjust = 0.5, face = "bold", vjust = -5),
     plot.background = element_blank(),
-    #plot.background = element_rect(fill = city_teal),
-    legend.position = "bottom",
+    # plot.background = element_rect(fill = city_teal),
+    legend.position = "inside",
+    legend.position.inside = c(0.9, 0.9),
     legend.title = element_blank(),
     legend.background = element_blank(),
     legend.text = element_text(colour = "white"),
     text = element_text(family = "Century Gothic", size = 6),
     axis.title.y = element_blank(),
     axis.title.x = element_blank(),
-    axis.text = element_text(colour = "white"),
+    axis.text.x = element_text(colour = "white", vjust = 0.5),
+    axis.text.y = element_text(colour = "white"),
     axis.ticks = element_line(colour = "white"),
     panel.background = element_blank(),
     panel.grid = element_blank(),
-    plot.caption = element_text(colour = "white", size = 5)
+    plot.caption = element_text(colour = "white", size = 5),
+    strip.background = element_blank(),
+    strip.text = element_text(colour = "white"),
+    strip.placement = "outside"
   ))
-
-dotplot_data |>
-  arrange(sample_date) |>
-  filter(monitoring_group == "Daily")
 ```
 
 ## Results
@@ -465,15 +561,19 @@ dotplot_data |>
   filter(between(sample_date, "2023-10-01", "2025-05-31"), monitoring_group %in% c("routine", "daily")) |>
   collect() |>
   filter(site_id == site_code) |>
-  mutate(year = year(sample_date),
-         month = month(sample_date)) |>
-  ggplot(aes(x = sample_date, colour = monitoring_group)) +
-  labs(y = "Enterococci\n(cfu per 100 mL)") +
-  geom_segment(aes(xend = sample_date, y = 0, yend = numeric_value)) +
-  geom_point(aes(y = numeric_value)) +
+   mutate(
+     year = year(sample_date),
+     month_day = format(sample_date, "2025-%m-%d") |> ymd()
+   ) |>
+  ggplot(aes(x = month_day, colour = monitoring_group)) +
+  labs(y = "Enterococci (cfu per 100 mL)") +
+  # geom_segment(aes(xend = sample_date, y = 0, yend = numeric_value)) +
+  # geom_point(aes(y = numeric_value)) +
+  geom_line(aes(y = numeric_value), size = unit(0.7, "mm")) +
+  # geom_col(aes(y = numeric_value), colour = NA) +
   geom_hline(yintercept = 240, colour = "white", size = 0.5, linetype = 2) +
-  facet_wrap(~year, nrow = 1) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b\n%Y", limits = c(ymd("2023-01-01"), ymd("2025-12-31"))) +
+  facet_wrap(~year, nrow = 3) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b", limits = c(ymd("2025-01-01"), ymd("2025-12-31"))) +
   
   # Scales
   scale_colour_manual(values = c("routine" = city_green, "daily" = city_blue)) +
@@ -481,18 +581,22 @@ dotplot_data |>
   # Theme
   theme(
     plot.title = element_text(colour = "white", hjust = 0, face = "bold"),
-    plot.background = element_rect(fill = city_teal),
+    plot.background = element_blank(),
     legend.position = "none",
-    legend.title = element_blank(),
-    legend.background = element_blank(),
-    legend.text = element_text(colour = "white"),
+    # legend.title = element_blank(),
+    # legend.background = element_blank(),
+    # legend.text = element_text(colour = "white"),
     text = element_text(family = "Century Gothic"),
     axis.title.y = element_text(colour = "white"),
     axis.title.x = element_blank(),
-    axis.text = element_text(colour = "white"),
+    axis.text.x = element_text(colour = "white", angle = 90),
+    axis.text.y = element_text(colour = "white"),
     axis.ticks = element_line(colour = "white"),
     panel.background = element_blank(),
-    panel.grid = element_blank()
+    panel.grid = element_blank(),
+    strip.background = element_blank(),
+    strip.text = element_text(colour = "white", size = unit(9, "mm"), face = "bold"),
+    panel.border = element_rect(colour = "white", fill = NA)
   ))
 ```
 
@@ -544,27 +648,44 @@ base <- ggplot() +
     )
 ```
 
-```{r assemble-plot, fig.width = 8.27, fig.height = 8.775, dpi = 600}
-base +
+```{r add-annotations}
+# Add comment about reporting period
+reporting_period <- ggplot() +
+  annotate(geom = "text", x = 0, y = 0, label = "Data only shown for reporting period (October 2023 to May 2025)", family = "Century Gothic", colour = "white") +
+  theme(
+    plot.background = element_blank(),
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+# 
+```
+
+
+```{r prepare-page-sizes}
+inch <- 25.4
+three_quarter_height <- 11.69 * 0.75
+
+11.75 * 0.75 * 25.4
+```
+
+```{r assemble-plot, fig.width = 8.27, fig.height = 8.7675, dpi = 600}
+(infographic <- base +
   inset_element(site_overview, left = 0, bottom = 0, right = 1.5, top = 1, align_to = "full") +
   inset_element(coast, left = 0, bottom = 0, right = 0.1, top = 0.5, align_to = "full") +
   inset_element(site_name, left = 0, bottom = 0.5, right = 0.1, top = 1, align_to = "full") +
-  inset_element(dotplot, left = 0.1, bottom = 0, right = 0.55, top = 0.2, align_to = "full") +
-  inset_element(site_map, left = 0.6, bottom = 0.7, right = 1, top = 1, align_to = "full") +
+  inset_element(dotplot, left = unit(25, "mm"), bottom = unit(0, "mm"), right = unit(110, "mm"), top = unit(45, "mm"), align_to = "full") +
+  inset_element(site_map, left = unit(125, "mm"), bottom = unit(150, "mm"), right = unit(213, "mm"), top = unit(215, "mm"), align_to = "full") +
   inset_element(results_plot, left = unit(23, "mm"), bottom = unit(47, "mm"), right = unit(105, "mm"), top = unit(173, "mm"), align_to = "full") +
   inset_element(hazen_categories, left = 0.1, bottom = 0.8, right = 0.65, top = 1, align_to = "full") +
-  inset_element(wheel, left = unit(120, "mm"), bottom = unit(105, "mm"), right = unit(210, "mm"), top = unit(155, "mm")) +
-  inset_element(text, left = unit(120, "mm"), bottom = unit(105, "mm"), right = unit(210, "mm"), top = unit(155, "mm")) +
-  inset_element(exceed_text, left = unit(120, "mm"), bottom = unit(60, "mm"), right = unit(210, "mm"), top = unit(130, "mm"))
+  inset_element(wheel, left = unit(120, "mm"), bottom = unit(105, "mm"), right = unit(210, "mm"), top = unit(150, "mm")) +
+  inset_element(text, left = unit(120, "mm"), bottom = unit(105, "mm"), right = unit(210, "mm"), top = unit(150, "mm")) +
+  inset_element(exceed_text, left = unit(116, "mm"), bottom = unit(10, "mm"), right = unit(206, "mm"), top = unit(80, "mm")) +
+  inset_element(wheel_seasonal, left = unit(130, "mm"), bottom = unit(65, "mm"), right = unit(200, "mm"), top = unit(120, "mm")) +
+  inset_element(text_seasonal, left = unit(130, "mm"), bottom = unit(67, "mm"), right = unit(200, "mm"), top = unit(122, "mm")))
 
-ggsave("camps_bay_south.jpg", plot = infographic, path = "02 Output Data/", width = 210, height = 297, units = "mm", dpi = 600)
-
-sites_overview
-site_map
-site_name
-coast
-results_plot
-samples_plot
-hazen_plot
-exceedance_plot
+ggsave("milnerton_lighthouse.jpg", plot = infographic, path = "../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/08_Reports/Know Your Coast/Draft Recreational Node Overviews/", width = 210, height = 223.8375, units = "mm", dpi = 600)
 ```
