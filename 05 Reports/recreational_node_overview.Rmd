@@ -6,11 +6,14 @@ output:
   bookdown::word_document2:
     reference_docx: recreational_node_overview_style_template.docx
 ---
+# Workspace Set Up
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, include = FALSE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
+
+## Loading packages
 
 ```{r load-packages}
 library(tidyverse)
@@ -27,6 +30,8 @@ library(osmdata)
 library(ggrepel)
 ```
 
+## Database Connection
+
 ```{r db-connection}
 # Connect to the Postgres database
 # Enter credentials when prompted
@@ -39,6 +44,8 @@ con <- dbConnect(RPostgres::Postgres(),
 )
 ```
 
+## Load the City colours
+
 ```{r prepare-city-colours}
 city_blue <- "#0098c5"
 city_green <- "#bacf00"
@@ -50,6 +57,12 @@ city_brown <- "#47292e"
 city_tan <- "#98871f"
 ```
 
+# Data Import
+
+## Coastal Water Quality Data
+
+Read in the site data from our database of coastal water quality sites.
+
 ```{r read-in-site-data}
 sites_sf <- st_read(con, query = "SELECT * FROM coastal.sites", as_tibble = TRUE) |>
   st_cast("POINT") |>
@@ -57,39 +70,17 @@ sites_sf <- st_read(con, query = "SELECT * FROM coastal.sites", as_tibble = TRUE
   arrange(site_description)
 ```
 
-```{r}
-# Read in coastline of Cape Town
-cct <- st_read("../../Infinity/Infinity GIS - Server/base_data/sa/WC/cape_town/CPT Metropolitan/metropolitan municipality cpt.shp", as_tibble = TRUE) |>
-  st_set_crs("EPSG: 4326")
+```{r read-in-results-data}
+sites <- tbl(con, I("coastal.sites_view"))
+results <- tbl(con, I("coastal.results_view"))
 ```
 
-```{r city-overview, fig.cap = "Map of coastal water quality monitoring sites in Cape Town", fig.width = 6.4, fig.height = 9.8, dpi = 600}
-# Plot city of Cape Town with sites
-cct_sites <- cct |>
-  ggplot() +
-  geom_sf(colour = NA, fill = "lightgrey") +
-  geom_sf(data = sites_sf, aes(colour = category, size = category)) +
-  theme(
-    legend.position = "bottom",
-    legend.background = element_blank(),
-    axis.ticks = element_blank(),
-    axis.text = element_blank(),
-    plot.background = element_blank(),
-    panel.background = element_blank(),
-    text = element_text(family = "Century Gothic"),
-    legend.title = element_blank(),
-    plot.title = element_text(hjust = 0.5),
-    plot.subtitle = element_text(hjust = 0.5),
-    panel.grid = element_blank()
-  ) +
-  scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "darkgrey")) +
-  scale_size_manual(values = c("Recreational Node" = 1, "Coastal Monitoring Point" = 0.5))
-```
+## Open Street Map data
 
-## Access Open Street Map data
+Select a site to work with and then access the Open Street Map spatial data using the OSM package.
 
 ```{r choose-site}
-site_code <- "XCS34"
+site_code <- "XCN04"
 ```
 
 ```{r create-bounding-box}
@@ -147,6 +138,10 @@ river <- opq(site_bbox) |>
    osmdata_sf()
 ```
 
+# Data Visualisation
+
+## Coastline Overview
+
 ```{r coastline-overview, fig.width = 3.5, fig.height = 3.5, dpi = 600}
 # Plot overview of entire coastline
 (site_overview <- ggplot() +
@@ -174,6 +169,8 @@ river <- opq(site_bbox) |>
     scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "darkgrey")) +
     scale_size_manual(values = c("Recreational Node" = 1, "Coastal Monitoring Point" = 0.5)))
 ```
+
+## Site Map
 
 ```{r plot-map, fig.width = 3.5, fig.height = 3.5, dpi = 600}
 # Plot all data for a specific site
@@ -229,7 +226,8 @@ river <- opq(site_bbox) |>
   theme(
     plot.background = element_blank(),
     panel.background = element_blank(),
-    legend.position = "none",
+    legend.position = "inside",
+    legend.position.inside = c(unit(10, "mm"), unit(10, "mm")),
     panel.grid = element_blank(),
     axis.title = element_blank(),
     axis.ticks = element_blank(),
@@ -238,7 +236,7 @@ river <- opq(site_bbox) |>
   ))
 ```
 
-# Create a figure that shows percentage of samples that have exceeded the threshold
+## Percentage Exceedance
 
 ```{r perc-exceedance-plot}
 sites <- tbl(con, I("coastal.sites_view"))
@@ -264,7 +262,7 @@ exceedances <- sites |>
 ```{r exceedances-figure, fig.width = 6, fig.height = 3, dpi = 600}
 # Create a figure for the percentage exceedances
 exceed_text <- ggplot(data = exceedances) +
-  geom_text(aes(x = 0, y = 0, label = label), family = "Century Gothic", size = 3, colour = "white", lineheight = 1) +
+  geom_text(aes(x = 0, y = 0, label = label), family = "Century Gothic", size = 4, colour = "white", lineheight = 1) +
   theme(
     axis.text = element_blank(),
     axis.ticks = element_blank(),
@@ -310,7 +308,7 @@ text <- exceedances |>
   )
 ```
 
-# Hazen Categories
+## Hazen Categories
 
 ```{r hazen-categories, fig.width = 4, fig.height = 2.5, dpi = 600}
 # Get the Hazen categories for all data
@@ -406,7 +404,7 @@ winter <- sites |>
   ))
 ```
 
-# Sample frequency plots
+## Sample frequency plots
 
 ```{r sample-frequency-plot, fig.width = 8.3, fig.height = 2.5, dpi = 600}
 # Create a dot plot to show the information more simply
@@ -458,6 +456,8 @@ dotplot_data |>
   filter(monitoring_group == "Daily")
 ```
 
+## Results
+
 ```{r results-plot}
 # Plot the actual results for the period
 (results_plot <- sites |>
@@ -496,6 +496,8 @@ dotplot_data |>
   ))
 ```
 
+## Titles
+
 ```{r title-figure}
 coast <- sites |>
   filter(site_id == site_code) |>
@@ -532,6 +534,8 @@ site_name <- sites |>
   )
 ```
 
+## Final Figure
+
 ```{r base-plot}
 base <- ggplot() +
   theme(
@@ -547,11 +551,11 @@ base +
   inset_element(site_name, left = 0, bottom = 0.5, right = 0.1, top = 1, align_to = "full") +
   inset_element(dotplot, left = 0.1, bottom = 0, right = 0.55, top = 0.2, align_to = "full") +
   inset_element(site_map, left = 0.6, bottom = 0.7, right = 1, top = 1, align_to = "full") +
-  inset_element(results_plot, left = 0.15, bottom = 0.40, right = 0.95, top = 0.70, align_to = "full") +
+  inset_element(results_plot, left = unit(23, "mm"), bottom = unit(47, "mm"), right = unit(105, "mm"), top = unit(173, "mm"), align_to = "full") +
   inset_element(hazen_categories, left = 0.1, bottom = 0.8, right = 0.65, top = 1, align_to = "full") +
-  inset_element(wheel, left = unit(15, "mm"), bottom = unit(40, "mm"), right = unit(60, "mm"), top = unit(80, "mm")) +
-  inset_element(text, left = unit(15, "mm"), bottom = unit(40, "mm"), right = unit(60, "mm"), top = unit(80, "mm")) +
-  inset_element(exceed_text, left = unit(50, "mm"), bottom = unit(40, "mm"), right = unit(105, "mm"), top = unit(80, "mm"))
+  inset_element(wheel, left = unit(120, "mm"), bottom = unit(105, "mm"), right = unit(210, "mm"), top = unit(155, "mm")) +
+  inset_element(text, left = unit(120, "mm"), bottom = unit(105, "mm"), right = unit(210, "mm"), top = unit(155, "mm")) +
+  inset_element(exceed_text, left = unit(120, "mm"), bottom = unit(60, "mm"), right = unit(210, "mm"), top = unit(130, "mm"))
 
 ggsave("camps_bay_south.jpg", plot = infographic, path = "02 Output Data/", width = 210, height = 297, units = "mm", dpi = 600)
 
