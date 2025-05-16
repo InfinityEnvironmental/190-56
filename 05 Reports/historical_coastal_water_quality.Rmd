@@ -209,6 +209,135 @@ for (site in unique_sites) {
 }
 ```
 
+# Seasonal trends in water quality across every year
+```{r Seasonality-across-every-yr, fig.height = 12}
+
+#Filter site CN11
+selected_site <- "CN11"
+results_hazen_monthly2 <- results_sorted %>%
+  filter(site_id == selected_site)
+
+#Calculate Hazen Categories based on monthly data
+results_hazen_monthly2_1 <- results_hazen_monthly2 %>%
+  mutate(year = year(sample_date),
+         month = month(sample_date, label = TRUE)) %>%
+  group_by(site_id, year, month) %>%
+  summarise(
+    min_date = min(sample_date, na.rm = TRUE),
+    max_date = max(sample_date, na.rm = TRUE),
+    n_samples = sum(!is.na(numeric_value)),
+    hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
+    hazen90 = quantile(numeric_value, 0.90, type = 5, na.rm = TRUE),
+    hazen_category = case_when(
+      n_samples < 10 ~ "Not enough samples",
+      hazen95 <= 10 ~ "Excellent",
+      hazen95 <= 20 ~ "Good",
+      hazen95 > 20 & hazen90 > 18 ~ "Poor",
+      hazen95 > 20 & hazen90 < 18 ~ "Sufficient",
+      TRUE ~ NA_character_
+    ),
+    .groups = 'drop'
+  )
+
+#Merge with original data
+violin_data_monthly2 <- results_hazen_monthly2 %>%
+  mutate(year = year(sample_date),
+    month = month(sample_date, label = TRUE)) %>%
+  left_join(results_hazen_monthly2_1, by = c("site_id", "year", "month"))
+
+# Get the unique years in your data for the selected site
+unique_years <- unique(violin_data_monthly2$year)
+num_years <- length(unique_years)
+
+if (num_years > 0) {
+  # Split the years into two roughly equal groups
+  mid_point <- ceiling(num_years / 2)
+  years_group1 <- sort(unique_years)[1:mid_point+1]
+  years_group2 <- sort(unique_years)[(mid_point + 2):num_years]
+
+  # --- Plot 1: First group of years ---
+  plot_group1 <- violin_data_monthly2 %>%
+    filter(year %in% years_group1) %>%
+    ggplot(aes(x = month, y = numeric_value, fill = hazen_category)) +
+    geom_violin(trim = TRUE, width = 0.8) +
+    geom_point(aes(group = month),
+               position = position_jitter(width = 0.2),
+               alpha = 0.6,
+               size = 0.8) +
+    scale_y_log10() +
+    facet_wrap(~ year, ncol = 3, strip.position = "right") + 
+    labs(
+      title = paste("Monthly Seasonality of Enterococci - Site:", selected_site, "(Years", min(years_group1), "-", max(years_group1), ")"),
+      x = "Month",
+      y = "Enterococci (log10 scale)",
+      fill = "Hazen Category") +
+    theme_minimal() +
+    theme(
+    axis.line = element_line(colour = "black"),
+    axis.ticks.y = element_line(colour = "black"),
+    axis.ticks.length.y = unit(-0.15, "cm"),
+    axis.text.y = element_text(colour = "black", size = 10, margin = margin(r = 3)),
+    axis.title.y = element_text(colour = "black", size = 12, margin = margin(r = 5)),
+    axis.line.x = element_line(colour = "black"),
+    axis.ticks.x = element_line(colour = "black"),
+    axis.ticks.length.x = unit(-0.15, "cm"),
+    axis.text.x = element_text(colour = "black", size = 10, angle = 45, hjust = 1),
+    axis.title.x = element_text(colour = "black", size = 12, margin = margin(t = 5)),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.5),
+    strip.text.y.right = element_text(colour = "black", size = 10, angle = 0, vjust = 0.8, hjust = -0.2, margin = margin(l = 0)),
+    strip.background = element_rect(colour = NA, fill = NA),
+    plot.title = element_text(colour = "black", size = 14),
+    plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")
+    )
+  print(plot_group1)
+
+  # --- Plot 2: Second group of years (if there are more than one year) ---
+  if (length(years_group2) > 0) {
+    plot_group2 <- violin_data_monthly2 %>%
+      filter(year %in% years_group2) %>%
+      ggplot(aes(x = month, y = numeric_value, fill = hazen_category)) +
+      geom_violin(trim = TRUE, width = 0.8) +
+      geom_point(aes(group = month),
+                 position = position_jitter(width = 0.2),
+                 alpha = 0.6,
+                 size = 0.8) +
+      scale_y_log10() +
+      facet_wrap(~ year, ncol = 3, strip.position = "right") +
+      labs(
+        title = paste("Monthly Seasonality of Enterococci - Site:", selected_site, "(Years", min(years_group2), "-", max(years_group2), ")"),
+        x = "Month",
+        y = "Enterococci (log10 scale)",
+        fill = "Hazen Category"
+      ) +
+      theme_minimal() +
+      theme(
+    axis.line = element_line(colour = "black"),
+    axis.ticks.y = element_line(colour = "black"),
+    axis.ticks.length.y = unit(-0.15, "cm"),
+    axis.text.y = element_text(colour = "black", size = 10, margin = margin(r = 5)),
+    axis.title.y = element_text(colour = "black", size = 12, margin = margin(r = 10)),
+    axis.line.x = element_line(colour = "black"),
+    axis.ticks.x = element_line(colour = "black"),
+    axis.ticks.length.x = unit(-0.15, "cm"),
+    axis.text.x = element_text(colour = "black", size = 10, angle = 45, hjust = 1),
+    axis.title.x = element_text(colour = "black", size = 12, margin = margin(t = 10)),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.5),
+    strip.text.y.right = element_text(colour = "black", size = 10, angle = 0, vjust = 0.8, hjust = -0.2, margin = margin(l = 0)),
+    strip.background = element_rect(colour = NA, fill = NA),
+    plot.title = element_text(colour = "black", size = 14)
+      )
+    print(plot_group2)
+  }
+} else {
+  print("No data available for the selected site.")
+}
+
+```
+
 
 # Time-series trends in water quality data
 
