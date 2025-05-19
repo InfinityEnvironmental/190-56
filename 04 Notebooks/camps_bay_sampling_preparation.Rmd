@@ -59,11 +59,32 @@ date <- tibble(date = seq(ymd("2025-05-19"), ymd("2025-05-30"), "1 day")) |>
 hour <- tibble(hour = seq(8, 17, 1))
 
 # Cross join
-site |>
+labels <- site |>
   cross_join(date) |>
-  arrange(date, site_id) |>
   cross_join(hour) |>
-  write_csv("02 Output Data/camps_bay_sample_preparation.csv")
+  arrange(site_id, date, hour) |>
+  mutate(seq = rep(c(1, 2, 3, 4), 100)) |>
+  mutate(triplicate = case_when(
+    site_id == "CN10" ~ seq == 4,
+    site_id == "CN11" ~ seq == 1,
+    site_id == "CN31" ~ seq == 3,
+    site_id == "CN41" ~ seq == 2
+  )) |>
+  cross_join(tibble(replicate = c("A", "B", "C", "FIELD BLANK"))) |>
+  filter(triplicate | (!triplicate & replicate == "A")) |>
+
+  mutate(label_date = format(date, "%a %d %b"),
+         label_hour = str_c(hour, ": ____"),
+         label_site = str_c(site_id),
+         label_replicate = replicate)
+  
+  # Write csv
+  write_csv(labels, "../../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/09_Sample Preparation/bottle_labels.csv")
+  
+# Prepare data for mail merge
+  labels |>
+    select(label_date, label_site, label_replicate, label_hour, hour, date) |>
+    mutate(label_hour = str_remove_all(label_hour, "_")) |>
+    pivot_wider(id_cols = c(label_date, label_site, hour, date), names_from = label_replicate, values_from = label_hour) |>
+    write_csv("../../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/09_Sample Preparation/Camps Bay High-Frequency Sampling/mail_merge.csv")
 ```
-
-
