@@ -76,6 +76,11 @@ results <- tbl(con, I("coastal.results_view"))
 
 ## Open Street Map data
 
+```{r create-bounding-box}
+# Create bounding box for City of Cape Town area
+cct_sites_bbox <- st_bbox(obj = c(xmin = 18.25, xmax = 18.9, ymin = -34.40, ymax = -33.5))
+```
+
 ```{r coastline-data}
 # Access entire coastline
 cct_coastline <- opq(cct_sites_bbox) |>
@@ -91,12 +96,7 @@ sites |>
 ```
 
 ```{r choose-site}
-site_code <- "CN22"
-```
-
-```{r create-bounding-box}
-# Create bounding box for City of Cape Town area
-cct_sites_bbox <- st_bbox(obj = c(xmin = 18.25, xmax = 18.9, ymin = -34.40, ymax = -33.5))
+site_code <- "XCN14"
 ```
 
 ```{r create-bounding-box-for-site}
@@ -188,7 +188,7 @@ site_overview <- ggplot() +
   # geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
   
   # Add rivers
-  # geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
+  geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   
   # Add other water
   geom_sf(data = water$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightblue", alpha = 0.7, colour = NA) +
@@ -235,7 +235,7 @@ site_overview <- ggplot() +
    
   # Add the monitoring sites with labels
   geom_sf(data = sites_sf |> st_transform("ESRI: 102562"), aes(colour = category), size = 1) +
-  geom_sf_text(data = sites_sf, aes(label = str_wrap(site_description, 20)), hjust = 1, check_overlap = TRUE, nudge_x = -100, colour = "white", family = "Century Gothic", size = unit(1.5, "mm")) +
+  geom_sf_text(data = sites_sf, aes(label = str_wrap(site_description, 25)), hjust = 1, nudge_x = -100, check_overlap = TRUE, colour = "white", family = "Century Gothic", size = unit(1.5, "mm")) +
   
   # Add buildings
   geom_sf(data = buildings$osm_polygons |>
@@ -332,7 +332,7 @@ exceed_text <- ggplot(data = exceedances) +
 # Create progress wheel for exceedances
 wheel <- exceedances |>
   ggplot(aes(x = "Site", y = samples_exceed_pct, fill = samples_exceed_pct)) +
-  geom_col() + scale_fill_distiller(palette = "RdYlGn", direction = -1, limits = c(0, 50)) +
+  geom_col() + scale_fill_gradientn(colours = c("#66BD63", "#FEE08B", "#FDAE61", "#F46D43", "#D73027", "#A50026"), limits = c(0, 100), breaks = c(0, 10, 20, 50, 75, 100)) +
   coord_radial(theta = "y", start = 0, end = 2 * pi, inner.radius = 0.5, expand = FALSE) +
   facet_grid(cols = vars("All"), switch = "x") +
   scale_y_continuous(limits = c(0, 100)) +
@@ -365,9 +365,13 @@ text <- exceedances |>
 ```
 
 ```{r create-seasonal-progress-wheel}
+# Get colours from Rcolobrewer
+RColorBrewer::display.brewer.all(select = "RdYlGn")
+RColorBrewer::brewer.pal(n = 11, name = "RdYlGn")
+
 wheel_seasonal <- seasonal_exceedances |>
   ggplot(aes(x = "Site", y = samples_exceed_pct, fill = samples_exceed_pct)) +
-    geom_col() + scale_fill_distiller(palette = "RdYlGn", direction = -1, limits = c(0, 50)) +
+    geom_col() + scale_fill_gradientn(colours = c("#66BD63", "#FEE08B", "#FDAE61", "#F46D43", "#D73027", "#A50026"), limits = c(0, 100), breaks = c(0, 10, 20, 50, 75, 100)) +
     coord_radial(theta = "y", start = 0, end = 2 * pi, inner.radius = 0.5, expand = FALSE) +
   facet_grid(cols = vars(season), switch = "x") +
     scale_y_continuous(limits = c(0, 100)) +
@@ -400,7 +404,6 @@ text_seasonal <- seasonal_exceedances |>
     strip.text = element_blank()
   )
 ```
-
 
 ## Hazen Categories
 
