@@ -83,7 +83,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_90(15.05.2025).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_91(19.05.2025).pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 # Extract the pdf data
@@ -206,7 +206,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml, sample_temp_c, filename
 FROM coastal.results
-WHERE sample_date = '2025-05-15';
+WHERE sample_date = '2025-05-19';
 ```
 
 ```{sql, connection = con}
@@ -289,7 +289,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.85.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.86.pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/")
 
 # Extract the pdf data
@@ -408,7 +408,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml, monitoring_group
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2025-05-16';
+WHERE monitoring_group = 'daily' AND sample_date = '2025-05-19';
 ```
 
 ```{sql, connection = con}
@@ -575,6 +575,192 @@ SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
 WHERE monitoring_group = 'daily' AND sample_date = '2025-05-16';
+```
+
+```{sql, connection = con}
+ROLLBACK;
+```
+
+```{sql, connection = con}
+COMMIT;
+```
+
+# Upload high-frequency Camps Bay sampling to database
+
+## Daily Samples Atlantic
+
+### Check which pdf files have not yet been imported
+
+```{r not-yet-imported}
+# List of files in folder
+files_list <- list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/", pattern = "*.pdf")
+
+extract_sample_date <- function(filename){
+  sample_date <- pdf_text(paste("../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/", filename, sep = "")) |>
+    str_split("\\n") |>
+    unlist() |>
+    keep(~str_detect(.x, "Sample taken")) |>
+    str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+    pluck(1) |>
+    dmy()
+  
+  tibble(filename = filename, sample_date = sample_date)
+}
+
+# Map the function across the list of files in the directory
+files <- map_df(files_list, ~extract_sample_date(.x))
+
+# Retrieve a list of sample dates from the results table in database
+database <- tbl(con, I("coastal.high_frequency_samples")) |>
+  distinct(filename) |>
+  collect() |>
+  arrange(desc(filename))
+
+# Check which files are not yet in database
+files |>
+  left_join(database, by = c("filename" = "filename"), keep = TRUE) |>
+  filter(is.na(filename.y))
+```
+
+### Extract data from pdf
+
+```{r extract-pdf}
+# Select the pdf that you want to import
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/Infinity Environmental AD.131(CN).pdf"
+filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/")
+
+# Extract the pdf data
+pdf_data <- pdf_text(path) |>
+  str_split("\n")
+
+# Extract the sample date
+sample_date <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Sample taken")) |>
+  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+  pluck(1) |>
+  dmy()
+
+# Extract the analysis date
+analysis_completed <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Analysis completed")) |>
+  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+  pluck(1) |>
+  dmy()
+
+# Extract the sample temperature
+sample_temp_c <- pdf_data |>
+  unlist() |> 
+  keep(~str_detect(.x, "Sample temperature:")) |>
+  str_extract("(?<=(Sample temperature:\\s))\\d{1,2}\\.\\d") |>
+  pluck(1) |>
+  as.numeric()
+
+# Extract tabular data
+extract_table <- function(page){
+  page |>
+    unlist() |> 
+    head_while(~!str_detect(.x, "colony forming units")) |>
+    tail_while(~!str_detect(.x, "Sample Description")) |>
+    discard(~.x == "") |>
+    unlist()
+}
+
+# Extract table from all pages of pdf
+table <- map(pdf_data, ~extract_table(.x)) |>
+  unlist()
+
+# First column of results
+column1 <- table |>
+  str_sub(1,63) |>
+  str_trim()
+
+# Extract sample text
+column2 <- table |>
+  str_sub(63) |>
+  str_trim()
+
+# Combine columns
+table <- c(column1, column2) |>
+  discard(~.x == "")
+
+# All text
+text <- table |>
+  str_extract(".*(?=\\s\\()")
+
+# Extract site ID
+site_id_column <- text |>
+  str_extract("[:upper:]{2}\\d{2}")
+
+# Extract sample tag
+tag <- text |>
+  str_extract("(?<=([:upper:]{2}\\d{2}\\s)).*") |>
+  str_replace("Field Blank", "Blank")
+
+# Extract time
+time <- table |>
+  str_extract("(?<=\\().*(?=\\))") |>
+  str_replace("h", ":")
+
+# Extract result
+result <- table |>
+  str_extract("(?<=(\\s{5})).*$") |>
+  str_trim() |>
+  str_replace("None found", "ND")
+
+# Combine all the data
+tbl <- tibble(
+  site_id = site_id_column,
+  tag = tag,
+  date = sample_date,
+  time = time,
+  analysis_completed = analysis_completed,
+  sample_temp_c = sample_temp_c,
+  enterococci_cfu_per_100ml = result,
+  filename = filename
+) |>
+  arrange(time)
+
+# Check data
+tbl
+
+# Copy to database
+copy_to(con, tbl, name = "coastal", overwrite = TRUE)
+```
+
+### Upload to database
+
+```{sql, connection = con}
+BEGIN;
+```
+
+```{sql connection = con}
+SELECT * FROM coastal;
+```
+
+```{sql, connection = con}
+WITH cte AS 
+(SELECT
+  site_id,
+  tag,
+  date,
+  time::time,
+  analysis_completed,
+  sample_temp_c,
+  enterococci_cfu_per_100ml,
+  filename,
+  'WLAB'::coastal.lab AS lab_code
+FROM coastal)
+INSERT INTO coastal.high_frequency_samples (site_id, tag, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code)
+SELECT * FROM cte;
+```
+
+```{sql, connection = con}
+SELECT
+  site_id, tag, sample_date, sample_time, enterococci_cfu_per_100ml, sample_temp_c, filename
+FROM coastal.high_frequency_samples
+WHERE sample_date = '2025-05-19';
 ```
 
 ```{sql, connection = con}
