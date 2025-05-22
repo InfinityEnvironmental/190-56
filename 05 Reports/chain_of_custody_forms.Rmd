@@ -1,0 +1,29 @@
+---
+title: "Chain of Custody Forms"
+author: "Francois van Schalkwyk"
+date: "2025-05-19"
+output: pdf_document
+params:
+  filtered_data: NULL
+---
+
+```{r load-packages}
+library(tidyverse)
+library(kableExtra)
+```
+
+```{r setup, include = FALSE}
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+```{r read-in-schedule}
+schedule <- read_csv("../../Infinity/Infinity Projects - 190-56 Coastal WQ/01_Admin/Weekly Printing/Schedules CSV/may_2025.csv")
+```
+
+```{r table, results = "Asis"}
+params$filtered_data |>
+  select(date, samplers, site_id, site_description, week, day) |>
+  kable("latex", booktabs = TRUE)
+  
+```
+
