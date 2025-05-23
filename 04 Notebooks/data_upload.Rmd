@@ -585,9 +585,7 @@ ROLLBACK;
 COMMIT;
 ```
 
-# Upload high-frequency Camps Bay sampling to database
-
-## Daily Samples Atlantic
+## Upload high-frequency Camps Bay sampling to database
 
 ### Check which pdf files have not yet been imported
 
@@ -626,7 +624,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/Infinity Environmental AD.131(CN).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/Infinity Environmental AD.133(CN).pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/")
 
 # Extract the pdf data
@@ -760,7 +758,8 @@ SELECT * FROM cte;
 SELECT
   site_id, tag, sample_date, sample_time, enterococci_cfu_per_100ml, sample_temp_c, filename
 FROM coastal.high_frequency_samples
-WHERE sample_date = '2025-05-19';
+WHERE sample_date = '2025-05-20'
+ORDER BY sample_date, sample_time;
 ```
 
 ```{sql, connection = con}
