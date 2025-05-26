@@ -117,14 +117,21 @@ violin_data <- results_sorted %>%
   mutate(year = year(sample_date)) %>%
   left_join(results_hazen, by = c("site_id", "year"))
 
-# Get unique site IDs
+# Get unique site IDs (optional, for reference)
 unique_sites <- unique(violin_data$site_id)
+print(paste("Available Site IDs:", paste(unique_sites, collapse = ", ")))
 
-for (site in unique_sites) {
-  site_violin_data <- violin_data %>%
-    filter(site_id == site)
+# Prompt the user for a site ID
+selected_site <- readline(prompt = "Enter the Site ID for the plot: ")
 
-plot <- ggplot(site_violin_data, aes(x = factor(year), y = numeric_value, fill = hazen_category_enterococci))+
+# Filter data for the selected site
+site_violin_data <- violin_data %>%
+  filter(site_id == selected_site)
+
+# Check if the selected site exists in the data
+if (nrow(site_violin_data) > 0) {
+  # Create the violin plot for the selected site
+  plot <- ggplot(site_violin_data, aes(x = factor(year), y = numeric_value, fill = hazen_category_enterococci)) +
     geom_violin(trim = TRUE) +
     geom_point(aes(group = factor(year)), # Group points within each violin
                position = position_jitter(width = 0.2),
@@ -132,12 +139,12 @@ plot <- ggplot(site_violin_data, aes(x = factor(year), y = numeric_value, fill =
                size = 1) +
     scale_y_log10() +
     labs(
-      title = paste("Enterococci Distribution by Year - Site:", site),
+      title = paste("Enterococci Distribution by Year - Site:", selected_site),
       x = "Year",
       y = "Enterococci (log10 scale)",
       fill = "Hazen Category"
     ) +
-    theme_minimal() + 
+    theme_minimal() +
     theme(axis.line = element_line(colour = "black"),
           axis.ticks = element_line(colour = "black"),
           axis.ticks.length = unit(-0.15, "cm"),
@@ -145,8 +152,12 @@ plot <- ggplot(site_violin_data, aes(x = factor(year), y = numeric_value, fill =
           panel.grid.minor = element_blank(),
           axis.text.x = element_text(angle = 45, hjust = 1))
 
+  # Print the plot for the selected site
   print(plot)
+} else {
+  cat(paste("Error: Site ID '", selected_site, "' not found in the data.\n"))
 }
+
 ```
 
 # Seasonal trends in water quality across years
@@ -178,13 +189,21 @@ violin_data_monthly <- results_sorted %>%
   mutate(month = month(sample_date, label = TRUE)) %>%
   left_join(results_hazen_monthly, by = c("site_id", "month"))
 
+# Get unique site IDs (optional, for reference)
 unique_sites <- unique(violin_data_monthly$site_id)
+print(paste("Available Site IDs:", paste(unique_sites, collapse = ", ")))
 
-for (site in unique_sites) {
-  site_violin_data_monthly <- violin_data_monthly %>%
-    filter(site_id == site)
+# Prompt the user for a site ID
+selected_site <- readline(prompt = "Enter the Site ID for the plot: ")
 
-  plot <- ggplot(site_violin_data_monthly, aes(x = month, y = numeric_value, fill = hazen_category)) +
+# Filter data for the selected site
+site_violin_data <- violin_data_monthly %>%
+  filter(site_id == selected_site)
+
+# Check if the selected site exists in the data
+if (nrow(site_violin_data) > 0) {
+  # Create the violin plot for the selected site
+ plot <- ggplot(site_violin_data, aes(x = month, y = numeric_value, fill = hazen_category)) +
     geom_violin(trim = TRUE) +
     geom_point(aes(group = month), # Group points within each violin
                position = position_jitter(width = 0.2),
@@ -192,7 +211,7 @@ for (site in unique_sites) {
                size = 1) +
     scale_y_log10() + 
     labs(
-      title = paste("Monthly Climatology of Enterococci distribution - Site:", site),
+      title = paste("Monthly Climatology of Enterococci distribution - Site:", selected_site),
       x = "Month",
       y = "Enterococci (log10 scale)",
       fill = "Hazen Category"
@@ -205,7 +224,10 @@ for (site in unique_sites) {
           panel.grid.minor = element_blank(),
           axis.text.x = element_text(angle = 45, hjust = 1))
 
+ # Print the plot for the selected site
   print(plot)
+} else {
+  cat(paste("Error: Site ID '", selected_site, "' not found in the data.\n"))
 }
 ```
 
