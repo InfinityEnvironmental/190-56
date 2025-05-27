@@ -96,7 +96,7 @@ sites |>
 ```
 
 ```{r choose-site}
-site_code <- "HB13"
+site_code <- "XCN11"
 ```
 
 ```{r create-bounding-box-for-site}
@@ -185,11 +185,11 @@ site_overview <- ggplot() +
   
   # Add beaches
   geom_sf(data = beaches$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
-  geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
+  # geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
   
   # Add rivers
   geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
-  # geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
+  geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   geom_sf(data = river$osm_polygons |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   
   # Add other water
@@ -237,15 +237,17 @@ site_overview <- ggplot() +
    
   # Add the monitoring sites with labels
   geom_sf(data = sites_sf |> st_transform("ESRI: 102562"), aes(colour = category), size = 1) +
-  geom_label(data = sites_sf, aes(label = site_description, geometry = geom), stat = "sf_coordinates",
+  geom_label_repel(data = sites_sf, aes(label = site_description, geometry = geom), stat = "sf_coordinates",
             colour = "white",
             size = unit(2, "mm"),
+            nudge_x = -200,
             family = "Century Gothic",
             hjust = 1,
-            nudge_x = -100,
-            check_overlap = TRUE,
             fill = city_teal,
-            label.size = NA
+            label.size = NA,
+            force_pull = 50,
+            xlim = c(bbox_htb[1] - 5000, bbox_htb[3] + 5000),
+            ylim = c(bbox_htb[2] - 5000, bbox_htb[4] + 5000)
             ) +
   
   # Add buildings
