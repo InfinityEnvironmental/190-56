@@ -96,7 +96,7 @@ sites |>
 ```
 
 ```{r choose-site}
-site_code <- "XCN14"
+site_code <- "HB13"
 ```
 
 ```{r create-bounding-box-for-site}
@@ -174,7 +174,7 @@ site_overview <- ggplot() +
       panel.grid = element_blank()
     ) +
     scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "darkgrey")) +
-    scale_size_manual(values = c("Recreational Node" = 1, "Coastal Monitoring Point" = 0.5))
+    scale_size_manual(values = c("Recreational Node" = 2, "Coastal Monitoring Point" = 1))
 ```
 
 ## Site Map
@@ -185,10 +185,12 @@ site_overview <- ggplot() +
   
   # Add beaches
   geom_sf(data = beaches$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
-  # geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
+  geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
   
   # Add rivers
   geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
+  # geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
+  geom_sf(data = river$osm_polygons |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   
   # Add other water
   geom_sf(data = water$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightblue", alpha = 0.7, colour = NA) +
@@ -235,7 +237,16 @@ site_overview <- ggplot() +
    
   # Add the monitoring sites with labels
   geom_sf(data = sites_sf |> st_transform("ESRI: 102562"), aes(colour = category), size = 1) +
-  geom_sf_text(data = sites_sf, aes(label = str_wrap(site_description, 25)), hjust = 1, nudge_x = -100, check_overlap = TRUE, colour = "white", family = "Century Gothic", size = unit(1.5, "mm")) +
+  geom_label(data = sites_sf, aes(label = site_description, geometry = geom), stat = "sf_coordinates",
+            colour = "white",
+            size = unit(2, "mm"),
+            family = "Century Gothic",
+            hjust = 1,
+            nudge_x = -100,
+            check_overlap = TRUE,
+            fill = city_teal,
+            label.size = NA
+            ) +
   
   # Add buildings
   geom_sf(data = buildings$osm_polygons |>
@@ -334,7 +345,7 @@ wheel <- exceedances |>
   ggplot(aes(x = "Site", y = samples_exceed_pct, fill = samples_exceed_pct)) +
   geom_col() + scale_fill_gradientn(colours = c("#66BD63", "#FEE08B", "#FDAE61", "#F46D43", "#D73027", "#A50026"), limits = c(0, 100), breaks = c(0, 10, 20, 50, 75, 100)) +
   coord_radial(theta = "y", start = 0, end = 2 * pi, inner.radius = 0.5, expand = FALSE) +
-  facet_grid(cols = vars("All"), switch = "x") +
+  facet_grid(cols = vars("All Seasons")) +
   scale_y_continuous(limits = c(0, 100)) +
   theme(
     plot.background = element_blank(),
@@ -351,7 +362,7 @@ wheel <- exceedances |>
 # Create the text
 text <- exceedances |>
   ggplot() + 
-  geom_text(aes(x = 0, y = 0, label = str_c(samples_exceed_pct, "%", sep = "")), colour = "white", size = 7, family = "Century Gothic") +
+  geom_text(aes(x = 0, y = 0, label = str_c(samples_exceed_pct, "%", sep = "")), colour = "white", size = 6, family = "Century Gothic") +
   theme(
     plot.background = element_blank(),
     # plot.background = element_rect(fill = city_teal),
@@ -384,12 +395,13 @@ wheel_seasonal <- seasonal_exceedances |>
       axis.title = element_blank(),
       panel.grid = element_blank(),
       strip.background = element_blank(),
-      strip.text = element_text(family = "Century Gothic", colour = "white", vjust = 2)
+      strip.text = element_text(family = "Century Gothic", colour = "white", vjust = 2),
+      strip.placement = "inside"
     )
 
 text_seasonal <- seasonal_exceedances |>
   ggplot() + 
-  geom_text(aes(x = 0, y = 0, label = str_c(samples_exceed_pct, "%", sep = "")), colour = "white", size = unit(6, "mm"), family = "Century Gothic") +
+  geom_text(aes(x = 0, y = 0, label = str_c(samples_exceed_pct, "%", sep = "")), colour = "white", size = unit(4.6, "mm"), family = "Century Gothic") +
   facet_grid(cols = vars(season)) +
   theme(
     plot.background = element_blank(),
@@ -578,7 +590,7 @@ results_plot <- sites |>
      month_day = format(sample_date, "2025-%m-%d") |> ymd()
    ) |>
   ggplot(aes(x = month_day, colour = monitoring_group)) +
-  labs(y = "Enterococci (cfu per 100 mL)") +
+  labs(y = "Enterococci (cfu per 100 mL)", caption = "Dashed line shows safe threshold for recreational water use") +
   # geom_segment(aes(xend = sample_date, y = 0, yend = numeric_value)) +
   # geom_point(aes(y = numeric_value)) +
   geom_line(aes(y = numeric_value), linewidth = unit(0.7, "mm")) +
@@ -593,6 +605,8 @@ results_plot <- sites |>
   # Theme
   theme(
     plot.title = element_text(colour = "white", hjust = 0, face = "bold"),
+    plot.caption = element_text(colour = "white", hjust = 0, size = unit(6, "mm")),
+    # plot.background = element_rect(fill = city_teal),
     plot.background = element_blank(),
     legend.position = "none",
     # legend.title = element_blank(),
@@ -637,7 +651,7 @@ site_name <- sites |>
   filter(site_id == site_code) |>
   mutate(coast_label = str_c(coastline, " Coast", sep = "")) |>
   ggplot() +
-  geom_text(aes(x = 0, y = 1, label = str_wrap(site_description, 25)), angle = 90, size.unit = "mm", size = unit(9, "mm"), family = "Century Gothic", colour = "white", lineheight = 0.7) +
+  geom_text(aes(x = 0, y = 1, label = site_description), angle = 90, size.unit = "mm", size = unit(8, "mm"), family = "Century Gothic", colour = "white", lineheight = 0.7) +
   
   # Styles
   theme(
@@ -697,18 +711,18 @@ three_quarter_height <- 11.69 * 0.75
 ```{r assemble-plot, fig.width = 8.27, fig.height = 8.7675, dpi = 600}
 (infographic <- base +
   inset_element(site_overview, left = 0, bottom = 0, right = 1.5, top = 1, align_to = "full") +
-  inset_element(coast, left = unit(0, "mm"), bottom = unit(3, "mm"), right = unit(23, "mm"), top = unit(70, "mm"), align_to = "full") +
-  inset_element(site_name, left = unit(0, "mm"), bottom = unit(70, "mm"), right = unit(23, "mm"), top = unit(217, "mm"), align_to = "full") +
+  inset_element(coast, left = unit(0, "mm"), bottom = unit(3, "mm"), right = unit(17, "mm"), top = unit(70, "mm"), align_to = "full") +
+  inset_element(site_name, left = unit(0, "mm"), bottom = unit(70, "mm"), right = unit(17, "mm"), top = unit(217, "mm"), align_to = "full") +
   inset_element(dotplot, left = unit(25, "mm"), bottom = unit(0, "mm"), right = unit(130, "mm"), top = unit(45, "mm"), align_to = "full") +
   inset_element(site_map, left = unit(125, "mm"), bottom = unit(150, "mm"), right = unit(213, "mm"), top = unit(215, "mm"), align_to = "full") +
   inset_element(results_plot, left = unit(23, "mm"), bottom = unit(47, "mm"), right = unit(105, "mm"), top = unit(173, "mm"), align_to = "full") +
   inset_element(hazen_categories, left = 0.1, bottom = 0.8, right = 0.65, top = 1, align_to = "full") +
-  inset_element(wheel, left = unit(120, "mm"), bottom = unit(105, "mm"), right = unit(210, "mm"), top = unit(150, "mm")) +
-  inset_element(text, left = unit(120, "mm"), bottom = unit(105, "mm"), right = unit(210, "mm"), top = unit(155, "mm")) +
-  inset_element(exceed_text, left = unit(118, "mm"), bottom = unit(10, "mm"), right = unit(208, "mm"), top = unit(60, "mm")) +
-  inset_element(wheel_seasonal, left = unit(130, "mm"), bottom = unit(65, "mm"), right = unit(200, "mm"), top = unit(120, "mm")) +
-  inset_element(text_seasonal, left = unit(130, "mm"), bottom = unit(67, "mm"), right = unit(200, "mm"), top = unit(122, "mm")) +
-  inset_element(sample_threshold_title, left = unit(125, "mm"), bottom = unit(45, "mm"), right = unit(195, "mm"), top = unit(62, "mm")) +
+  inset_element(wheel, left = unit(120, "mm"), bottom = unit(100-5, "mm"), right = unit(210+2, "mm"), top = unit(140-5, "mm")) +
+  inset_element(text, left = unit(120, "mm"), bottom = unit(100-5-5-3, "mm"), right = unit(210+2, "mm"), top = unit(145-5-3, "mm")) +
+  inset_element(exceed_text, left = unit(118, "mm"), bottom = unit(10 + 10, "mm"), right = unit(208, "mm"), top = unit(60 + 10, "mm")) +
+  inset_element(wheel_seasonal, left = unit(125-1-10+1, "mm"), bottom = unit(70+2, "mm"), right = unit(205+1+10+1, "mm"), top = unit(110-5+5-5+2, "mm")) +
+  inset_element(text_seasonal, left = unit(132+1+4, "mm"), bottom = unit(77+1-3+2, "mm"), right = unit(198+1-4, "mm"), top = unit(107+1-3+2, "mm")) +
+  inset_element(sample_threshold_title, left = unit(125+5+2, "mm"), bottom = unit(45+50+20+10+5+2, "mm"), right = unit(195+5+2, "mm"), top = unit(62+50+20+10+5+2, "mm")) +
   inset_element(reporting_period, left = unit(130, "mm"), bottom = unit(0, "mm"), right = unit(210, "mm"), top = unit(8, "mm"), align_to = "full"))
 ```
 
