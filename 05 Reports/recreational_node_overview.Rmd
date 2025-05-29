@@ -96,7 +96,7 @@ sites |>
 ```
 
 ```{r choose-site}
-site_code <- "XCS09"
+site_code <- "CN39"
 ```
 
 ```{r create-bounding-box-for-site}
@@ -242,17 +242,19 @@ site_overview <- ggplot() +
   # Add the monitoring sites with labels
   geom_sf(data = sites_sf |> st_transform("ESRI: 102562"), aes(colour = category), size = 1) +
   geom_label_repel(data = sites_sf |> filter(category == "Recreational Node"), aes(label = site_description, geometry = geom), stat = "sf_coordinates",
+  # geom_label_repel(data = sites_sf |> filter(category == "Recreational Node"), aes(label = str_wrap(site_description, 16), geometry = geom), stat = "sf_coordinates",
             colour = "white",
             size = unit(2, "mm"),
-            nudge_x = -200,
+            nudge_x = 100,
             family = "Century Gothic",
-            # point.padding = 10,
+            label.padding = 0.20,
+            # point.padding = 5,
             # hjust = 1,
-            force = 5,
+            force = 0.5,
             fill = city_teal,
             label.size = NA,
-            min.segment.length = 0.1,
-            # force_pull = 20,
+            # min.segment.length = 2,
+            # force_pull = 120,
             xlim = c(bbox_htb[1] - 5000, bbox_htb[3] + 5000),
             ylim = c(bbox_htb[2] - 5000, bbox_htb[4] + 5000)
             ) +
