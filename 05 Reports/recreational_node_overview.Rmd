@@ -96,7 +96,11 @@ sites |>
 ```
 
 ```{r choose-site}
+<<<<<<< HEAD
 site_code <- "CN39"
+=======
+site_code <- "CN12A"
+>>>>>>> 627c54cc7c361b7dd1d9869eaa39fb66c1d883cd
 ```
 
 ```{r create-bounding-box-for-site}
@@ -109,7 +113,7 @@ site_bbox <- sites_sf |>
 bbox_htb <- sites_sf |>
   filter(site_id == site_code) |>
   st_transform(crs = "ESRI: 102562") |>
-  st_bbox() + c(-1500, -1500, 1500, 1500)
+  st_bbox() + c(-750, -750, 750, 750)
 ```
 
 ```{r}
@@ -189,7 +193,7 @@ site_overview <- ggplot() +
   
   # Add rivers
   geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
-  # geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
+  geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   geom_sf(data = river$osm_polygons |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   
   # Add other water
