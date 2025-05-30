@@ -96,7 +96,7 @@ sites |>
 ```
 
 ```{r choose-site}
-site_code <- "CN39"
+site_code <- "CN20I"
 ```
 
 ```{r create-bounding-box-for-site}
@@ -109,7 +109,7 @@ site_bbox <- sites_sf |>
 bbox_htb <- sites_sf |>
   filter(site_id == site_code) |>
   st_transform(crs = "ESRI: 102562") |>
-  st_bbox() + c(-750, -750, 750, 750)
+  st_bbox() + c(-300, -300, 300, 300)
 ```
 
 ```{r}
@@ -185,7 +185,7 @@ site_overview <- ggplot() +
   
   # Add beaches
   geom_sf(data = beaches$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
-  # geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
+  geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
   
   # Add rivers
   geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
@@ -245,12 +245,12 @@ site_overview <- ggplot() +
   # geom_label_repel(data = sites_sf |> filter(category == "Recreational Node"), aes(label = str_wrap(site_description, 16), geometry = geom), stat = "sf_coordinates",
             colour = "white",
             size = unit(2, "mm"),
-            nudge_x = 100,
+            # nudge_x = 150,
             family = "Century Gothic",
             label.padding = 0.20,
             # point.padding = 5,
             # hjust = 1,
-            force = 0.5,
+            # force = 0.5,
             fill = city_teal,
             label.size = NA,
             # min.segment.length = 2,
@@ -697,7 +697,6 @@ reporting_period <- ggplot() +
   )
 
 # Add title for percentage exceedances
-
 sample_threshold_title <- ggplot() +
   annotate(geom = "text", x = 0, y = 0, label = "Samples that exceed threshold\nfor safe water use", family = "Century Gothic", colour = "white", size = unit(4, "mm"), fontface = "bold") +
   theme(
@@ -708,13 +707,6 @@ sample_threshold_title <- ggplot() +
     axis.ticks = element_blank(),
     axis.title = element_blank()
   )
-```
-
-```{r prepare-page-sizes}
-inch <- 25.4
-three_quarter_height <- 11.69 * 0.75
-
-11.75 * 0.75 * 25.4
 ```
 
 ```{r assemble-plot, fig.width = 8.27, fig.height = 8.7675, dpi = 600}
