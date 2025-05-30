@@ -1,0 +1,79 @@
+---
+title: "Camps Bay High-frequency Sampling"
+author: "Francois van Schalkwyk"
+date: "2025-03-19"
+output: html_document
+---
+
+# Workspace Set-Up
+
+Make sure that you are working in the outfalls project, found in the working directory.
+
+## Set working directory for all code chunks to project root directory
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## Load required packages
+
+```{r message = FALSE}
+library(tidyverse)
+library(dbplyr)
+library(DBI)
+library(pdftools)
+library(readxl)
+library(sf)
+```
+
+## Database Connection
+
+```{r db connection}
+# Enter credentials when prompted
+con <- dbConnect(RPostgres::Postgres(),
+  host = "aws-0-eu-central-1.pooler.supabase.com",
+  port = 5432,
+  user = str_c(rstudioapi::askForPassword(prompt = "Username: "), "wnrvdvesovnkmqbhkhjz", sep = "."),
+  password = rstudioapi::askForPassword(),
+  dbname = "postgres"
+)
+```
+
+```{r}
+dbGetInfo(con)
+```
+
+# Read data for Camps Bay High-frequency Sampling
+
+```{r read-results}
+results <- tbl(con, I("coastal.high_frequency_samples")) |>
+  inner_join(
+    tbl(con, I("coastal.sites")), by = "site_id"
+  ) |>
+  select(site_description, geom, site_id, tag, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code) |>
+  collect()
+```
+
+```{r create-sf}
+# Create sf object from results table
+results_sf <- results |>
+  mutate(geom = st_as_sfc(geom, EWKB = TRUE)) |>
+  st_as_sf()
+```
+
+```{r plot-results-by-site}
+results_sf |>
+  rename(censored_value = enterococci_cfu_per_100ml) |>
+  mutate(numeric_value = if_else(censored_value == 'ND', 0, as.numeric(censored_value)), .after = censored_value) |>
+  mutate(timestamp = str_c(sample_date, sample_time, sep = " ") |> ymd_hms(), .after = sample_time) |>
+  ggplot(aes(x = timestamp, y = numeric_value, colour = site_description)) +
+  geom_line() +
+  facet_wrap(facets = vars(site_description)) +
+  theme(
+    legend.position = "bottom"
+  )
+```
+
+
+
