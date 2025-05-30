@@ -83,7 +83,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_97(26.05.2025).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_98(27.05.2025).pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 # Extract the pdf data
@@ -207,7 +207,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml, sample_temp_c, filename
 FROM coastal.results
-WHERE sample_date = '2025-05-26' AND monitoring_group = 'routine';
+WHERE sample_date = '2025-05-27' AND monitoring_group = 'routine';
 ```
 
 ```{sql, connection = con}
@@ -625,7 +625,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/Infinity Environmental AD.135(CN).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/Infinity Environmental AD.142(CN).pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/")
 
 # Extract the pdf data
@@ -693,11 +693,12 @@ text <- table |>
 
 # Extract site ID
 site_id_column <- text |>
-  str_extract("[:upper:]{2}\\d{2}")
+  str_extract("[:upper:]{2}\\s?\\d{2}") |>
+  str_remove("\\s")
 
 # Extract sample tag
 tag <- text |>
-  str_extract("(?<=([:upper:]{2}\\d{2}\\s)).*") |>
+  str_extract("(?<=([:upper:]{2}\\s?\\d{2}\\s)).*") |>
   str_replace("Field Blank", "Blank")
 
 # Extract time
@@ -724,6 +725,119 @@ tbl <- tibble(
   filename = filename
 ) |>
   arrange(time)
+
+# Check data
+tbl
+
+# Copy to database
+copy_to(con, tbl, name = "coastal", overwrite = TRUE)
+```
+
+### Alternative for sample sheets with multiple dates
+
+```{r extract-pdf}
+# Select the pdf that you want to import
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/Infinity Environmental AD.144(CN).pdf"
+filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/")
+
+# Extract the pdf data
+pdf_data <- pdf_text(path) |>
+  str_split("\n")
+
+# Select single page
+page <- pdf_data |>
+  pluck(1)
+
+read_page <- function(page){
+  
+  # Extract the sample date
+  sample_date <- page |>
+    keep(~str_detect(.x, "Sample taken")) |>
+    str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+    pluck(1) |>
+    dmy()
+  
+  # Extract the analysis date
+  analysis_completed <- page |>
+    keep(~str_detect(.x, "Analysis completed")) |>
+    str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+    pluck(1) |>
+    dmy()
+  
+  # Extract the sample temperature
+  sample_temp_c <- page |>
+    keep(~str_detect(.x, "Sample temperature:")) |>
+    str_extract("(?<=(Sample temperature:\\s))\\d{1,2}\\.\\d") |>
+    pluck(1) |>
+    as.numeric()
+  
+  # Extract tabular data
+  table <- page |>
+      head_while(~!str_detect(.x, "colony forming units")) |>
+      tail_while(~!str_detect(.x, "Sample Description")) |>
+      discard(~.x == "")
+  
+  # First column of results
+  column1 <- table |>
+    str_sub(1,63) |>
+    str_trim()
+  
+  # Extract sample text
+  column2 <- table |>
+    str_sub(63) |>
+    str_trim()
+  
+  # Combine columns
+  combined <- c(column1, column2) |>
+    discard(~.x == "")
+  
+  # All text
+  text <- combined |>
+    # str_extract(".*(?=\\s\\()")
+    str_extract(".*(?=\\d{2}h\\d{2})") |>
+    str_remove_all("\\(") |>
+    str_trim()
+  
+  # Extract site ID
+  site_id_column <- text |>
+    str_extract("[:upper:]{2}\\s?\\d{2}") |>
+    str_remove("\\s")
+  
+  # Extract sample tag
+  tag <- text |>
+    str_extract("(?<=([:upper:]{2}\\s?\\d{2}\\s)).*") |>
+    str_replace("Field Blank", "Blank")
+  
+  # Extract time
+  time <- combined |>
+    # str_extract("(?<=\\().*(?=\\))") |>
+    str_extract("\\d{2}h\\d{2}") |>
+    str_replace("h", ":")
+  
+    # Extract result
+  result <- combined |>
+    str_extract("(?<=(\\s{5})).*$") |>
+    str_trim() |>
+    str_replace("None found", "ND")
+  
+  # Combine all the data
+  tbl <- tibble(
+    site_id = site_id_column,
+    tag = tag,
+    date = sample_date,
+    time = time,
+    analysis_completed = analysis_completed,
+    sample_temp_c = sample_temp_c,
+    enterococci_cfu_per_100ml = result,
+    filename = filename
+  ) |>
+    arrange(time)
+  
+  return(tbl)
+}
+
+# Map all pages
+tbl <- map_df(pdf_data, read_page)
 
 # Check data
 tbl
@@ -763,7 +877,7 @@ SELECT * FROM cte;
 SELECT
   site_id, tag, sample_date, sample_time, enterococci_cfu_per_100ml, sample_temp_c, filename
 FROM coastal.high_frequency_samples
-WHERE sample_date = '2025-05-21'
+WHERE sample_date = '2025-05-27'
 ORDER BY sample_date, sample_time;
 ```
 
