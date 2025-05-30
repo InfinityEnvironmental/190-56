@@ -586,7 +586,7 @@ ROLLBACK;
 COMMIT;
 ```
 
-## Upload high-frequency Camps Bay sampling to database
+## High-frequency Camps Bay sampling to database
 
 ### Check which pdf files have not yet been imported
 
@@ -625,7 +625,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/Infinity Environmental AD.141(CN).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/Infinity Environmental AD.135(CN).pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/")
 
 # Extract the pdf data
@@ -686,7 +686,10 @@ table <- c(column1, column2) |>
 
 # All text
 text <- table |>
-  str_extract(".*(?=\\s\\()")
+  # str_extract(".*(?=\\s\\()")
+  str_extract(".*(?=\\d{2}h\\d{2})") |>
+  str_remove_all("\\(") |>
+  str_trim()
 
 # Extract site ID
 site_id_column <- text |>
@@ -699,7 +702,8 @@ tag <- text |>
 
 # Extract time
 time <- table |>
-  str_extract("(?<=\\().*(?=\\))") |>
+  # str_extract("(?<=\\().*(?=\\))") |>
+  str_extract("\\d{2}h\\d{2}") |>
   str_replace("h", ":")
 
 # Extract result
@@ -759,7 +763,7 @@ SELECT * FROM cte;
 SELECT
   site_id, tag, sample_date, sample_time, enterococci_cfu_per_100ml, sample_temp_c, filename
 FROM coastal.high_frequency_samples
-WHERE sample_date = '2025-05-26'
+WHERE sample_date = '2025-05-21'
 ORDER BY sample_date, sample_time;
 ```
 
