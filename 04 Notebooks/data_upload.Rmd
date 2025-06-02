@@ -625,7 +625,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/Infinity Environmental AD.145(CN).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/Infinity Environmental AD.151(CN).pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/02 Data/")
 
 # Extract the pdf data
