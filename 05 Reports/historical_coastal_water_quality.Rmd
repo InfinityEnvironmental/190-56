@@ -8,12 +8,18 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 
-```{r import-packages, message = FALSE}
+```{r load-packages, echo = FALSE, message = FALSE}
 library(tidyverse)
 library(dbplyr)
 library(DBI)
 library(pdftools)
 library(readxl)
+library(extrafont)
+library(sf)
+library(patchwork)
+library(units)
+library(osmdata)
+library(ggrepel)
 ```
 
 ```{r database-connection}
@@ -45,7 +51,6 @@ results <- tbl(con, I("coastal.results_view")) |> collect()
 # Sort results
 results_sorted <- results %>%
   arrange(sample_date)
-view(results_sorted)
 
 # Check frequency of sampling
 results_frequency <- results %>%
@@ -83,6 +88,89 @@ results_frequency <- results %>%
 
 - How have the categories for each site changed over time?
 - Maps of water quality with sites coloured by category
+
+```{r}
+# Annual summary of Hazen categories
+hazen_annual <- results |>
+  filter(site_id == "CN11") |>
+  group_by(
+    year = year(sample_date)
+  ) |>
+  summarise(
+    min_date = min(sample_date),
+    max_date = max(sample_date),
+    n = sum(!is.na(numeric_value)),
+    hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
+    hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
+  hazen_category_annual = case_when(
+      n < 10 ~ "TFD",
+      hazen95 <= 100 ~ "Excellent",
+      hazen95 <= 200 ~ "Good",
+      hazen95 > 200 & hazen90 > 185 ~ "Poor",
+      hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+  ) |> fct(levels = c("TFD", "Poor", "Sufficient", "Good", "Excellent")))
+
+# Add data for 5-year periods
+hazen_period <- results |>
+  filter(site_id == "CN11") |>
+  group_by(year = year(sample_date)) |>
+  
+  # Add 5 year period data
+  mutate(
+    period = case_when(
+      year %in% seq(2005, 2009, 1) ~ "2005-2009",
+      year %in% seq(2010, 2014, 1) ~ "2010-2014",
+      year %in% seq(2015, 2019, 1) ~ "2015-2019",
+      year %in% seq(2020, 2024, 1) ~ "2020-2024",
+      year == 2025 ~ "2025"
+    ) |> fct_inorder()
+  ) |>
+  ungroup(year) |>
+  group_by(period) |>
+  summarise(
+    min_date = min(sample_date),
+    max_date = max(sample_date),
+    n = sum(!is.na(numeric_value)),
+    hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
+    hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
+  hazen_category_annual = case_when(
+      n < 10 ~ "TFD",
+      hazen95 <= 100 ~ "Excellent",
+      hazen95 <= 200 ~ "Good",
+      hazen95 > 200 & hazen90 > 185 ~ "Poor",
+      hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+  ) |> fct(levels = c("TFD", "Poor", "Sufficient", "Good", "Excellent")))
+
+# Hazen categories for all samples
+hazen_period <- results |>
+  filter(site_id == "CN11") |>
+  summarise(
+    min_date = min(sample_date),
+    max_date = max(sample_date),
+    n = sum(!is.na(numeric_value)),
+    hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
+    hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
+  hazen_category_annual = case_when(
+      n < 10 ~ "TFD",
+      hazen95 <= 100 ~ "Excellent",
+      hazen95 <= 200 ~ "Good",
+      hazen95 > 200 & hazen90 > 185 ~ "Poor",
+      hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+  ) |> fct(levels = c("TFD", "Poor", "Sufficient", "Good", "Excellent")))
+
+# Combine the Hazen categories for all
+hazen_annual
+  
+
+# Plot the Hazen data for each year
+hazen_data |>
+  ggplot(aes(x = year, y = "Hazen Category", fill = hazen_category_annual)) +
+  geom_tile(width = 0.95) +
+  scale_fill_brewer(type = "div", palette = 8)
+
+RColorBrewer::display.brewer.all(type = "div")
+```
+
 
 # Percentage exceedances over time
 
