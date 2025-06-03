@@ -20,6 +20,7 @@ library(patchwork)
 library(units)
 library(osmdata)
 library(ggrepel)
+library(basemaps)
 ```
 
 ```{r database-connection}
@@ -808,3 +809,75 @@ for (site in unique_sites6) {
 - River mouths
 - Natural features (algal blooms)
 - Marine outfalls
+
+# In-depth analysis by site
+
+## Hout Bay
+
+```{r read-inland-water-quality-data}
+inland_data <- read_sf("01 Input Data/Inland_Water_Quality_Results_(Raw).shp")
+inland_sites <- read_sf("01 Input Data/Routine_Inland_Water_Quality_Monitoring.shp")
+```
+
+```{r clean-data}
+# Inland water quality data
+inland_data_clean <- inland_data |>
+  filter(SMPL_PNT == "DR05", PRMT_CODE == "Escherichia coli (CFU)") |>
+  arrange(SMPL_DATE) |>
+  select(SMPL_PNT, SMPL_DATE, PRMT_VL, PRMT_ORGN_, geometry) |>
+  mutate(censored_value = str_c(PRMT_ORGN_, PRMT_VL) |> str_remove("=")) |>
+  mutate(numeric_value = case_when(
+    censored_value |> str_detect("<") ~ str_remove(censored_value, "<") |> as.numeric() / 3,
+    censored_value |> str_detect(">") ~ str_remove(censored_value, ">") |> as.numeric() * 3,
+    .default = as.numeric(censored_value)
+  )) |>
+  rename(
+    site_id = SMPL_PNT,
+    sample_date = SMPL_DATE
+    ) |>
+  select(site_id, sample_date, censored_value, numeric_value, geometry)
+
+# Hout Bay coastal data
+coastal_clean <- tbl(con, I("coastal.results_view")) |>
+  filter(site_id == "XCN10") |>
+  select(site_id, sample_date, numeric_value) |>
+  collect()
+```
+
+```{r compare-plots, fig.width = 3, fig.height = 3}
+# Disa River results
+(disa_river_data <- inland_data_clean |>
+  ggplot(aes(x = sample_date, y = numeric_value)) +
+  labs(
+    title = "Disa River",
+    y = expression(paste(italic("E. coli"), " (CFU per 100 mL)")),
+    x = "Sample Date"
+    ) +
+  geom_col(fill = city_red) +
+  scale_y_log10(labels = scales::label_log()) +
+  coord_cartesian(xlim = c(ymd("2017-01-01"), ymd("2025-01-01"))) +
+  theme(
+    text = element_text(family = "Century Gothic"),
+    plot.title = element_text(hjust = 0.5),
+    plot.background = element_blank(),
+    panel.background = element_blank(),
+    axis.title.x = element_blank()
+  ))
+
+ggsave(path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/", filename = "disa_river_plot.jpg", plot = disa_river_data, width = 4, height = 3, dpi = 600)
+```
+
+```{r}
+# Read in Silvermine river data
+inland_data
+```
+
+```{r silvermine-river-data}
+inland_data |>
+  distinct(SMPL_PNT)
+
+inland_sites |>
+  distinct(LCTN_DSCR) |>
+  
+```
+
