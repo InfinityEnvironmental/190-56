@@ -89,10 +89,25 @@ results_frequency <- results %>%
 - How have the categories for each site changed over time?
 - Maps of water quality with sites coloured by category
 
-```{r}
+```{r calculate-fig-sizes}
+width = (210 - (2 * 12.7)) / 25.4
+height = 20 / 25.4
+```
+
+```{r select-sites}
+tbl(con, I("coastal.sites")) |>
+  filter(str_detect(site_description |> str_to_lower(), "melkbos"))
+```
+
+
+```{r select-site}
+current_site_id <- "XCN07"
+```
+
+```{r hazen-over-time, fig.width = 7.267717, fig.height = 1.2, dpi = 600}
 # Annual summary of Hazen categories
-hazen_annual <- results |>
-  filter(site_id == "CN11") |>
+hazen_data <- results |>
+  filter(site_id == current_site_id, monitoring_group %in% c("daily", "routine")) |>
   group_by(
     year = year(sample_date)
   ) |>
@@ -102,75 +117,74 @@ hazen_annual <- results |>
     n = sum(!is.na(numeric_value)),
     hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
     hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
-  hazen_category_annual = case_when(
+  hazen_category = case_when(
       n < 10 ~ "TFD",
       hazen95 <= 100 ~ "Excellent",
       hazen95 <= 200 ~ "Good",
       hazen95 > 200 & hazen90 > 185 ~ "Poor",
       hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
   ) |> fct(levels = c("TFD", "Poor", "Sufficient", "Good", "Excellent")))
-
-# Add data for 5-year periods
-hazen_period <- results |>
-  filter(site_id == "CN11") |>
-  group_by(year = year(sample_date)) |>
-  
-  # Add 5 year period data
-  mutate(
-    period = case_when(
-      year %in% seq(2005, 2009, 1) ~ "2005-2009",
-      year %in% seq(2010, 2014, 1) ~ "2010-2014",
-      year %in% seq(2015, 2019, 1) ~ "2015-2019",
-      year %in% seq(2020, 2024, 1) ~ "2020-2024",
-      year == 2025 ~ "2025"
-    ) |> fct_inorder()
-  ) |>
-  ungroup(year) |>
-  group_by(period) |>
-  summarise(
-    min_date = min(sample_date),
-    max_date = max(sample_date),
-    n = sum(!is.na(numeric_value)),
-    hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
-    hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
-  hazen_category_annual = case_when(
-      n < 10 ~ "TFD",
-      hazen95 <= 100 ~ "Excellent",
-      hazen95 <= 200 ~ "Good",
-      hazen95 > 200 & hazen90 > 185 ~ "Poor",
-      hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
-  ) |> fct(levels = c("TFD", "Poor", "Sufficient", "Good", "Excellent")))
-
-# Hazen categories for all samples
-hazen_period <- results |>
-  filter(site_id == "CN11") |>
-  summarise(
-    min_date = min(sample_date),
-    max_date = max(sample_date),
-    n = sum(!is.na(numeric_value)),
-    hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
-    hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
-  hazen_category_annual = case_when(
-      n < 10 ~ "TFD",
-      hazen95 <= 100 ~ "Excellent",
-      hazen95 <= 200 ~ "Good",
-      hazen95 > 200 & hazen90 > 185 ~ "Poor",
-      hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
-  ) |> fct(levels = c("TFD", "Poor", "Sufficient", "Good", "Excellent")))
-
-# Combine the Hazen categories for all
-hazen_annual
-  
 
 # Plot the Hazen data for each year
-hazen_data |>
-  ggplot(aes(x = year, y = "Hazen Category", fill = hazen_category_annual)) +
-  geom_tile(width = 0.95) +
-  scale_fill_brewer(type = "div", palette = 8)
+(hazen_strip <- hazen_data |>
+  ggplot(aes(x = year, y = "Hazen Category", fill = hazen_category)) +
+  geom_tile(width = 0.8) +
+  scale_fill_manual(name = "Hazen Water Quality Category", values = c("TFD" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    text = element_text(family = "Century Gothic")
+        ))
 
 RColorBrewer::display.brewer.all(type = "div")
 ```
 
+```{r sample-exceedance-dotplot, fig.width = 7.267717, fig.height = 3. dpi = 600}
+# Prepare the data
+exceedance_data <- results |>
+  filter(site_id == current_site_id, monitoring_group %in% c("routine", "daily")) |>
+  mutate(
+    exceedance = if_else(numeric_value > 240, "Yes", "No")
+  ) |>
+  select(site_id, sample_date, exceedance)
+
+# Plot the exceedance data as a dotplot
+(exceedance_plot <- exceedance_data |>
+  ggplot(aes(x = sample_date, fill = exceedance)) +
+  geom_dotplot(
+    method = "histodot",
+    colour = NA,
+    stackgroups = TRUE,
+    dotsize = 0.7,
+    binwidth = 80,
+    stackratio = 1.3
+    ) +
+  scale_fill_manual(name = "Exceeds safe water use threshold", values = c("Yes" = "red", "No" = city_dark_green)) +
+    scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+  theme(
+    legend.position = "bottom",
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    text = element_text(family = "Century Gothic")
+  ))
+```
+
+```{r save-plots}
+ggsave(filename = str_c(current_site_id, "_exceedance.jpg", sep = ""), path = "../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/08_Reports/Know Your Coast/", plot = exceedance_plot, width = (210-2*12.7), height = 70, units = "mm", dpi = 600)
+```
+
+```{r save-plots}
+ggsave(filename = str_c(current_site_id, "_hazen.jpg", sep = ""), path = "../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/08_Reports/Know Your Coast/", plot = hazen_strip, width = (210-2*12.7), height = 30, units = "mm", dpi = 600)
+```
 
 # Percentage exceedances over time
 
