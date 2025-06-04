@@ -97,20 +97,23 @@ height = 20 / 25.4
 
 ```{r select-sites}
 tbl(con, I("coastal.sites")) |>
-  filter(str_detect(site_description |> str_to_lower(), "melkbos"))
+  filter(str_detect(site_description |> str_to_lower(), "muizenber"))
 ```
-
 
 ```{r select-site}
-current_site_id <- "XCN07"
+current_site_id <- "CN36"
 ```
 
-```{r hazen-over-time, fig.width = 7.267717, fig.height = 1.2, dpi = 600}
+```{r hazen-over-time, fig.width = 7.267717, fig.height = 1.5, dpi = 600}
 # Annual summary of Hazen categories
 hazen_data <- results |>
   filter(site_id == current_site_id, monitoring_group %in% c("daily", "routine")) |>
   group_by(
-    year = year(sample_date)
+    year = year(sample_date) |> as.character(),
+    season = case_when(
+      month(sample_date) %in% c(10, 11, 12, 1, 2, 3) ~ "Summer",
+      .default = "Winter"
+    )
   ) |>
   summarise(
     min_date = min(sample_date),
@@ -124,12 +127,16 @@ hazen_data <- results |>
       hazen95 <= 200 ~ "Good",
       hazen95 > 200 & hazen90 > 185 ~ "Poor",
       hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
-  ) |> fct(levels = c("TFD", "Poor", "Sufficient", "Good", "Excellent")))
+  ) |> fct(levels = c("TFD", "Poor", "Sufficient", "Good", "Excellent"))) |>
+  ungroup()
 
 # Plot the Hazen data for each year
 (hazen_strip <- hazen_data |>
-  ggplot(aes(x = year, y = "Hazen Category", fill = hazen_category)) +
+  select(year, season, hazen_category) |>
+  complete(year, season) |>
+  ggplot(aes(x = as.character(season), y = "Hazen Category", fill = hazen_category)) +
   geom_tile(width = 0.8) +
+  facet_grid(cols = vars(year), switch = "x") +
   scale_fill_manual(name = "Hazen Water Quality Category", values = c("TFD" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
   theme(
     legend.position = "bottom",
@@ -140,7 +147,9 @@ hazen_data <- results |>
     axis.ticks = element_blank(),
     panel.background = element_blank(),
     panel.grid = element_blank(),
-    text = element_text(family = "Century Gothic")
+    text = element_text(family = "Century Gothic"),
+    strip.placement = "outside",
+    strip.background = element_blank()
         ))
 
 RColorBrewer::display.brewer.all(type = "div")
@@ -163,11 +172,11 @@ exceedance_data <- results |>
     colour = NA,
     stackgroups = TRUE,
     dotsize = 0.7,
-    binwidth = 80,
+    binwidth = 8,
     stackratio = 1.3
     ) +
   scale_fill_manual(name = "Exceeds safe water use threshold", values = c("Yes" = "red", "No" = city_dark_green)) +
-    scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b %Y") +
   theme(
     legend.position = "bottom",
     panel.background = element_blank(),
@@ -180,11 +189,11 @@ exceedance_data <- results |>
 ```
 
 ```{r save-plots}
-ggsave(filename = str_c(current_site_id, "_exceedance.jpg", sep = ""), path = "../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/08_Reports/Know Your Coast/", plot = exceedance_plot, width = (210-2*12.7), height = 70, units = "mm", dpi = 600)
+ggsave(filename = str_c(current_site_id, "_exceedance.jpg", sep = ""), path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Long-term Plots/", plot = exceedance_plot, width = (210-2*12.7), height = 70, units = "mm", dpi = 600)
 ```
 
 ```{r save-plots}
-ggsave(filename = str_c(current_site_id, "_hazen.jpg", sep = ""), path = "../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/08_Reports/Know Your Coast/", plot = hazen_strip, width = (210-2*12.7), height = 30, units = "mm", dpi = 600)
+ggsave(filename = str_c(current_site_id, "_hazen.jpg", sep = ""), path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Long-term Plots/", plot = hazen_strip, width = 7.3, height = 1.5, dpi = 600)
 ```
 
 # Percentage exceedances over time
@@ -812,17 +821,22 @@ for (site in unique_sites6) {
 
 # In-depth analysis by site
 
-## Hout Bay
+## Import inland water quality data
 
 ```{r read-inland-water-quality-data}
 inland_data <- read_sf("01 Input Data/Inland_Water_Quality_Results_(Raw).shp")
 inland_sites <- read_sf("01 Input Data/Routine_Inland_Water_Quality_Monitoring.shp")
 ```
 
+```{r select-site}
+# Choose the site ID for inland water quality
+current_site_id <- "LOU05"
+```
+
 ```{r clean-data}
 # Inland water quality data
-inland_data_clean <- inland_data |>
-  filter(SMPL_PNT == "DR05", PRMT_CODE == "Escherichia coli (CFU)") |>
+(inland_data_clean <- inland_data |>
+  filter(SMPL_PNT == current_site_id, PRMT_CODE == "Escherichia coli (CFU)") |>
   arrange(SMPL_DATE) |>
   select(SMPL_PNT, SMPL_DATE, PRMT_VL, PRMT_ORGN_, geometry) |>
   mutate(censored_value = str_c(PRMT_ORGN_, PRMT_VL) |> str_remove("=")) |>
@@ -835,49 +849,48 @@ inland_data_clean <- inland_data |>
     site_id = SMPL_PNT,
     sample_date = SMPL_DATE
     ) |>
-  select(site_id, sample_date, censored_value, numeric_value, geometry)
+  select(site_id, sample_date, censored_value, numeric_value, geometry))
 
-# Hout Bay coastal data
-coastal_clean <- tbl(con, I("coastal.results_view")) |>
-  filter(site_id == "XCN10") |>
-  select(site_id, sample_date, numeric_value) |>
-  collect()
+# Check for NA values
+inland_data_clean |>
+  filter(if_any(everything(), is.na))
+
+# Just for one site - remove outlier values
+inland_data_clean |>
+  filter(numeric_value < 1e6)
 ```
 
-```{r compare-plots, fig.width = 3, fig.height = 3}
-# Disa River results
-(disa_river_data <- inland_data_clean |>
-  ggplot(aes(x = sample_date, y = numeric_value)) +
-  labs(
-    title = "Disa River",
-    y = expression(paste(italic("E. coli"), " (CFU per 100 mL)")),
-    x = "Sample Date"
-    ) +
-  geom_col(fill = city_red) +
-  scale_y_log10(labels = scales::label_log()) +
-  coord_cartesian(xlim = c(ymd("2017-01-01"), ymd("2025-01-01"))) +
+```{r site-details}
+# Check details about site
+inland_sites |>
+  select(SCN_SRV_CO, MNTR_TYPE, LCTN_DSCR, CTMT_CSTL, geometry) |>
+  rename(site_id = SCN_SRV_CO, monitoring_type = MNTR_TYPE, site_description = LCTN_DSCR, catchment = CTMT_CSTL) |>
+  filter(site_id == current_site_id)
+```
+
+```{r dotplot-ecoli, fig.width = 8, fig.height = 2, dpi = 600}
+(inland_bubble_plot <- inland_data_clean |>
+   filter(numeric_value < 1e6) |>
+  ggplot(aes(x = sample_date, size = numeric_value, y = "Ecoli", colour = log10(numeric_value))) +
+  labs(title = expression(paste(italic("E. coli"))), subtitle = "Lourens River Bridge, Beach Road") +
+  geom_point(alpha = 0.7, shape = 16) +
+  scale_size_continuous(range = c(0.2, 30)) +
+  scale_colour_distiller(type = "div", palette = 8) +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   theme(
+    plot.background = element_blank(),
+    legend.position = "none",
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    panel.grid.major.x = element_line(colour = "grey"),
+    axis.title = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
     text = element_text(family = "Century Gothic"),
     plot.title = element_text(hjust = 0.5),
-    plot.background = element_blank(),
-    panel.background = element_blank(),
-    axis.title.x = element_blank()
+    plot.subtitle = element_text(hjust = 0.5)
   ))
 
-ggsave(path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/", filename = "disa_river_plot.jpg", plot = disa_river_data, width = 4, height = 3, dpi = 600)
-```
-
-```{r}
-# Read in Silvermine river data
-inland_data
-```
-
-```{r silvermine-river-data}
-inland_data |>
-  distinct(SMPL_PNT)
-
-inland_sites |>
-  distinct(LCTN_DSCR) |>
-  
+ggsave(path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025", filename = str_c(current_site_id, ".jpg"), plot = inland_bubble_plot, width = 8, height = 2, dpi = 600)
 ```
 
