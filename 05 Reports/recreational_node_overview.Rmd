@@ -96,7 +96,7 @@ sites |>
 ```
 
 ```{r choose-site}
-site_code <- "CN20I"
+site_code <- "CN36"
 ```
 
 ```{r create-bounding-box-for-site}
@@ -152,8 +152,8 @@ river <- opq(site_bbox) |>
 # Plot overview of entire coastline
 site_overview <- ggplot() +
   geom_sf(data = cct_coastline$osm_lines, colour = "white", linewidth = 0.4) +
-  geom_sf(data = sites_sf, aes(colour = category, size = category)) +
-  geom_sf(data = sites_sf |> filter(site_id == site_code), colour = city_pink, size = 5, alpha = 0.6, shape = 16) +
+  geom_sf(data = sites_sf, aes(colour = category, size = category), shape = 16) +
+  geom_sf(data = sites_sf |> filter(site_id == site_code), colour = city_pink, size = 7, alpha = 0.7, shape = 16) +
    geom_sf(data = bbox_htb |> st_as_sfc(), colour = "white", fill = NA) +
   
   # Plot styling
@@ -173,8 +173,8 @@ site_overview <- ggplot() +
       plot.subtitle = element_text(hjust = 0.5),
       panel.grid = element_blank()
     ) +
-    scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "darkgrey")) +
-    scale_size_manual(values = c("Recreational Node" = 2, "Coastal Monitoring Point" = 1))
+  scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "lightgrey")) +
+  scale_size_manual(values = c("Recreational Node" = 4, "Coastal Monitoring Point" = 2))
 ```
 
 ## Site Map
@@ -189,12 +189,12 @@ site_overview <- ggplot() +
   
   # Add rivers
   geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
-  geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
+  # geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   geom_sf(data = river$osm_polygons |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   
   # Add other water
   geom_sf(data = water$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightblue", alpha = 0.7, colour = NA) +
-  # geom_sf(data = water$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightblue", alpha = 0.7, colour = NA) +
+  geom_sf(data = water$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightblue", alpha = 0.7, colour = NA) +
   
   # Add the coastline
   geom_sf(data = coastline$osm_lines |> st_transform("ESRI: 102562"), colour = "lightgrey", size = unit(1, "mm")) +
@@ -234,6 +234,7 @@ site_overview <- ggplot() +
     "residential" = unit(0.1, "mm"),
     "service" = unit(0.1, "mm")
   )) +
+   # geom_sf(data = streets$osm_polygons) +
    
   # Add buildings
   geom_sf(data = buildings$osm_polygons |>
@@ -244,7 +245,7 @@ site_overview <- ggplot() +
   geom_label_repel(data = sites_sf |> filter(category == "Recreational Node"), aes(label = site_description, geometry = geom), stat = "sf_coordinates",
   # geom_label_repel(data = sites_sf |> filter(category == "Recreational Node"), aes(label = str_wrap(site_description, 16), geometry = geom), stat = "sf_coordinates",
             colour = "white",
-            size = unit(2, "mm"),
+            size = unit(3, "mm"),
             # nudge_x = 150,
             family = "Century Gothic",
             label.padding = 0.20,
@@ -259,7 +260,7 @@ site_overview <- ggplot() +
             ylim = c(bbox_htb[2] - 5000, bbox_htb[4] + 5000)
             ) +
    
-  # Add the current monitoring point
+  # Add the current monitoring poin3
   geom_sf(data = sites_sf |> filter(site_id == site_code) |> st_transform("ESRI: 102562"), colour = city_pink, size = 3, shape = 16) +
   
   scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "grey")) +
@@ -384,9 +385,6 @@ text <- exceedances |>
 
 ```{r create-seasonal-progress-wheel}
 # Get colours from Rcolobrewer
-RColorBrewer::display.brewer.all(select = "RdYlGn")
-RColorBrewer::brewer.pal(n = 11, name = "RdYlGn")
-
 wheel_seasonal <- seasonal_exceedances |>
   ggplot(aes(x = "Site", y = samples_exceed_pct, fill = samples_exceed_pct)) +
     geom_col() + scale_fill_gradientn(colours = c("#66BD63", "#FEE08B", "#FDAE61", "#F46D43", "#D73027", "#A50026"), limits = c(0, 100), breaks = c(0, 10, 20, 50, 75, 100)) +
@@ -506,7 +504,7 @@ hazen_categories <- bind_rows(all, summer, winter) |>
   dplyr::select(hazen_category, season, alpha_value) |>
   ggplot() +
   geom_tile(aes(x = hazen_category, y = "Season", fill = hazen_category, alpha = alpha_value), height = 0.8, width = 0.9) +
-  geom_text(aes(x = hazen_category, y = "Season", label = hazen_category), family = "Century Gothic", colour = "white", size = 3) +
+  geom_text(aes(x = hazen_category, y = "Season", label = hazen_category), family = "Century Gothic", colour = "white", size = 3.5) +
   scale_fill_manual(name = "Hazen Water Quality Category", values = c("TFD" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
   facet_grid(rows = vars(str_to_title(season)), switch = "y") +
   
@@ -514,19 +512,15 @@ hazen_categories <- bind_rows(all, summer, winter) |>
   theme(
     plot.background = element_blank(),
     panel.background = element_blank(),
+    panel.border = element_rect(colour = "white", fill = NA),
     panel.grid = element_blank(),
     axis.text = element_blank(),
     axis.ticks = element_blank(),
     axis.title = element_blank(),
     legend.position = "none",
     strip.background = element_blank(),
-    strip.text = element_text(colour = "white", family = "Century Gothic", size = 8)
+    strip.text = element_text(colour = "white", family = "Century Gothic", size = 10, face = "bold")
   )
-```
-
-```{r}
-RColorBrewer::display.brewer.all(5)
-RColorBrewer::brewer.pal(5, "YlOrRd")
 ```
 
 ## Sample frequency plots
@@ -656,6 +650,7 @@ coast <- sites |>
 ```
 
 ```{r site-name}
+# Prepare the site name
 site_name <- sites |>
   filter(site_id == site_code) |>
   mutate(coast_label = str_c(coastline, " Coast", sep = "")) |>
@@ -676,6 +671,7 @@ site_name <- sites |>
 ## Final Figure
 
 ```{r base-plot}
+# Create the base plot
 base <- ggplot() +
   theme(
     plot.background = element_rect(fill = city_teal),
@@ -716,8 +712,8 @@ sample_threshold_title <- ggplot() +
   inset_element(site_name, left = unit(0, "mm"), bottom = unit(70, "mm"), right = unit(17, "mm"), top = unit(217, "mm"), align_to = "full") +
   inset_element(dotplot, left = unit(25, "mm"), bottom = unit(0, "mm"), right = unit(130, "mm"), top = unit(45, "mm"), align_to = "full") +
   inset_element(site_map, left = unit(125, "mm"), bottom = unit(150, "mm"), right = unit(213, "mm"), top = unit(215, "mm"), align_to = "full") +
-  inset_element(results_plot, left = unit(23, "mm"), bottom = unit(47, "mm"), right = unit(105, "mm"), top = unit(173, "mm"), align_to = "full") +
-  inset_element(hazen_categories, left = 0.1, bottom = 0.8, right = 0.65, top = 1, align_to = "full") +
+  inset_element(results_plot, left = unit(23, "mm"), bottom = unit(47, "mm"), right = unit(105, "mm"), top = unit(150, "mm"), align_to = "full") +
+  inset_element(hazen_categories, left = unit(15, "mm"), bottom = unit(147, "mm"), right = unit(136.5, "mm"), top = unit(216.9, "mm"), align_to = "full") +
   inset_element(wheel, left = unit(120, "mm"), bottom = unit(100-5, "mm"), right = unit(210+2, "mm"), top = unit(140-5, "mm")) +
   inset_element(text, left = unit(120, "mm"), bottom = unit(100-5-5-3, "mm"), right = unit(210+2, "mm"), top = unit(145-5-3, "mm")) +
   inset_element(exceed_text, left = unit(118, "mm"), bottom = unit(10 + 10, "mm"), right = unit(208, "mm"), top = unit(60 + 10, "mm")) +
@@ -728,5 +724,7 @@ sample_threshold_title <- ggplot() +
 ```
 
 ```{r save-figure}
-ggsave(str_c(site_code, ".jpg", sep = ""), plot = infographic, path = "../../Infinity/Infinity Projects - Files/190-56 Coastal WQ/08_Reports/Know Your Coast/Draft Recreational Node Overviews/", width = 210, height = 223.8375, units = "mm", dpi = 600)
+ggsave(str_c(site_code, ".jpg", sep = ""), plot = infographic, path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Recreational Node Overviews/", width = 210, height = 223.8375, units = "mm", dpi = 600)
+
+site_code
 ```
