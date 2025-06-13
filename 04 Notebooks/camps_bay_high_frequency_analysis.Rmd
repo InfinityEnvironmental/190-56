@@ -25,6 +25,7 @@ library(DBI)
 library(pdftools)
 library(readxl)
 library(sf)
+library(extrafont)
 ```
 
 ## Database Connection
@@ -51,7 +52,7 @@ results <- tbl(con, I("coastal.high_frequency_samples")) |>
   inner_join(
     tbl(con, I("coastal.sites")), by = "site_id"
   ) |>
-  select(site_description, geom, site_id, tag, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code) |>
+  select(site_description, geom, site_id, tag, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, temperature_c, salinity_psu, filename, lab_code) |>
   collect()
 ```
 
@@ -62,18 +63,78 @@ results_sf <- results |>
   st_as_sf()
 ```
 
-```{r plot-results-by-site}
-results_sf |>
+```{r prepare-results}
+# Prepare data for plotting
+plotting_data <- results_sf |>
   rename(censored_value = enterococci_cfu_per_100ml) |>
-  mutate(numeric_value = if_else(censored_value == 'ND', 0, as.numeric(censored_value)), .after = censored_value) |>
-  mutate(timestamp = str_c(sample_date, sample_time, sep = " ") |> ymd_hms(), .after = sample_time) |>
-  ggplot(aes(x = timestamp, y = numeric_value, colour = site_description)) +
-  geom_line() +
-  facet_wrap(facets = vars(site_description)) +
-  theme(
-    legend.position = "bottom"
-  )
+  mutate(numeric_value = str_replace(censored_value, "ND", "0") |> str_remove("\\s") |> as.numeric()) |>
+  mutate(tag = replace_na(tag, "A")) |>
+  mutate(hour = str_c("2025-05-19 ", hour(sample_time), ":00:00") |> ymd_hms()) |>
+  mutate(site_description = if_else(site_id == "CN10", "Maidens Cove", site_description)) |>
+  group_by(site_description, sample_date, sample_time, hour) |>
+  filter(tag != "Blank") |>
+  summarise(mean = mean(numeric_value), sd = sd(numeric_value), n = n())
 ```
 
+```{r plot-by-day, fig.width = 8, fig.height = 5, dpi = 600}
+# Plot
+cn41_fig3 <- plotting_data |>
+  filter(site_description == "Camps Bay Central") |>
+  mutate(
+    week = if_else(between(sample_date, ymd("2025-05-19"), ymd("2025-05-23")), "Week 1", "Week 2"),
+    day = sample_date |> wday(label = TRUE, abbr = FALSE)
+    ) |>
+  
+  # Plot the data
+  ggplot(aes(x = hour, y = mean)) +
+  labs(
+    y = "Enterococci (cfu per 100 mL)",
+    title = "Camps Bay Central"
+  ) +
+  geom_col() +
+  geom_errorbar(aes(ymax = mean + sd, ymin = mean)) +
+  facet_grid(rows = vars(week), cols = vars(day)) +
+  
+  # Set scale options
+  scale_x_datetime(date_labels = "%H:%M") +
+  
+  # Set style options
+  theme(
+    text = element_text(family = "Century Gothic"),
+    plot.title = element_text(hjust = 0.5, vjust = 2),
+    axis.text.x = element_text(angle = 90, vjust = 0.5),
+    axis.title.x = element_blank()
+  )
 
+ggsave(filename = "cn41_fig3.jpg", plot = cn41_fig3, path = "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/03 Figures/", width = 210, height = 140, units = "mm", dpi = 600)
+```
 
+```{r plot-linear, fig.width = 8, fig.height = 5, dpi = 600}
+# Plot data
+cn31_fig2 <- plotting_data |>
+  filter(site_description == "Glen Beach") |>
+  mutate(sample_datetime = ymd_hms(str_c(sample_date, sample_time, sep = " "))) |>
+  
+  # Plot the data
+  ggplot(aes(x = sample_datetime, y = mean)) +
+  labs(
+    y = "Enterococci (cfu per 100 mL)",
+    title = "Glen Beach"
+  ) +
+  geom_segment(aes(xend = sample_datetime, yend = 0)) +
+  geom_errorbar(aes(ymax = mean + sd, ymin = mean)) +
+  # facet_wrap(facets = vars(sample_date), nrow = 2) +
+  
+  # Set scale options
+  scale_x_datetime(date_labels = "%H:%M") +
+  
+  # Set style options
+  theme(
+    text = element_text(family = "Century Gothic"),
+    plot.title = element_text(hjust = 0.5, vjust = 2),
+    axis.text.x = element_text(angle = 90, vjust = 0.5),
+    axis.title.x = element_blank()
+  )
+
+ggsave(filename = "cn31_fig2.jpg", plot = cn31_fig2, path = "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/03 Figures/", width = 210, height = 140, units = "mm", dpi = 600)
+```
