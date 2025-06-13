@@ -889,6 +889,98 @@ ROLLBACK;
 COMMIT;
 ```
 
+### Sample Metadata
+
+```{r read-metadata}
+metadata <- read_csv("../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/01 Field Data & Chain of Custody/camps_bay_high_frequency.csv")
+
+# Initial cleaning
+metadata <- metadata |>
+  rename(sample_date = "DATE", site_id = "SITE_ID", tag = "TAG", sample_time = "TIME", temperature_c = "TEMPERATURE", salinity_psu = "SALINITY") |>
+  mutate(sample_date = case_when(
+    (is.na(ymd(sample_date))) ~ dmy(sample_date),
+    (is.na(dmy(sample_date))) ~ ymd(sample_date)
+  )) |>
+  mutate(tag = if_else(str_length(tag) == 0, NA, tag))
+```
+
+```{r copy-to-database}
+copy_to(con, metadata, "metadata", temporary = TRUE, overwrite = TRUE)
+```
+
+```{sql, connection = con}
+BEGIN;
+```
+
+```{sql, connection = con}
+SELECT * FROM metadata;
+```
+
+```{sql, connection = con}
+WITH final_cte AS
+(WITH cte_metadata AS
+(SELECT
+  sample_date,
+  site_id,
+  CASE
+    WHEN tag IS NULL THEN 'A'
+    ELSE tag
+  END AS tag,
+  sample_time,
+  CASE WHEN temperature_c = 'Not measured' THEN null ELSE temperature_c::numeric END AS temperature_c,
+  CASE WHEN salinity_psu = 'Not measured' THEN null ELSE salinity_psu::numeric END AS salinity_psu
+FROM metadata),
+cte_samples AS
+(SELECT
+  sample_id,
+  sample_date,
+  sample_time,
+  site_id,
+  CASE
+    WHEN tag IS NULL THEN 'A'
+    ELSE tag
+  END AS tag
+FROM coastal.high_frequency_samples)
+
+SELECT
+  sample_id,
+  temperature_c,
+  salinity_psu
+FROM cte_samples a
+  LEFT JOIN cte_metadata b USING (site_id, sample_date, sample_time, tag))
+
+UPDATE coastal.high_frequency_samples a
+SET
+  temperature_c = b.temperature_c,
+  salinity_psu = b.salinity_psu
+FROM final_cte b
+WHERE a.sample_id = b.sample_id;
+```
+```{sql, connection = con}
+SELECT site_id, tag, sample_date, sample_time, temperature_c, salinity_psu FROM coastal.high_frequency_samples
+WHERE temperature_c IS NULL AND salinity_psu IS NULL AND tag IS NULL
+  ORDER BY sample_date, sample_time, site_id, tag;
+```
+
+```{sql, connection = con}
+SELECT * FROM coastal.high_frequency_samples WHERE site_id = 'CN41' AND sample_date = '2025-05-20' AND sample_time = '08:15';
+```
+
+```{sql, connection = con}
+ROLLBACK;
+```
+
+```{sql, connection = con}
+COMMIT;
+```
+
+```{sql, connection = con}
+SELECT *
+FROM coastal.high_frequency_samples a
+  JOIN metadata b USING (sample_date, sample_time, site_id, tag)
+```
+
+
 ## Add a single value
 
 ```{sql connection = con}
