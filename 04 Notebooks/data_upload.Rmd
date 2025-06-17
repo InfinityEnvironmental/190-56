@@ -227,19 +227,19 @@ BEGIN;
 ```{sql connection = con}
 INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code, monitoring_group)
 SELECT
-  'CN11' AS site_id,
-  '2025-06-03'::date AS sample_date,
-  '10:30'::time AS sample_time,
-  '2025-06-05'::date AS analysis_completed,
-   2.8 AS sample_temp_c,
-  '195' AS enterococci_cfu_per_100ml,
-  'Infinity Environmental AD.154(FB)' AS filename,
+  'XCN03' AS site_id,
+  '2025-06-10'::date AS sample_date,
+  '09:51'::time AS sample_time,
+  '2025-06-12'::date AS analysis_completed,
+   3.1 AS sample_temp_c,
+  '5' AS enterococci_cfu_per_100ml,
+  'Infinity Environmental AD.161(FB)' AS filename,
   'WLAB'::coastal.lab AS lab_code,
   'routine'::coastal.monitoring_group AS monitoring_group;
 ```
 
 ```{sql connection = con}
-SELECT * FROM coastal.results WHERE sample_date = '2025-06-03' AND monitoring_group = 'routine';
+SELECT * FROM coastal.results WHERE sample_date = '2025-06-10' AND monitoring_group = 'routine';
 ```
 
 ```{sql connection = con}
