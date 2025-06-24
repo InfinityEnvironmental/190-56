@@ -1017,6 +1017,71 @@ triplicates <- read_xlsx("../../Infinity/Coastal Water Quality - Documents/Share
   mutate(sample_time = hms::as_hms(sample_time))
 ```
 
+```{r assess-triplicate-data}
+triplicates |>
+  group_by(month = month(sample_date, label = TRUE), lab_code) |>
+  count()
+
+triplicates |>
+  filter(lab_code == "SABS") |>
+  group_by(sample_date) |>
+  count()
+
+# Have a look at the data
+triplicates
+```
+
+```{r upload-data}
+copy_to(con, triplicates, name = "triplicates", temporary = TRUE, overwrite = TRUE)
+```
+
+```{sql, connection = con}
+BEGIN;
+```
+
+```{sql, connection = con}
+SELECT * FROM triplicates;
+```
+
+```{sql, connection = con}
+SELECT
+  sample_id,
+  site_id,
+  sample_date,
+  sample_time,
+  analysis_completed,
+  sample_temp_c,
+  enterococci_cfu_per_100ml,
+  filename,
+  lab_code
+FROM coastal.triplicate_results;
+```
+
+```{sql, connection = con}
+INSERT INTO coastal.triplicate_results (sample_id, site_id, sample_date, sample_time, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code)
+SELECT
+  sample_id,
+  site_id,
+  sample_date,
+  sample_time,
+  sample_temperature_c,
+  enterococci_cfu_per_100ml,
+  filename,
+  lab_code::coastal.lab
+FROM triplicates;
+```
+
+```{sql, connection = con}
+SELECT * FROM coastal.triplicate_results;
+```
+
+```{sql, connection = con}
+ROLLBACK;
+```
+
+```{sql, connection = con}
+COMMIT;
+```
 
 # Upload historical data to database
 
