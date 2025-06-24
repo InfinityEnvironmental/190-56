@@ -1010,6 +1010,14 @@ ROLLBACK;
 COMMIT;
 ```
 
+# Upload triplicate samples
+
+```{r read-triplicate-data}
+triplicates <- read_xlsx("../../Infinity/Coastal Water Quality - Documents/Shared Results/Triplicate Sampling/triplicate_sampling_to_populate.xlsx") |>
+  mutate(sample_time = hms::as_hms(sample_time))
+```
+
+
 # Upload historical data to database
 
 ## LIMS Data
