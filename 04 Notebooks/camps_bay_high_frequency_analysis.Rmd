@@ -138,3 +138,11 @@ cn31_fig2 <- plotting_data |>
 
 ggsave(filename = "cn31_fig2.jpg", plot = cn31_fig2, path = "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/03 Figures/", width = 210, height = 140, units = "mm", dpi = 600)
 ```
+
+# Rainfall Analysis
+
+```{r}
+read_csv("01 Input Data/Rainfall Data/Constantiaberg Rainfall Data/hourly_Constantiaberg AWS.csv",
+         skip = 1)
+```
+
