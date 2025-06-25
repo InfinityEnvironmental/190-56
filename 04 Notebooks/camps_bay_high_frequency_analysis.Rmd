@@ -26,6 +26,7 @@ library(pdftools)
 library(readxl)
 library(sf)
 library(extrafont)
+library(patchwork)
 ```
 
 ## Database Connection
@@ -73,40 +74,67 @@ plotting_data <- results_sf |>
   mutate(site_description = if_else(site_id == "CN10", "Maidens Cove", site_description)) |>
   group_by(site_description, sample_date, sample_time, hour) |>
   filter(tag != "Blank") |>
-  summarise(mean = mean(numeric_value), sd = sd(numeric_value), n = n())
+  summarise(mean = mean(numeric_value), sd = sd(numeric_value), n = n()) |>
+  ungroup()
 ```
 
-```{r plot-by-day, fig.width = 8, fig.height = 5, dpi = 600}
-# Plot
-cn41_fig3 <- plotting_data |>
-  filter(site_description == "Camps Bay Central") |>
-  mutate(
-    week = if_else(between(sample_date, ymd("2025-05-19"), ymd("2025-05-23")), "Week 1", "Week 2"),
-    day = sample_date |> wday(label = TRUE, abbr = FALSE)
-    ) |>
+```{r plot-by-day, fig.width = 10, fig.height = 8, dpi = 600}
+plot_camps_bay_data <- function(plotting_data, description){
   
-  # Plot the data
-  ggplot(aes(x = hour, y = mean)) +
-  labs(
-    y = "Enterococci (cfu per 100 mL)",
-    title = "Camps Bay Central"
-  ) +
-  geom_col() +
-  geom_errorbar(aes(ymax = mean + sd, ymin = mean)) +
-  facet_grid(rows = vars(week), cols = vars(day)) +
+    # Plot
+  plot <- plotting_data |>
+    filter(site_description == description) |>
+    mutate(
+      week = if_else(between(sample_date, ymd("2025-05-19"), ymd("2025-05-23")), "Week 1", "Week 2"),
+      day = sample_date |> wday(label = TRUE, abbr = FALSE)
+      ) |>
+    
+    # Plot the data
+    ggplot(aes(x = hour, y = mean)) +
+    labs(
+      y = "Enterococci (cfu per 100 mL)",
+      title = description
+    ) +
+    
+    geom_smooth(data = rainfall, aes(x = timestamp))
+    geom_col() +
+    geom_errorbar(aes(ymax = mean + sd, ymin = mean)) +
+    geom_hline(yintercept = 240, linetype = 2, colour = "grey") +
+    facet_grid(rows = vars(week), cols = vars(day)) +
+    
+    # Set scale options
+    scale_x_datetime(date_labels = "%H:%M") +
+    coord_cartesian(ylim = c(0, 300)) +
+    
+    # Set style options
+    theme(
+      text = element_text(family = "Century Gothic"),
+      plot.title = element_text(hjust = 0.5, vjust = 2),
+      axis.text.x = element_text(angle = 90, vjust = 0.5),
+      axis.title.x = element_blank()
+    )
   
-  # Set scale options
-  scale_x_datetime(date_labels = "%H:%M") +
-  
-  # Set style options
-  theme(
-    text = element_text(family = "Century Gothic"),
-    plot.title = element_text(hjust = 0.5, vjust = 2),
-    axis.text.x = element_text(angle = 90, vjust = 0.5),
-    axis.title.x = element_blank()
-  )
+  return(plot)
+}
 
-ggsave(filename = "cn41_fig3.jpg", plot = cn41_fig3, path = "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/03 Figures/", width = 210, height = 140, units = "mm", dpi = 600)
+(camps_bay_central <- plotting_data |> plot_camps_bay_data("Camps Bay Central") & labs(caption = "Dashed line shows the single-sample threshold for Enterococci of 240 cfu per 100 mL"))
+(camps_bay_south <- plotting_data |> plot_camps_bay_data("Camps Bay South") & labs(caption = "Dashed line shows the single-sample threshold for Enterococci of 240 cfu per 100 mL"))
+(maidens_cove <- plotting_data |> plot_camps_bay_data("Maidens Cove"))
+(glen_beach <- plotting_data |> plot_camps_bay_data("Glen Beach"))
+
+# Glen Beach exceedances
+glen_beach_ex <- plotting_data |> plot_camps_bay_data("Glen Beach") + coord_cartesian(ylim = c(0, 3000)) + theme(plot.title = element_blank())
+
+# Maidens Cove exceedances
+maidens_cove_ex <- plotting_data |> plot_camps_bay_data("Maidens Cove") + coord_cartesian(ylim = c(0, 700))
+
+# Combine plots
+glen_total <- glen_beach / glen_beach_ex + plot_annotation(caption = "Dashed line shows the single-sample threshold for Enterococci of 240 cfu per 100 mL") & theme(text = element_text(family = "Century Gothic"))
+
+# Maidens Cove
+maidens_total <- maidens_cove / maidens_cove_ex + plot_annotation(caption = "Dashed line shows the single-sample threshold for Enterococci of 240 cfu per 100 mL") & theme(text = element_text(family = "Century Gothic"))
+
+ggsave(filename = "camps_bay_south.jpg", plot = camps_bay_south, path = "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/03 Figures/", width = 210, height = 140, units = "mm", dpi = 600)
 ```
 
 ```{r plot-linear, fig.width = 8, fig.height = 5, dpi = 600}
@@ -142,7 +170,147 @@ ggsave(filename = "cn31_fig2.jpg", plot = cn31_fig2, path = "../../Infinity/Coas
 # Rainfall Analysis
 
 ```{r}
-read_csv("01 Input Data/Rainfall Data/Constantiaberg Rainfall Data/hourly_Constantiaberg AWS.csv",
-         skip = 1)
+names <- read_csv("01 Input Data/Rainfall Data/Constantiaberg Rainfall Data/hourly_Constantiaberg AWS.csv",
+         skip = 2) |>
+  colnames()
+
+units <- read_csv("01 Input Data/Rainfall Data/Constantiaberg Rainfall Data/hourly_Constantiaberg AWS.csv",
+         skip = 2) |>
+  slice(1) |>
+  unlist(, use.names = FALSE)
+
+data <- read_csv("01 Input Data/Rainfall Data/Constantiaberg Rainfall Data/hourly_Constantiaberg AWS.csv",
+         skip = 3)
+
+colnames(data) <- names
+
+# Get the rainfall data for the time period of the study
+rainfall <- data |>
+  select(Timestamp, rain_tot) |>
+  filter(Timestamp |> between(ymd("2025-05-19"), ymd("2025-05-31"))) |>
+  rename(timestamp = Timestamp, rainfall_mm = rain_tot)
+```
+
+# Plot the bacterial data with the rainfall data
+
+```{r, fig.width = 8, fig.height = 5, dpi = 600}
+# List of sites
+sites <- plotting_data |>
+  distinct(site_description)
+
+# Plot rainfall data
+rainfall_plot <- rainfall |>
+  filter(!(wday(timestamp) %in% c(1, 7))) |>
+  mutate(
+    week = if_else(between(timestamp, ymd("2025-05-19"), ymd("2025-05-23")), "Week 1", "Week 2"),
+    day = timestamp |> wday(label = TRUE, abbr = FALSE),
+    hour = format(timestamp, "%H")
+         ) |>
+
+# Plot the data
+  ggplot(aes(x = timestamp, y = rainfall_mm)) +
+  labs(
+    y = "Rainfall (mm)",
+    title = "Rainfall"
+  ) +
+  geom_col() +
+  facet_grid(day ~ week) +
+  
+  # Set scale options
+  scale_x_continuous(breaks = c(0, 6, 12, 18, 24), labels = c("12am", "6am", "12pm", "6pm", "12am")) +
+  
+  # Set style options
+  theme(
+    text = element_text(family = "Century Gothic"),
+    plot.title = element_text(hjust = 0.5, vjust = 2),
+    axis.text.x = element_text(angle = 90, vjust = 0.5),
+    axis.title.x = element_blank()
+  )
+
+rainfall |>
+  mutate(date = date(timestamp),
+         time = hms::as_hms(timestamp),
+         week = if_else(between(timestamp, ymd("2025-05-19"), ymd("2025-05-23")), "Week 1", "Week 2"),
+         day = timestamp |> wday(label = TRUE, abbr = FALSE)) |>
+  ggplot(aes(x = time, y = rainfall_mm)) +
+  geom_col() +
+  facet_grid(rows = vars(week))
+
+ggsave("rainfall.jpg", plot = rainfall_plot, path = "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/03 Figures/", width = 8, height = 5, dpi = 600)
+```
+
+```{r combine_plots, fig.width = 8, fig.height = 10, dpi = 600}
+camps_bay_central / rainfall_plot
+```
+
+```{r, fig.width = 8, fig.height = 10, dpi = 600}
+# Create function 
+plot_camps_bay_data <- function(plotting_data, description, ylim, rainfall_position){
+  
+  # Camps Bay Data
+  camps_bay <- plotting_data |>
+    filter(site_description == description) |>
+    mutate(hour = hour(sample_time),
+           day = wday(sample_date, label = TRUE, abbr = FALSE),
+           week = if_else(between(sample_date, ymd("2025-05-19"), ymd("2025-05-23")), "Week 1", "Week 2")
+           )
+  
+  # Rainfall data
+  rainfall_daily <- rainfall |>
+    group_by(date = date(timestamp)) |>
+    summarise(total_rainfall_mm = sum(rainfall_mm)) |>
+    mutate(day = wday(date, label = TRUE, abbr = FALSE),
+           week = if_else(between(date, ymd("2025-05-19"), ymd("2025-05-23")), "Week 1", "Week 2")
+           )
+  
+  # Plot the data
+  plot <- ggplot(data = camps_bay, aes(x = hour, y = mean)) +
+    labs(
+      y = "Enterococci (cfu per 100 mL)",
+      title = description,
+      # caption = "Dashed line shows the single-sampled threshold for Enterococci of 240 cfu per 100 mL"
+    ) +
+    
+    geom_point(data = rainfall_daily, aes(x = 12, y = rainfall_position, size = total_rainfall_mm), colour = "#1F78B4") +
+    geom_col() +
+    geom_errorbar(aes(ymax = mean + sd, ymin = mean)) +
+    geom_hline(yintercept = 240, linetype = 2, colour = "grey") +
+    facet_grid(rows = vars(week), cols = vars(day)) +
+    
+    scale_x_continuous(breaks = c(0, 6, 12, 18, 24), labels = c("12am", "6am", "12pm", "6pm", "12am")) +
+    scale_size_continuous(name = "Total Daily Rainfall (mm) (SAEON, 2025)") +
+  
+    coord_cartesian(ylim = c(0, ylim)) +
+    
+    # Set style options
+    theme(
+      legend.position = "bottom",
+      text = element_text(family = "Century Gothic"),
+      plot.title = element_text(hjust = 0.5),
+      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+      axis.title.x = element_blank()
+    )
+
+return(plot)
+}
+
+(camps_bay_central <- plot_camps_bay_data(plotting_data, "Camps Bay Central", 300, 280))
+(camps_bay_south <- plot_camps_bay_data(plotting_data, "Camps Bay South", 300, 280))
+(glen_beach <- plot_camps_bay_data(plotting_data, "Glen Beach", 300, 280))
+(glen_beach_ex <- plot_camps_bay_data(plotting_data, "Glen Beach", 3000, 2000) + theme(plot.title = element_blank()))
+(maidens_cove <- plot_camps_bay_data(plotting_data, "Maidens Cove", 300, 280))
+(maidens_cove_ex <- plot_camps_bay_data(plotting_data, "Maidens Cove", 700, 600) + theme(plot.title = element_blank()))
+
+# Combine Maidens Cove
+glen_beach_combined <- glen_beach / glen_beach_ex + plot_layout(guides = "collect") + plot_annotation(caption = "Dashed line shows the single-sample threshold for Enterococci of 240 cfu per 100 mL") & theme(legend.position = "bottom", text = element_text(family = "Century Gothic"))
+
+# Combine Maidens Cove
+maidens_cove_combined <- maidens_cove / maidens_cove_ex + plot_layout(guides = "collect") + plot_annotation(caption = "Dashed line shows the single-sample threshold for Enterococci of 240 cfu per 100 mL") & theme(legend.position = "bottom", text = element_text(family = "Century Gothic"))
+
+# Make extra plot for Tuesday Week 1
+camps_bay |>
+  filter(day == "Thursday", week == "Week 1")
+
+ggsave(filename = "glen_beach_with_rainfall.jpg", plot = glen_beach_combined, path = "../../Infinity/Coastal Water Quality - Documents/Shared Results/Camps Bay High-Frequency Sampling/03 Figures/", width = 8, height = 10, dpi = 600)
 ```
 
