@@ -830,13 +830,35 @@ inland_sites <- read_sf("01 Input Data/Routine_Inland_Water_Quality_Monitoring.s
 
 ```{r select-site}
 # Choose the site ID for inland water quality
-current_site_id <- "LOU05"
+c("LOU05 Lourens River Mouth, Beach Road",
+"DR05 Hout Bay River Mouth",
+"CN28 Camps Bay Stormwater Discharge",
+"CEN05 Diepsloot Stream, Glen Beach",
+"CEN04 Camps Bay Stream",
+"CN16B Saunders Rocks Stormwater Discharge",
+"CN17A Three Anchor Bay Stormwater Discharge",
+"RTV10 Diep River Mouth",
+"FHC Fish Hoek Stormwater Culvert",
+"FHLH Fish Hoek Lighthouse Stormwater Discharge",
+"SIL06 Silvermine River Mouth",
+"CS22 Muizenberg Station Stormwater Discharge",
+"ZEV08 Zeekoevlei Canal Mouth at Baden Powell Road",
+"CS23 Mitchells Plain Stormwater West Discharge",
+"KHA04 Khayelitsha Stormwater Discharge",
+"EK17 Eerste River Estuary near Macassar Beach",
+"SIR05 Sir Lowry's Pass River Mouth") |>
+  as_tibble() |>
+  mutate(site_id = str_extract(value, "[:upper:]{2,4}\\d{0,2}[AB]?"),
+         site_description = str_remove(value, "[:upper:]{2,4}\\d{0,2}[AB]?") |> str_trim()) |>
+  select(site_id, site_description) -> inland_shortlist
+
+site <- 17
 ```
 
 ```{r clean-data}
 # Inland water quality data
 (inland_data_clean <- inland_data |>
-  filter(SMPL_PNT == current_site_id, PRMT_CODE == "Escherichia coli (CFU)") |>
+  filter(SMPL_PNT == inland_shortlist |> slice(site) |> pull(site_id), PRMT_CODE == "Escherichia coli (CFU)") |>
   arrange(SMPL_DATE) |>
   select(SMPL_PNT, SMPL_DATE, PRMT_VL, PRMT_ORGN_, geometry) |>
   mutate(censored_value = str_c(PRMT_ORGN_, PRMT_VL) |> str_remove("=")) |>
@@ -865,21 +887,28 @@ inland_data_clean |>
 inland_sites |>
   select(SCN_SRV_CO, MNTR_TYPE, LCTN_DSCR, CTMT_CSTL, geometry) |>
   rename(site_id = SCN_SRV_CO, monitoring_type = MNTR_TYPE, site_description = LCTN_DSCR, catchment = CTMT_CSTL) |>
-  filter(site_id == current_site_id)
+  filter(site_id == inland_shortlist |> slice(site) |> pull(site_id))
 ```
 
-```{r dotplot-ecoli, fig.width = 8, fig.height = 2, dpi = 600}
+```{r dotplot-ecoli, fig.width = 8, fig.height = 4, dpi = 600}
 (inland_bubble_plot <- inland_data_clean |>
-   filter(numeric_value < 1e6) |>
-  ggplot(aes(x = sample_date, size = numeric_value, y = "Ecoli", colour = log10(numeric_value))) +
-  labs(title = expression(paste(italic("E. coli"))), subtitle = "Lourens River Bridge, Beach Road") +
+   # filter(numeric_value < 1e6) |>
+  ggplot(aes(x = sample_date, size = numeric_value, y = "Ecoli", colour = numeric_value)) +
+  labs(title = expression(paste(italic("E. coli"))), subtitle = inland_shortlist |> slice(site) |> pull(site_description)) +
   geom_point(alpha = 0.7, shape = 16) +
-  scale_size_continuous(range = c(0.2, 30)) +
-  scale_colour_distiller(type = "div", palette = 8) +
+  scale_size_continuous(name = "cfu per 100 mL", range = c(1, 30), label = scales::label_number()) +
+  scale_colour_distiller(name = expression(paste(italic("E. coli"), " (cfu per 100 mL)")),
+                         type = "div",
+                         palette = 8,
+                         trans = "log10",
+                         label = scales::label_number()) +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   theme(
     plot.background = element_blank(),
-    legend.position = "none",
+    legend.position = "bottom",
+    legend.direction = "horizontal",
+    legend.title.position = "bottom",
+    legend.title = element_text(hjust = 0.5),
     panel.background = element_blank(),
     panel.grid = element_blank(),
     panel.grid.major.x = element_line(colour = "grey"),
@@ -889,8 +918,9 @@ inland_sites |>
     text = element_text(family = "Century Gothic"),
     plot.title = element_text(hjust = 0.5),
     plot.subtitle = element_text(hjust = 0.5)
-  ))
+  ) +
+   guides(colour = "none", size = guide_legend(override.aes = list(colour = "grey"))))
 
-ggsave(path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025", filename = str_c(current_site_id, ".jpg"), plot = inland_bubble_plot, width = 8, height = 2, dpi = 600)
+ggsave(path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Long-term Plots/", filename = str_c(inland_shortlist |> slice(site) |> pull(site_id), ".jpg"), plot = inland_bubble_plot, width = 8, height = 4, dpi = 600)
 ```
 
