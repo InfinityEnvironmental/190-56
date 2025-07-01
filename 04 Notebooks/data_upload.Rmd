@@ -1045,16 +1045,22 @@ SELECT * FROM triplicates;
 
 ```{sql, connection = con}
 SELECT
-  sample_id,
-  site_id,
-  sample_date,
-  sample_time,
-  analysis_completed,
-  sample_temp_c,
-  enterococci_cfu_per_100ml,
-  filename,
-  lab_code
-FROM coastal.triplicate_results;
+  to_char(sample_date, 'month') AS month,
+  lab_code,
+  count(*)
+FROM triplicates a
+GROUP BY to_char(sample_date, 'month'), lab_code
+ORDER BY month, lab_code;
+```
+
+```{sql, connection = con}
+SELECT
+  to_char(sample_date, 'month') AS month,
+  lab_code,
+  count(*)
+FROM coastal.triplicate_results
+GROUP BY to_char(sample_date, 'month'), lab_code
+ORDER BY month, lab_code;
 ```
 
 ```{sql, connection = con}
@@ -1068,11 +1074,18 @@ SELECT
   enterococci_cfu_per_100ml,
   filename,
   lab_code::coastal.lab
-FROM triplicates;
+FROM triplicates
+WHERE sample_date >= '2025-05-01' AND lab_code = 'SSVC';
 ```
 
 ```{sql, connection = con}
-SELECT * FROM coastal.triplicate_results;
+SELECT
+  to_char(sample_date, 'month') AS month,
+  lab_code,
+  count(*)
+FROM coastal.triplicate_results
+GROUP BY to_char(sample_date, 'month'), lab_code
+ORDER BY to_char(sample_date, 'month'), lab_code;
 ```
 
 ```{sql, connection = con}
