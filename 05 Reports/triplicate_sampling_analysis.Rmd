@@ -1,0 +1,77 @@
+---
+title: "Triplicate Sampling Analysis"
+author: "Francois van Schalkwyk"
+date: "`r Sys.Date()`"
+output: word_document
+---
+
+## Set working directory for all code chunks to project root directory
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## Load required packages
+
+```{r message = FALSE}
+library(tidyverse)
+library(dbplyr)
+library(DBI)
+library(pdftools)
+library(readxl)
+library(sf)
+library(extrafont)
+library(patchwork)
+```
+
+## Database Connection
+
+```{r db connection}
+# Enter credentials when prompted
+con <- dbConnect(RPostgres::Postgres(),
+  host = "aws-0-eu-central-1.pooler.supabase.com",
+  port = 5432,
+  user = str_c(rstudioapi::askForPassword(prompt = "Username: "), "wnrvdvesovnkmqbhkhjz", sep = "."),
+  password = rstudioapi::askForPassword(),
+  dbname = "postgres"
+)
+```
+
+```{r}
+dbGetInfo(con)
+```
+
+# Read in triplicate sampling data
+
+```{r read-data}
+triplicate <- tbl(con, I("coastal.triplicate_results")) |>
+  collect()
+```
+
+```{r clean-data}
+to_plot <- triplicate |>
+  select(sample_date, sample_time, sample_id, site_id, enterococci_cfu_per_100ml, lab_code) |>
+  # Make month column
+  mutate(month = month(sample_date, label = TRUE, abbr = FALSE)) |>
+  # Make numeric enterococci column
+  rename(censored_value = enterococci_cfu_per_100ml) |>
+  mutate(numeric_value = case_when(
+    str_detect(censored_value, "<") ~ 0,
+    censored_value == "ND" ~ 0,
+    .default = censored_value |> as.numeric()
+  )) |>
+  mutate(sample_id = str_extract(sample_id, "^[:upper:]{2,3}\\d{2,3}")) |>
+  group_by(sample_date, lab_code, sample_id) |>
+  summarise(mean = mean(numeric_value), sd = sd(numeric_value))
+
+# Plot the data
+to_plot |>
+  filter(sample_date == "2025-04-01") |>
+  ggplot(aes(x = lab_code, y = mean, fill = sample_id)) +
+  geom_col(position = position_dodge(preserve = "single")) +
+  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.3, position = position_dodge(preserve = "total")) +
+  scale_x_discrete()
+```
+
+
