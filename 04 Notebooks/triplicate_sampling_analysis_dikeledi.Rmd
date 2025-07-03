@@ -1,0 +1,25 @@
+---
+title: "Triplicate Sampling Analysis"
+author: "Francois van Schalkwyk"
+date: "`r Sys.Date()`"
+output: word_document
+---
+
+## Set working directory for all code chunks to project root directory
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## Load required packages
+
+```{r message = FALSE}
+library(tidyverse)
+```
+
+# Read in triplicate sampling data
+
+
+
+
