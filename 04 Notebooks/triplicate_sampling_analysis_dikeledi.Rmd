@@ -19,7 +19,17 @@ library(tidyverse)
 ```
 
 # Read in triplicate sampling data
+```{r read-in-triplicate-sampling-data}
+
+trip_data <- read_csv("01 Input Data/triplicate_results.csv")
+```
 
 
+```{r inspect-data}
+head(trip_data)
+tail(trip_data)
+glimpse(trip_data)
+summary(trip_data)
+```
 
-
+trip_data
