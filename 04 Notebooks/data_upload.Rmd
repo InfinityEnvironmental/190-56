@@ -83,7 +83,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_120(30.06.2025).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_121(01.07.2025).pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
 # Extract the pdf data
@@ -207,7 +207,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml, sample_temp_c, filename
 FROM coastal.results
-WHERE sample_date = '2025-06-30' AND monitoring_group = 'routine';
+WHERE sample_date = '2025-07-01' AND monitoring_group = 'routine';
 ```
 
 ```{sql, connection = con}
@@ -227,19 +227,19 @@ BEGIN;
 ```{sql connection = con}
 INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code, monitoring_group)
 SELECT
-  'XCN03' AS site_id,
-  '2025-06-10'::date AS sample_date,
-  '09:51'::time AS sample_time,
-  '2025-06-12'::date AS analysis_completed,
-   3.1 AS sample_temp_c,
-  '5' AS enterococci_cfu_per_100ml,
-  'Infinity Environmental AD.161(FB)' AS filename,
+  'CN11' AS site_id,
+  '2025-07-01'::date AS sample_date,
+  '10:22'::time AS sample_time,
+  '2025-07-03'::date AS analysis_completed,
+   4.6 AS sample_temp_c,
+  '16' AS enterococci_cfu_per_100ml,
+  'Infinity Environmental AD.178(FB).pdf' AS filename,
   'WLAB'::coastal.lab AS lab_code,
   'routine'::coastal.monitoring_group AS monitoring_group;
 ```
 
 ```{sql connection = con}
-SELECT * FROM coastal.results WHERE sample_date = '2025-06-10' AND monitoring_group = 'routine';
+SELECT * FROM coastal.results WHERE sample_date = '2025-07-01' AND monitoring_group = 'routine';
 ```
 
 ```{sql connection = con}
@@ -1016,7 +1016,7 @@ COMMIT;
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Triplicate Sampling/Infinity Environmental AD.176(FB).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Triplicate Sampling/Infinity Environmental AD.178(FB).pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Triplicate Sampling/")
 
 # Extract the pdf data
@@ -1061,11 +1061,6 @@ extract_table <- function(page){
 table <- map(pdf_data, ~extract_table(.x)) |>
   unlist()
 
-# Extract sample number
-sample_number <- table |>
-  str_sub(1,15) |>
-  str_trim()
-
 # Extract sample text
 sample_text <- table |>
   str_sub(15,95) |>
@@ -1077,21 +1072,18 @@ sample_result <- table |>
   str_trim()
 
 # Make a table with the extracted data
-tbl <- tibble(number = sample_number,
+tbl <- tibble(
        text = sample_text,
-       result = sample_result) |> 
-  mutate(number = if_else(number == "", NA, number)) |>
-  fill(number, .direction = "down") |> 
-  group_by(number) |>
-  summarise(text = str_c(text, collapse = ""), result = first(result)) |>
-  select(text, result) |>
+       result = sample_result) |>
   mutate(
-      site_id = str_extract(text, "[:upper:]{2,3}\\s?\\d{2}\\d?[AOIWETC]?") |> str_remove_all("\\s"),
-      sample_time = str_extract(text, "\\d{1,2}h\\d{2}") |> str_replace("h", ":"),
-      sample_date = sample_date,
-      analysis_completed = analysis_completed,
-      sample_temp_c = sample_temp_c,
-      filename = filename |> str_remove(path)
+    sample_id = str_extract(text, "[:upper:]{2,3}\\d{2,3}[IAOWETC]?\\s?[ABCDEFGHI]?") |> str_remove("\\s"),
+    site_id = str_extract(text, "[:upper:]{2,3}\\s?\\d{2}\\d?[AOIWETC]?") |> str_remove_all("\\s"),
+    site_id = if_else(site_id %in% c("LB001", "FB001"), NA, site_id),
+    sample_time = str_extract(text, "\\d{1,2}h\\d{2}") |> str_replace("h", ":"),
+    sample_date = sample_date,
+    analysis_completed = analysis_completed,
+    sample_temp_c = sample_temp_c,
+    filename = filename |> str_remove(path)
       ) |>
   select(-text) |>
   rename(enterococci_cfu_per_100ml = result) |>
@@ -1102,6 +1094,45 @@ tbl
 
 # Copy to database
 copy_to(con, tbl, name = "coastal", overwrite = TRUE)
+```
+
+```{sql connection = con}
+BEGIN;
+```
+
+```{sql connection = con}
+SELECT * FROM coastal;
+```
+
+```{sql connection = con}
+SELECT * FROM coastal.triplicate_results;
+```
+
+```{sql connection = con}
+INSERT INTO coastal.triplicate_results (sample_id, site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code)
+SELECT
+  sample_id,
+  site_id,
+  sample_date,
+  sample_time::time,
+  analysis_completed,
+  sample_temp_c,
+  enterococci_cfu_per_100ml,
+  filename,
+  'WLAB'::coastal.lab AS lab_code
+FROM coastal;
+```
+
+```{sql connection = con}
+SELECT * FROM coastal.triplicate_results WHERE sample_date = '2025-07-01';
+```
+
+```{sql connection = con}
+ROLLBACK;
+```
+
+```{sql connection = con}
+COMMIT;
 ```
 
 ## Upload manually
@@ -1134,7 +1165,7 @@ BEGIN;
 ```
 
 ```{sql, connection = con}
-SELECT * FROM triplicates;
+SELECT * FROM triplicates WHERE sample_date >= '2025-06-30';
 ```
 
 ```{sql, connection = con}
@@ -1143,6 +1174,7 @@ SELECT
   lab_code,
   count(*)
 FROM triplicates a
+WHERE sample_date >= '2025-06-30'
 GROUP BY to_char(sample_date, 'month'), lab_code
 ORDER BY month, lab_code;
 ```
@@ -1153,6 +1185,7 @@ SELECT
   lab_code,
   count(*)
 FROM coastal.triplicate_results
+WHERE sample_date >= '2025-06-30'
 GROUP BY to_char(sample_date, 'month'), lab_code
 ORDER BY month, lab_code;
 ```
@@ -1169,7 +1202,7 @@ SELECT
   filename,
   lab_code::coastal.lab
 FROM triplicates
-WHERE sample_date >= '2025-05-01' AND lab_code = 'SSVC';
+WHERE sample_date >= '2025-06-30';
 ```
 
 ```{sql, connection = con}
