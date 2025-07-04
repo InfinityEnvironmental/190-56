@@ -3,7 +3,7 @@ title: "Triplicate Sampling Analysis"
 author: "Francois van Schalkwyk"
 date: "`r Sys.Date()`"
 output: word_document
----
+---	    
 
 ## Set working directory for all code chunks to project root directory
 
@@ -16,6 +16,120 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 
 ```{r message = FALSE}
 library(tidyverse)
+library(ggplot2)
+library(dplyr)
 ```
 
 # Read in triplicate sampling data
+
+```{r}
+dat<-read_csv("C:/Users/AvumileBawuli/Repositories/190-56/01 Input Data/triplicate_results.csv")
+
+attach(dat)
+
+names(dat)
+```
+```{r inspect-data}
+head(dat)
+tail(dat)
+glimpse(dat)
+summary(dat)
+```
+
+#Bar plot 
+```{r}
+ggplot(dat, aes(x = site_id, y = enterococci_cfu_per_100ml, fill = site_id)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Enterococci Levels by Site",
+    x = "Site",
+    y = "Enterococci_cfu_per_100ml"
+  )
+```
+#Fixing data
+```{r}
+df <- data.frame(
+  id = 1:113,
+  value = c(enterococci_cfu_per_100ml),
+  stringsAsFactors = FALSE
+)
+```
+#Mutate column value to convert non-numeric values to 0
+```{r}
+df <- df %>%
+  mutate(value = ifelse(grepl("^[0-9.]+$", value), as.numeric(value), 0))
+
+print(df)
+```
+
+#Summary Stats
+```{r}
+summary_data <- dat %>%
+  group_by(site_id) %>%
+  summarise(
+    mean_enterococci = mean(enterococci_cfu_per_100ml),
+    sd_enterococci = sd(enterococci_cfu_per_100ml),
+    n = n(),
+    se_enterococci = sd_enterococci / sqrt(n)
+  )
+```
+#Plot with error bars
+```{r}
+ggplot(summary_data, aes(x = site_id, y = mean_enterococci, fill = site_id)) +
+  geom_bar(stat = "identity", color = "black", width = 5) +
+  geom_errorbar(aes(ymin = mean_enterococci - sd_enterococci,
+                    ymax = mean_enterococci + sd_enterococci),
+                width = 0.2, linewidth = 0.8) +
+  labs(
+    title = "Mean Enterococci Levels by Site (± SD)",
+    x = "site_id",
+    y = "Mean Enterococci"
+  ) +
+  theme_minimal()
+```
+```{r}
+summary(summary_data)
+```
+
+
+
+
+#Stacked bar graph
+```{r}
+ggplot(dat, aes(x = sample_date, y = enterococci_cfu_per_100ml, fill = site_id)) +
+  geom_bar(stat = "identity") +
+  theme_minimal()
+```
+#Time
+```{r}
+dat <- dat %>%
+  mutate(Time = as.Date(sample_date))
+```
+#Mutate column value to convert non-numeric values to 0
+```{r}
+df <- df %>%
+  mutate(value = ifelse(grepl("^[0-9.]+$", value), as.numeric(value), 0))
+
+print(df)
+```
+ # Convert to numeric
+[]
+#Line plot
+```{r}
+```{r}
+
+```
+
+ggplot(dat, aes(x = Time, y = enterococci_cfu_per_100ml , color = site_id, group = site_id)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 1) +
+    labs(
+    title = "Enterococci Levels Over Time by Site",
+    x = "Time",
+    y = "Enterococci_cfu",
+    color = "site_id"
+  ) +
+  theme_minimal()
+```
+
+
