@@ -5,21 +5,44 @@ date: "`r Sys.Date()`"
 output: word_document
 ---
 
-## Set working directory for all code chunks to project root directory
+# Set working directory for all code chunks to project root directory
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 
-## Load required packages
+# Load required packages
 
 ```{r message = FALSE}
 library(tidyverse)
 ```
 
 # Read in triplicate sampling data
+```{r read-in-triplicate-sampling-data}
 
+trip_data <- read_csv("01 Input Data/triplicate_results.csv")
+```
 
+# Clean triplicate data 
+```{r inspect-data}
+head(trip_data)
+tail(trip_data)
+glimpse(trip_data)
+summary(trip_data)
+view(trip_data) #see data
+trip_data |> 
+  select(sample_id, sample_date, sample_time, enterococci_cfu_per_100ml)
+    trip_data$enterococci_cfu_per_100ml <- as.character(trip_data$enterococci_cfu_per_100ml)
+trip_data$enterococci_cfu_per_100ml[trip_data$enterococci_cfu_per_100ml == "ND"] <- "0"
+trip_data$enterococci_cfu_per_100ml[trip_data$enterococci_cfu_per_100ml == "<1"] <- "0"
+trip_data$enterococci_cfu_per_100ml <- as.numeric(trip_data$enterococci_cfu_per_100ml) #remove ND and <1
+```
 
+# Visualise triplicate data
+```{r plot-data}
+ggplot(data = trip_data,
+       mapping = aes(x=sample_id))+
+  geom_bar()
+```
 

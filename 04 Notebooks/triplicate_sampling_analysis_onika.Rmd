@@ -3,7 +3,7 @@ title: "Triplicate Sampling Analysis"
 author: "Francois van Schalkwyk"
 date: "`r Sys.Date()`"
 output: word_document
----
+---	    
 
 ## Set working directory for all code chunks to project root directory
 
@@ -19,3 +19,83 @@ library(tidyverse)
 ```
 
 # Read in triplicate sampling data
+
+```{r   Import data}
+dat<-read_csv("C:/Users/AvumileBawuli/Repositories/190-56/01 Input Data/triplicate_results.csv")
+attach(dat)
+names(dat)
+```
+```{r inspect-data}
+head(dat)
+tail(dat)
+glimpse(dat)
+summary(dat)
+```
+#Clean the data
+```{r}
+data_clean <- dat %>%  #Clean enterococci values
+  mutate(enterococci_cfu_per_100ml = case_when(
+      enterococci_cfu_per_100ml == "<1" ~ "0.5",  # Replace <1 with 0.5 or NA, depending on your analysis
+      enterococci_cfu_per_100ml == "ND" ~ NA_character_,
+      TRUE ~ enterococci_cfu_per_100ml
+    ),
+    enterococci_cfu_per_100ml = as.numeric(enterococci_cfu_per_100ml))
+
+```
+
+#Convert sample date
+```{r}
+sample_date = ymd(sample_date)
+sample_time = na_if(sample_time, "NULL")# Treat NULL as NA
+sample_temp_c = na_if(sample_temp_c, "NULL")
+sample_temp_c = as.numeric(sample_temp_c)
+```
+#Summary statistics
+```{r}
+summary(data_clean$enterococci_cfu_per_100ml)
+```
+#Box plot by lab or site
+```{r}
+ggplot(data_clean, aes(x = lab_code, y = enterococci_cfu_per_100ml)) +
+  geom_boxplot() +
+  labs(title = "Enterococci Levels by Lab", y = "CFU/100ml", x = "Lab")
+```
+
+#Time series trend by site
+```{r}
+ggplot(data_clean, aes(x = sample_date, y = enterococci_cfu_per_100ml, color = site_id)) +
+  geom_point() +
+  geom_smooth(method = "loess", se = FALSE) +
+  labs(title = "Enterococci Over Time by Site", y = "CFU/100ml", x = "Date")
+```
+#Mean enterococci per site
+```{r}
+data_clean %>%
+  group_by(site_id) %>%
+  summarise(
+    mean_cfu = mean(enterococci_cfu_per_100ml, na.rm = TRUE),
+    max_cfu = max(enterococci_cfu_per_100ml, na.rm = TRUE),
+    sample_count = n()
+  ) %>%
+  arrange(desc(mean_cfu))
+```
+
+
+
+#Bar plot 
+```{r}
+ggplot(dat, aes(x = site_id, y = enterococci_cfu_per_100ml, fill = site_id)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Enterococci Levels by Site",
+    x = "Site",
+    y = "Enterococci_cfu_per_100ml"
+  )
+```
+
+
+
+
+
+
+
