@@ -37,6 +37,8 @@ trip_data |>
 trip_data$enterococci_cfu_per_100ml[trip_data$enterococci_cfu_per_100ml == "ND"] <- "0"
 trip_data$enterococci_cfu_per_100ml[trip_data$enterococci_cfu_per_100ml == "<1"] <- "0"
 trip_data$enterococci_cfu_per_100ml <- as.numeric(trip_data$enterococci_cfu_per_100ml) #remove ND and <1
+str(trip_data)
+any(names(trip_data) == "lab_code")
 ```
 
 # Visualise triplicate data
@@ -44,5 +46,9 @@ trip_data$enterococci_cfu_per_100ml <- as.numeric(trip_data$enterococci_cfu_per_
 ggplot(data = trip_data,
        mapping = aes(x=sample_id))+
   geom_bar()
+ggplot(data = trip_data,
+       mapping = aes(x=lab_code, y=enterococci_cfu_per_100ml))+
+  geom_col()
+
 ```
 
