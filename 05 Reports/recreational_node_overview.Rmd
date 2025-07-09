@@ -163,7 +163,7 @@ river <- opq(site_bbox) |>
 site_overview <- ggplot() +
   geom_sf(data = cct_coastline$osm_lines, colour = "white", linewidth = 0.4) +
   geom_sf(data = sites_sf, aes(colour = category, size = category), shape = 16) +
-  geom_sf(data = sites_sf |> filter(site_id == site_code), colour = city_pink, size = unit(2, "mm"), alpha = 0.7, shape = 16) +
+  geom_sf(data = sites_sf |> filter(site_id == site_code), colour = city_pink, size = unit(4, "mm"), alpha = 0.5, shape = 16) +
    geom_sf(data = bbox_htb |> st_as_sfc(), colour = "white", fill = NA) +
   
   # Plot styling
@@ -304,8 +304,9 @@ exceedances <- sites |>
     samples_exceed_pct = round(sum(numeric_value > 240) / n() * 100, 0)
   ) |>
   mutate(
-    label = str_c(samples_exceed, " out of ", all_samples, " samples taken\nexceeded the threshold\nvalue for Enterococci\nof 240 cfu per 100 mL", sep = "")
-    )
+    label = str_c(samples_exceed, " out of ", all_samples, " samples", sep = ""),
+    extra_text = " taken exceeded the\nthreshold value for\nEnterococci of\n240 cfu per 100 mL"
+  )
 
 # Winter and summer data
 seasonal_exceedances <- sites |>
@@ -345,7 +346,8 @@ group_by(season) |>
 ```{r exceedances-figure, fig.width = 6, fig.height = 3, dpi = 600}
 # Create a figure for the percentage exceedances
 exceed_text <- ggplot(data = exceedances) +
-  geom_text(aes(x = 0, y = 0, label = label), family = "Century Gothic", size = 4, colour = "white", lineheight = 1) +
+  geom_text(aes(x = 0, y = 0, label = label), family = "Century Gothic", size = 4, colour = "white", lineheight = 1, vjust = -0.1, fontface = "bold") +
+  geom_text(aes(x = 0, y = 0, label = extra_text), family = "Century Gothic", size = 4, colour = "white", lineheight = 1, vjust = 1.1) +
   theme(
     axis.text = element_blank(),
     axis.ticks = element_blank(),
@@ -449,7 +451,7 @@ all <- sites |>
     hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
     hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
   hazen_category = case_when(
-      n < 10 ~ "TFD",
+      n < 10 ~ "TFD*",
       hazen95 <= 100 ~ "Excellent",
       hazen95 <= 200 ~ "Good",
       hazen95 > 200 & hazen90 > 185 ~ "Poor",
@@ -473,7 +475,7 @@ summer <- sites |>
     hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
     hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
   hazen_category = case_when(
-      n < 10 ~ "TFD",
+      n < 10 ~ "TFD*",
       hazen95 <= 100 ~ "Excellent",
       hazen95 <= 200 ~ "Good",
       hazen95 > 200 & hazen90 > 185 ~ "Poor",
@@ -497,7 +499,7 @@ winter <- sites |>
     hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
     hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
   hazen_category = case_when(
-      n < 10 ~ "TFD",
+      n < 10 ~ "TFD*",
       hazen95 <= 100 ~ "Excellent",
       hazen95 <= 200 ~ "Good",
       hazen95 > 200 & hazen90 > 185 ~ "Poor",
@@ -508,20 +510,22 @@ winter <- sites |>
 # Combine the three categories
 
 hazen_categories <- bind_rows(all, summer, winter) |>
-  mutate(hazen_category = fct(hazen_category, levels = c("TFD", "Poor", "Sufficient", "Good", "Excellent"))) |>
+  mutate(hazen_category = fct(hazen_category, levels = c("TFD*", "Poor", "Sufficient", "Good", "Excellent"))) |>
   complete(hazen_category, season) |>
   mutate(alpha_value = if_else(!is.na(n), 100, 50)) |>
   dplyr::select(hazen_category, season, alpha_value) |>
   ggplot() +
+  labs(caption = "* Too Few Data: More samples needed to calculate water quality category using the Hazen method") +
   geom_tile(aes(x = hazen_category, y = "Season", fill = hazen_category, alpha = alpha_value, colour = as.character(alpha_value)), height = 0.8, width = 0.9, linewidth = unit(1, "mm")) +
   geom_text(aes(x = hazen_category, y = "Season", label = hazen_category), family = "Century Gothic", colour = "white", size = unit(5, "mm"), fontface = "bold") +
-  scale_fill_manual(name = "Hazen Water Quality Category", values = c("TFD" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
+  scale_fill_manual(name = "Hazen Water Quality Category", values = c("TFD*" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
   scale_colour_manual(values = c("50" = city_teal, "100" = "white")) +
   facet_grid(rows = vars(str_to_title(season)), switch = "y") +
   
 # Style components
   theme(
     plot.background = element_blank(),
+    plot.caption = element_text(family = "Century Gothic", colour = "white"),
     panel.background = element_blank(),
     panel.border = element_rect(colour = "white", fill = NA, linewidth = unit(0.5, "mm")),
     panel.grid = element_blank(),
@@ -705,7 +709,7 @@ reporting_period <- ggplot() +
 
 # Add title for percentage exceedances
 sample_threshold_title <- ggplot() +
-  annotate(geom = "text", x = 0, y = 0, label = "Samples that exceed threshold\nfor safe water use", family = "Century Gothic", colour = "white", size = unit(4, "mm"), fontface = "bold") +
+  annotate(geom = "text", x = 0, y = 0, label = "Samples that exceeded threshold\nfor safe water use", family = "Century Gothic", colour = "white", size = unit(4, "mm"), fontface = "bold") +
   theme(
     plot.background = element_blank(),
     panel.background = element_blank(),
@@ -727,7 +731,7 @@ sample_threshold_title <- ggplot() +
   inset_element(hazen_categories, left = unit(15, "mm"), bottom = unit(200, "mm"), right = unit(200, "mm"), top = unit(290, "mm"), align_to = "full") +
   inset_element(wheel, left = unit(120+5, "mm"), bottom = unit(145-10, "mm"), right = unit(210+2+5, "mm"), top = unit(175+10, "mm")) +
   inset_element(text, left = unit(120+5, "mm"), bottom = unit(100-5-5-3+20+20, "mm"), right = unit(210+2+5, "mm"), top = unit(145-5-3+20+10+20, "mm")) +
-  inset_element(exceed_text, left = unit(118+5-2, "mm"), bottom = unit(30+20+5+5, "mm"), right = unit(208+5-2, "mm"), top = unit(60 + 10 +20+5+5, "mm")) +
+  inset_element(exceed_text, left = unit(118+5-2, "mm"), bottom = unit(30+20+5+5, "mm"), right = unit(208+5-2, "mm"), top = unit(60 + 10 +20+20, "mm")) +
   inset_element(wheel_seasonal, left = unit(125-1-10+1+5, "mm"), bottom = unit(70+2+40, "mm"), right = unit(205+1+10+1+5, "mm"), top = unit(110-5+5-5+2+40, "mm")) +
   inset_element(text_seasonal, left = unit(132+1+4+5, "mm"), bottom = unit(77+1-3+2+40, "mm"), right = unit(198+1-4+5, "mm"), top = unit(107+1-3+2+40, "mm")) +
   inset_element(sample_threshold_title, left = unit(132, "mm"), bottom = unit(182, "mm"), right = unit(202, "mm"), top = unit(199, "mm")) +
@@ -771,7 +775,7 @@ all_sites_hazen <- sites |>
     hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
     hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
   hazen_category = case_when(
-      n < 10 ~ "TFD",
+      n < 10 ~ "TFD*",
       hazen95 <= 100 ~ "Excellent",
       hazen95 <= 200 ~ "Good",
       hazen95 > 200 & hazen90 > 185 ~ "Poor",
