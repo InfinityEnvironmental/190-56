@@ -30,7 +30,11 @@ head(trip_data)
 tail(trip_data)
 glimpse(trip_data)
 summary(trip_data)
-view(trip_data) #see data
+view(trip_data)
+```
+
+
+```{r transform-data}
 trip_data |> 
   select(sample_id, sample_date, sample_time, enterococci_cfu_per_100ml)
     trip_data$enterococci_cfu_per_100ml <- as.character(trip_data$enterococci_cfu_per_100ml)
@@ -44,11 +48,65 @@ any(names(trip_data) == "lab_code")
 # Visualise triplicate data
 ```{r plot-data}
 ggplot(data = trip_data,
-       mapping = aes(x=sample_id))+
+       mapping = aes(x=sample_id, fill = sample_id))+
   geom_bar()
-ggplot(data = trip_data,
-       mapping = aes(x=lab_code, y=enterococci_cfu_per_100ml))+
-  geom_col()
-
 ```
+
+
+```{r plot-data}
+ggplot(data = trip_data,
+       mapping = aes(x=lab_code, y=enterococci_cfu_per_100ml, fill = lab_code))+
+  geom_col()+
+  scale_fill_brewer(blues9)+
+  theme_minimal()
+```
+
+
+```{r plot-data}
+ggplot(data = trip_data,
+       mapping = aes(x=lab_code, y=enterococci_cfu_per_100ml, fill = lab_code))+
+  geom_boxplot()+
+  facet_wrap(~site_id)+
+  labs(title = "Enterococci Concentrations by Lab and Site", x="Lab", y="Enterococci (cfu/100ml)")+
+  scale_fill_brewer(blues9)+
+  theme_minimal() # Compare distributions
+```
+
+```{r plot-data}
+ggplot(trip_data, aes(x = lab_code, y = enterococci_cfu_per_100ml)) +
+  geom_point(position = position_jitter(width = 0.2), size = 3, aes(color = site_id)) +
+  facet_wrap(~ site_id) +
+  labs(title = "Triplicate Enterococci Results per Site per Lab",
+       x = "Lab", y = "Enterococci (cfu/100ml)") +
+  theme_minimal() # Visualize consistency
+```
+
+```{r plot-data}
+ggplot(trip_data, aes(x = lab_code, y = enterococci_cfu_per_100ml)) +
+  geom_point(aes(color = sample_id == "FB001"), size = 3) +
+  facet_wrap(~ site_id) +
+  labs(title = "Field Blanks and Samples by Lab",
+       x = "Lab", y = "Enterococci (cfu/100ml)", color = "Field Blank") +
+  scale_color_manual(values = c("TRUE" = "black", "FALSE" = "red")) +
+  theme_minimal() # Highlight field blanks
+```
+```{r plot-data}
+trip_sd <- trip_data %>%
+  group_by(site_id, lab_code, sample_date) %>%
+  summarise(triplicate_sd = sd(enterococci_cfu_per_100ml, na.rm = TRUE),
+    .groups = "drop")
+
+ggplot(trip_sd, aes(x = lab_code, y = triplicate_sd, fill = lab_code)) +
+  geom_boxplot() +
+  facet_wrap(~ site_id) +
+  labs(title = "Triplicate Standard Deviation per Lab and Site",
+       x = "Lab", y = "SD of Enterococci (cfu/100ml)") +
+  theme_minimal()
+```
++
+
+
+
+
+
 
