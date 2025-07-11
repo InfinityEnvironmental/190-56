@@ -32,7 +32,7 @@ glimpse(dat)
 summary(dat)
 ```
 #Clean the data
-```{r}
+```{r clean enterococci data}
 data_clean <- dat %>%  #Cleaning enterococci values
   mutate(enterococci_cfu_per_100ml = case_when(
       enterococci_cfu_per_100ml == "<1" ~ "0.5",  # Replace <1 with 0.5 or NA, depending on your analysis
@@ -44,18 +44,18 @@ data_clean <- dat %>%  #Cleaning enterococci values
 ```
 
 #Convert sample date
-```{r}
+```{r converting sample date data}
 sample_date = ymd(sample_date)
 sample_time = na_if(sample_time, "NULL")# Treat NULL as NA
 sample_temp_c = na_if(sample_temp_c, "NULL")
 sample_temp_c = as.numeric(sample_temp_c)
 ```
 #Summary statistics
-```{r}
+```{r summary stats}
 summary(data_clean$enterococci_cfu_per_100ml)
 ```
 #Box plot by lab or site
-```{r}
+```{r plot of the data by site}
 ggplot(data_clean, aes(x = lab_code, y = enterococci_cfu_per_100ml)) +
   geom_boxplot() +
   labs(title = "Enterococci Levels by Lab", y = "CFU per 100ml", x = "Lab")
@@ -110,7 +110,7 @@ anova_result <- aov(enterococci_cfu_per_100ml ~site_id, data = data_clean)
 summary(anova_result)
 ```
 
-
+s
 
 
 
