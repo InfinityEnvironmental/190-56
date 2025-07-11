@@ -33,7 +33,7 @@ summary(dat)
 ```
 #Clean the data
 ```{r}
-data_clean <- dat %>%  #Clean enterococci values
+data_clean <- dat %>%  #Cleaning enterococci values
   mutate(enterococci_cfu_per_100ml = case_when(
       enterococci_cfu_per_100ml == "<1" ~ "0.5",  # Replace <1 with 0.5 or NA, depending on your analysis
       enterococci_cfu_per_100ml == "ND" ~ NA_character_,
@@ -60,6 +60,13 @@ ggplot(data_clean, aes(x = lab_code, y = enterococci_cfu_per_100ml)) +
   geom_boxplot() +
   labs(title = "Enterococci Levels by Lab", y = "CFU per 100ml", x = "Lab")
 ```
+#Box plot by site
+```{r}
+ggplot(data_clean, aes(x = site_id, y = enterococci_cfu_per_100ml)) +
+  geom_boxplot() +
+  labs(title = "Enterococci Levels by Lab", y = "CFU per 100ml", x = "Lab")
+```
+
 
 #Time series trend by site
 ```{r}
@@ -68,6 +75,7 @@ ggplot(data_clean, aes(x = sample_date, y = enterococci_cfu_per_100ml, color = s
   geom_smooth(method = "loess", se = FALSE) +
   labs(title = "Enterococci Over Time by Site", y = "CFU per 100ml", x = "Date")
 ```
+
 #Mean enterococci per site
 ```{r}
 data_clean %>%
@@ -80,8 +88,6 @@ data_clean %>%
   arrange(desc(mean_cfu))
 ```
 
-
-
 #Bar plot 
 ```{r}
 ggplot(dat, aes(x = site_id, y = enterococci_cfu_per_100ml, fill = site_id)) +
@@ -92,11 +98,12 @@ ggplot(dat, aes(x = site_id, y = enterococci_cfu_per_100ml, fill = site_id)) +
     y = "Enterococci_cfu_per_100ml"
   )
 ```
-#Convert site ID to factor
 
+#Convert site ID to factor
 ```{r}
 data_clean$lab_code <- as.factor(data_clean$lab_code)
 ```
+
 #Anova
 ```{r}
 anova_result <- aov(enterococci_cfu_per_100ml ~site_id, data = data_clean)
