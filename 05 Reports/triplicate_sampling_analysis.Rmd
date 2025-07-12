@@ -1,0 +1,70 @@
+---
+title: "Triplicate Sampling Analysis"
+author: "Francois van Schalkwyk"
+date: "2025-07-12"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, include = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## Loading packages
+
+```{r load-packages, echo = FALSE}
+library(tidyverse)
+library(dbplyr)
+library(DBI)
+```
+
+## Database Connection
+
+```{r db-connection}
+# Connect to the Postgres database
+# Enter credentials when prompted
+con <- dbConnect(RPostgres::Postgres(),
+  host = "aws-0-eu-central-1.pooler.supabase.com",
+  port = 5432,
+  user = str_c(rstudioapi::askForPassword(prompt = "Username: "), "wnrvdvesovnkmqbhkhjz", sep = "."),
+  password = rstudioapi::askForPassword(),
+  dbname = "postgres"
+)
+```
+
+# Analysis
+
+```{r import-data}
+triplicates <- tbl(con, I("coastal.triplicate_results")) |>
+  select(-result_id) |>
+  arrange(sample_date, lab_code, sample_id) |>
+  mutate(sample_type = case_when(
+    str_sub(sample_id, 1, 2) == "FB" ~ "field control",
+    str_sub(sample_id, 1, 2) == "LB" ~ "lab control",
+    .default = "field sample"
+  )) |>
+  collect()
+```
+
+How do the results compare between labs?
+
+```{r, fig.height = 11, fig.width = 8.7, dpi = 600}
+triplicates |>
+  select(sample_date, lab_code, sample_type, enterococci_cfu_per_100ml) |>
+  group_by(sample_date, lab_code, sample_type) |>
+  rename(censored_value = enterococci_cfu_per_100ml) |>
+  mutate(numeric_value = if_else(censored_value %in% c("ND", "<1"), 0, censored_value |> as.numeric())) |>
+  mutate(sample_type = str_to_title(sample_type) |> fct(levels = c("Field Sample", "Field Control", "Lab Control"))) |>
+  summarise(mean = mean(numeric_value), sd = sd(numeric_value)) |>
+  ggplot(aes(x = sample_type, y = mean, ymin = mean - sd, ymax = mean + sd, fill = lab_code)) +
+  labs(y = expression("Mean (±SD) enterococci (cfu per 100 mL)")) +
+  geom_errorbar(position = position_dodge(preserve = "single", width = 1), width = 0.3) +
+  geom_col(position = position_dodge(preserve = "single", width = 1)) +
+  facet_wrap(~sample_date, ncol = 3, scales = "free_y") +
+  scale_fill_brewer(name = "Laboratory", type = "qual", palette = 3) +
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = "bottom",
+    text = element_text(family = "Century Gothic")
+  )
+```
