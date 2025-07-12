@@ -5,15 +5,20 @@ date: "`r Sys.Date()`"
 output: word_document
 ---
 
-# Workspace Set Up
+## Set working directory for all code chunks to project root directory
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 
-```{r load-packages}
+## Load required packages
+
+```{r message = FALSE}
 library(tidyverse)
+library(dbplyr)
+library(DBI)
+library(pdftools)
 library(readxl)
 library(DBI)
 library(extrafont)
@@ -42,27 +47,38 @@ city_brown <- "#47292e"
 city_tan <- "#98871f"
 ```
 
-# Hazen Method Set Up
+```{r}
+dbGetInfo(con)
+```
+
+# Hazen Method
+
+```{r read-coastal-data}
+tbl(con, I("coastal.results_view")) |>
+  collect() |>
+  group_by(site_id) |>
+  summarise(hazen90 = quantile(enterococci_cfu_per_100ml_numeric, probs = 0.9, type = 5))
+```
 
 ```{r}
 hazen_method <- function(data){
   # Summarise start and end date
-  start_date <- hout_bay |>
-  arrange(date) |>
+  start_date <- data |>
+  arrange(sample_date) |>
   slice_head(n = 1) |>
-  pull(date)
+  pull(sample_date)
   
   # Summarise end date
-  end_date <- hout_bay |>
-  arrange(date) |>
+  end_date <- data |>
+  arrange(sample_date) |>
   slice_tail(n = 1) |>
-  pull(date)
+  pull(sample_date)
   
   # Extract FIB data
-  l <- hout_bay$faecal_streptococci_cfu_per_100ml |> sort()
+  l <- data$enterococci_cfu_per_100ml_numeric |> sort()
   
   # Extract sample size
-  n <- hout_bay$faecal_streptococci_cfu_per_100ml |> length()
+  n <- data$enterococci_cfu_per_100ml_numeric |> length()
   
   # Hazen method
   r_hazen95 <- 0.5 + (0.95 * n)
@@ -74,7 +90,7 @@ hazen_method <- function(data){
   hazen90 <- pluck(l, floor(r_hazen90)) * (1 - rf90) + pluck(l, floor(r_hazen90) + 1) * rf90
   
   # Create summary table
-  tibble(start_date = start_date, end_date = end_date, sample_size = n, hazen95 = hazen95, hazen90 = hazen90) |>
+  summary <- tibble(start_date = start_date, end_date = end_date, sample_size = n, hazen95 = hazen95, hazen90 = hazen90) |>
   mutate(water_quality = case_when(
     sample_size < 10 ~ "Not enough samples",
     hazen95 <= 100 ~ "Excellent",
@@ -85,7 +101,29 @@ hazen_method <- function(data){
 }
 
 # Call Hazen method function
-hazen_method(hout_bay)
+data <- tbl(con, I("coastal.results_view")) |>
+  collect()
+
+# Hazen method for percentiles
+percentile_hazen <- function(data, p){
+  # Extract FIB data
+  l <- data |> sort()
+  
+  # Extract sample size
+  n <- data |> length()
+  
+  # Hazen method
+  r_hazen <- 0.5 + (0.9 * n)
+  rf <- r_hazen - floor(r_hazen)
+  hazen <- pluck(l, floor(r_hazen)) * (1 - rf) + pluck(l, ceiling(r_hazen)) * rf
+  
+  return(hazen)
+}
+
+data |>
+  group_by(site_id) |>
+  summarise(hazen90 = percentile_hazen(enterococci_cfu_per_100ml_numeric, 0.9))
+
 ```
 
 ```{r test-hazen-method}
@@ -256,5 +294,3 @@ daily_comparison_plot <- rolling365day_plot + rolling5yearplot + plot_layout(gui
 
 ggsave("daily_sample_comparison.jpg", plot = daily_comparison_plot, path = "02 Output Data/", width = 8, height = 5, dpi = 600)
 ```
-
-
