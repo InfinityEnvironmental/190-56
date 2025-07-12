@@ -97,8 +97,8 @@ site_id <- sites |>
 ```
 
 ```{r choose-site}
-site_code <- site_id |> keep_at(1)
-width <- 1500
+site_code <- site_id |> keep_at(20)
+width <- 270
 ```
 
 ```{r create-bounding-box-for-site}
@@ -119,7 +119,7 @@ create_bounding_box_htb <- function(site_code, width) {
     st_bbox() + c(-width, -width, width, width)
   return(bbox_htb)
 }
-bbox_htb <- create_bounding_box_htb(site_code, 1500)
+bbox_htb <- create_bounding_box_htb(site_code, width)
 ```
 
 ```{r}
@@ -195,11 +195,11 @@ site_overview <- ggplot() +
   
   # Add beaches
   geom_sf(data = beaches$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
-  # geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
+  geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
   
   # Add rivers
   # geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
-  # geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
+  geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   geom_sf(data = river$osm_polygons |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   
   # Add other water
@@ -252,15 +252,15 @@ site_overview <- ggplot() +
    
   # Add the monitoring sites with labels
   geom_sf(data = sites_sf |> st_transform("ESRI: 102562"), aes(colour = category), size = 1) +
-  geom_label_repel(data = sites_sf |> filter(category == "Recreational Node"), aes(label = site_description, geometry = geom), stat = "sf_coordinates",
+  geom_label_repel(data = sites_sf |> filter(category == "Recreational Node"), aes(label = str_wrap(site_description, 20), geometry = geom), stat = "sf_coordinates",
   # geom_label_repel(data = sites_sf |> filter(category == "Recreational Node"), aes(label = str_wrap(site_description, 16), geometry = geom), stat = "sf_coordinates",
             colour = "white",
             size = unit(3, "mm"),
-            # nudge_x = 150,
+            # nudge_x = -50,
             family = "Century Gothic",
             label.padding = 0.20,
             # point.padding = 5,
-            # hjust = 1,
+            # hjust = 0,
             # force = 0.5,
             fill = city_teal,
             label.size = NA,
@@ -270,7 +270,7 @@ site_overview <- ggplot() +
             ylim = c(bbox_htb[2] - 5000, bbox_htb[4] + 5000)
             ) +
    
-  # Add the current monitoring poin3
+  # Add the current monitoring point
   geom_sf(data = sites_sf |> filter(site_id == site_code) |> st_transform("ESRI: 102562"), colour = city_pink, size = 3, shape = 16) +
   
   scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "grey")) +
@@ -739,6 +739,8 @@ sample_threshold_title <- ggplot() +
 ```
 
 ```{r save-figure}
+site_code
+# ggsave(str_c(site_code, ".jpg", sep = ""), plot = infographic, path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Recreational Node Overviews/", width = 210, height = 297, units = "mm", dpi = 600)
 ggsave(str_c(site_code, ".jpg", sep = ""), plot = infographic, path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Recreational Node Overviews/", width = 210, height = 297, units = "mm", dpi = 600)
 ```
 
