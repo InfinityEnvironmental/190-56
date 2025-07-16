@@ -110,7 +110,7 @@ anova_result <- aov(enterococci_cfu_per_100ml ~site_id, data = data_clean)
 summary(anova_result)
 ```
 
-s
+
 
 
 
