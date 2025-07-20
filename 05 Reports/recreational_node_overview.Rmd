@@ -97,8 +97,8 @@ site_id <- sites |>
 ```
 
 ```{r choose-site}
-site_code <- site_id |> keep_at(20)
-width <- 270
+site_code <- site_id |> keep_at(32)
+width <- 1000
 ```
 
 ```{r create-bounding-box-for-site}
@@ -198,8 +198,8 @@ site_overview <- ggplot() +
   geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
   
   # Add rivers
-  # geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
-  geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
+  geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
+  # geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   geom_sf(data = river$osm_polygons |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   
   # Add other water
