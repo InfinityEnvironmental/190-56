@@ -64,7 +64,7 @@ ggplot(data = trip_data,
 
 ```{r plot-data}
 ggplot(data = trip_data,
-       mapping = aes(x=lab_code, y=enterococci_cfu_per_100ml, fill = lab_code))+
+       mapping = aes(x=lab_code, y=enterococci_cfu_per_100ml, fill = lab_code, alpha = 1))+
   geom_boxplot()+
   facet_wrap(~site_id)+
   labs(title = "Enterococci Concentrations by Lab and Site", x="Lab", y="Enterococci (cfu/100ml)")+
@@ -96,13 +96,32 @@ trip_sd <- trip_data %>%
   summarise(triplicate_sd = sd(enterococci_cfu_per_100ml, na.rm = TRUE),
     .groups = "drop")
 
-ggplot(trip_sd, aes(x = lab_code, y = triplicate_sd, fill = lab_code)) +
+ggplot(trip_sd, aes(x = lab_code, y = triplicate_sd, fill = lab_code, alpha = 10)) +
   geom_boxplot() +
   facet_wrap(~ site_id) +
   labs(title = "Triplicate Standard Deviation per Lab and Site",
        x = "Lab", y = "SD of Enterococci (cfu/100ml)") +
   theme_minimal()
 ```
+
+```{r}
+summary_df <- trip_data %>%
+  group_by(lab_code, sample_date) %>%
+  summarise(
+    mean_enterococci = mean(enterococci_cfu_per_100ml, na.rm = TRUE),
+    .groups = "drop"
+  )
+ggplot(summary_df, aes(x = lab_code, y = mean_enterococci, fill = as.factor(sample_date))) +
+  geom_col(position = position_dodge()) +
+  labs(
+    title = "Enterococci Concentration per Lab and Sampling Date",
+    x = "Lab",
+    y = "Mean Enterococci (cfu/100ml)",
+    fill = "Sampling Date"
+  ) +
+  theme_minimal()
+```
+
 +
 
 
