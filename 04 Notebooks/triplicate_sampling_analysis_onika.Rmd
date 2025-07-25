@@ -54,6 +54,7 @@ sample_temp_c = as.numeric(sample_temp_c)
 ```{r summary stats}
 summary(data_clean$enterococci_cfu_per_100ml)
 ```
+
 #Box plot by lab or site
 ```{r plot of the data by site}
 ggplot(data_clean, aes(x = lab_code, y = enterococci_cfu_per_100ml)) +
