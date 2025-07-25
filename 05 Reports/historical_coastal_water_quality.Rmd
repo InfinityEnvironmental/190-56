@@ -97,23 +97,19 @@ height = 20 / 25.4
 
 ```{r select-sites}
 tbl(con, I("coastal.sites")) |>
-  filter(str_detect(site_description |> str_to_lower(), "muizenber"))
+  filter(str_detect(site_description |> str_to_lower(), "jager"))
 ```
 
 ```{r select-site}
-current_site_id <- "CN36"
+current_site_id <- "CS35"
 ```
 
-```{r hazen-over-time, fig.width = 7.267717, fig.height = 1.5, dpi = 600}
+```{r hazen-over-time, fig.width = 7.267717, fig.height = 1.3, dpi = 600}
 # Annual summary of Hazen categories
 hazen_data <- results |>
   filter(site_id == current_site_id, monitoring_group %in% c("daily", "routine")) |>
   group_by(
-    year = year(sample_date) |> as.character(),
-    season = case_when(
-      month(sample_date) %in% c(10, 11, 12, 1, 2, 3) ~ "Summer",
-      .default = "Winter"
-    )
+    year = year(sample_date) |> as.character()
   ) |>
   summarise(
     min_date = min(sample_date),
@@ -132,12 +128,12 @@ hazen_data <- results |>
 
 # Plot the Hazen data for each year
 (hazen_strip <- hazen_data |>
-  select(year, season, hazen_category) |>
-  complete(year, season) |>
-  ggplot(aes(x = as.character(season), y = "Hazen Category", fill = hazen_category)) +
+  select(year, hazen_category) |>
+  # full_join(tibble(year = seq(2005, 2025, 1) |> as.character())) |>
+  # arrange(year) |>
+  ggplot(aes(x = year, y = "Hazen Category", fill = hazen_category)) +
   geom_tile(width = 0.8) +
-  facet_grid(cols = vars(year), switch = "x") +
-  scale_fill_manual(name = "Hazen Water Quality Category", values = c("TFD" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
+  scale_fill_manual(name = "Hazen Water Quality Category", values = c("TFD" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD"), na.value = "white", na.translate = FALSE) +
   theme(
     legend.position = "bottom",
     legend.title = element_blank(),
@@ -155,7 +151,7 @@ hazen_data <- results |>
 RColorBrewer::display.brewer.all(type = "div")
 ```
 
-```{r sample-exceedance-dotplot, fig.width = 7.267717, fig.height = 3. dpi = 600}
+```{r sample-exceedance-dotplot, fig.width = 7.267717, fig.height = 3, dpi = 600}
 # Prepare the data
 exceedance_data <- results |>
   filter(site_id == current_site_id, monitoring_group %in% c("routine", "daily")) |>
@@ -171,12 +167,12 @@ exceedance_data <- results |>
     method = "histodot",
     colour = NA,
     stackgroups = TRUE,
-    dotsize = 0.7,
-    binwidth = 8,
+    # dotsize = 10,
+    binwidth = 80,
     stackratio = 1.3
     ) +
   scale_fill_manual(name = "Exceeds safe water use threshold", values = c("Yes" = "red", "No" = city_dark_green)) +
-    scale_x_date(date_breaks = "1 month", date_labels = "%b %Y") +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   theme(
     legend.position = "bottom",
     panel.background = element_blank(),
@@ -193,7 +189,7 @@ ggsave(filename = str_c(current_site_id, "_exceedance.jpg", sep = ""), path = ".
 ```
 
 ```{r save-plots}
-ggsave(filename = str_c(current_site_id, "_hazen.jpg", sep = ""), path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Long-term Plots/", plot = hazen_strip, width = 7.3, height = 1.5, dpi = 600)
+ggsave(filename = str_c(current_site_id, "_hazen.jpg", sep = ""), path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Long-term Plots/", plot = hazen_strip, width = 7.3, height = 1.3, dpi = 600)
 ```
 
 # Percentage exceedances over time

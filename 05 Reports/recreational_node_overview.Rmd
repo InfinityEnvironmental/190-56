@@ -97,8 +97,8 @@ site_id <- sites |>
 ```
 
 ```{r choose-site}
-site_code <- site_id |> keep_at(20)
-width <- 270
+site_code <- site_id |> keep_at(73)
+width <- 1500
 ```
 
 ```{r create-bounding-box-for-site}
@@ -152,6 +152,16 @@ water <- opq(site_bbox) |>
 river <- opq(site_bbox) |>
    add_osm_feature("waterway", c("river", "stream")) |>
    osmdata_sf()
+
+# Add train
+rail <- opq(site_bbox) |>
+  add_osm_feature("type", "route") |>
+  osmdata_sf()
+
+# Add reservoir
+reservoir <- opq(site_bbox) |>
+  add_osm_feature("landuse", "reservoir") |>
+  osmdata_sf()
 ```
 
 # Data Visualisation
@@ -195,12 +205,12 @@ site_overview <- ggplot() +
   
   # Add beaches
   geom_sf(data = beaches$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
-  geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
+  # geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
   
   # Add rivers
-  # geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
-  geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
+  geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   geom_sf(data = river$osm_polygons |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
+  # geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   
   # Add other water
   geom_sf(data = water$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightblue", alpha = 0.7, colour = NA) +
@@ -209,6 +219,12 @@ site_overview <- ggplot() +
   # Add the coastline
   geom_sf(data = coastline$osm_lines |> st_transform("ESRI: 102562"), colour = "lightgrey", size = unit(1, "mm")) +
   geom_sf(data = coastline$osm_polygons |> st_transform("ESRI: 102562"), colour = NA, fill = "grey", alpha = 0.5) +
+   
+  # Add train line
+  geom_sf(data = rail$osm_lines |> st_transform("ESRI: 102562"), colour = "white", linetype = "dashed", linewidth = unit(0.1, "mm")) +
+   
+  # Add reservoir
+  geom_sf(data = reservoir$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightblue", alpha = 0.7, colour = NA) +
   
   # Add streets
   geom_sf(data = streets$osm_lines |>
@@ -256,7 +272,7 @@ site_overview <- ggplot() +
   # geom_label_repel(data = sites_sf |> filter(category == "Recreational Node"), aes(label = str_wrap(site_description, 16), geometry = geom), stat = "sf_coordinates",
             colour = "white",
             size = unit(3, "mm"),
-            # nudge_x = -50,
+            nudge_x = 180,
             family = "Century Gothic",
             label.padding = 0.20,
             # point.padding = 5,
