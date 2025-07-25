@@ -97,8 +97,8 @@ site_id <- sites |>
 ```
 
 ```{r choose-site}
-site_code <- site_id |> keep_at(1)
-width <- 1500
+site_code <- site_id |> keep_at(20)
+width <- 270
 ```
 
 ```{r create-bounding-box-for-site}
@@ -119,7 +119,7 @@ create_bounding_box_htb <- function(site_code, width) {
     st_bbox() + c(-width, -width, width, width)
   return(bbox_htb)
 }
-bbox_htb <- create_bounding_box_htb(site_code, 1500)
+bbox_htb <- create_bounding_box_htb(site_code, width)
 ```
 
 ```{r}
@@ -156,234 +156,14 @@ river <- opq(site_bbox) |>
 
 # Data Visualisation
 
-## Coastline Overview
-
-### Atlantic Coastline
-
-```{r atlantic-coast, fig.width = 8.27, fig.height = 11.69, dpi = 600}
-# Calculate percentage exceedances
-all_sites_exceedances <- sites |>
-  inner_join(results, by = "site_id") |>
-  filter(between(sample_date, "2023-10-01", "2025-05-31"), monitoring_group %in% c("routine", "daily"), category == "Recreational Node") |>
-  collect() |>
-  group_by(site_id) |>
-  summarise(
-    all_samples = n(),
-    samples_exceed = sum(numeric_value > 240),
-    samples_exceed_pct = round(sum(numeric_value > 240) / n() * 100, 0)
-  )
-
-# Calculate Hazen percentages
-all_sites_hazen <- sites |>
-  inner_join(results, by = "site_id") |>
-  filter(
-         between(sample_date, "2023-10-01", "2025-05-31"),
-         monitoring_group %in% c("routine", "daily"),
-         category == "Recreational Node") |>
-  collect() |>
-  group_by(site_id) |>
-  summarise(
-    min_date = min(sample_date),
-    max_date = max(sample_date),
-    n = sum(!is.na(numeric_value)),
-    hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
-    hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
-  hazen_category = case_when(
-      n < 10 ~ "TFD",
-      hazen95 <= 100 ~ "Excellent",
-      hazen95 <= 200 ~ "Good",
-      hazen95 > 200 & hazen90 > 185 ~ "Poor",
-      hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
-  ))
-
-# Join these on site id
-entire_coast_summary <- sites_sf |>
-  inner_join(all_sites_hazen, by = "site_id") |>
-  inner_join(all_sites_exceedances, by = "site_id") |>
-  mutate(hazen_category = fct(hazen_category, levels = c("TFD", "Poor", "Sufficient", "Good", "Excellent")))
-```
-
-```{r plot-atlantic, fig.width = 8.27, fig.height = 11.69, dpi = 600}
-# Plot the data
-(atlantic <- ggplot() +
-  geom_sf(data = cct_coastline$osm_lines, colour = "white") +
-  geom_sf(data = entire_coast_summary |> filter(coastline == "Atlantic"), aes(size = samples_exceed_pct, colour = fct_rev(hazen_category))) +
-   labs(caption = "Data shown for reporting period (October 2023 to May 2025)") +
-    
-  # Add labels to some sites
-  geom_text_repel(
-      data = entire_coast_summary |> filter(coastline == "Atlantic", site_id %in% c("XCN08", "XCN12", "XCN07", "XCN02", "XCN04")),
-      aes(geometry = geom, label = site_description),
-      stat = "sf_coordinates",
-      size = unit(3, "mm"),
-      xlim = c(17.9, 19.0),
-      ylim = c(-34.6, -33.5),
-      force = 100,
-      hjust = 1,
-      nudge_x = -0.09,
-      colour = "white",
-      family = "Century Gothic"
-      ) +
-  coord_sf(xlim = c(17.55, 18.47)) +
-
-  scale_colour_manual(name = "Water Quality Category", values = c("TFD" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
-  scale_size_continuous(name = str_wrap("% of samples that exceed the Enterococci threshold for safe water use of 240 cfu per 100 mL", 35), range = c(1, 5)) +
-  theme(
-    plot.background = element_rect(fill = city_teal, colour = NA),
-    panel.background = element_blank(),
-    panel.grid = element_blank(),
-    axis.title = element_blank(),
-    axis.text = element_blank(),
-    axis.ticks = element_blank(),
-    legend.position = "bottom",
-    legend.title.position = "left",
-    legend.direction = "vertical",
-    legend.title = element_text(hjust = 0.5),
-    text = element_text(family = "Century Gothic", colour = "white"),
-    legend.background = element_blank()
-        ) +
-  guides(size = guide_legend(override.aes = list(colour = "white"))))
-
-# Zoom in on town
-(subplot <- ggplot() +
-  geom_sf(data = cct_coastline$osm_lines, colour = "white") +
-  geom_sf(data = entire_coast_summary |> filter(coastline == "Atlantic"), aes(size = samples_exceed_pct, colour = fct_rev(hazen_category))) +
-    geom_text_repel(
-      data = entire_coast_summary |> filter(coastline == "Atlantic", site_id %in% c("CN22", "CN36", "CN39", "XCN09", "HB13", "XCN03", "CN16O", "CN14", "CN20I", "XCN10")),
-      aes(geometry = geom, label = site_description),
-      stat = "sf_coordinates",
-      size = unit(3, "mm"),
-      xlim = c(18, 19.0),
-      ylim = c(-34.3, -33.5),
-      force = 100,
-      hjust = 1,
-      nudge_x = -0.04,
-      colour = "white",
-      family = "Century Gothic"
-      ) +
-  coord_sf(xlim = c(18.2, 18.5), ylim = c(-34.07, -33.87)) +
-  
-  scale_colour_manual(name = "Hazen Water Quality Category", values = c("TFD" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
-  scale_size_continuous(name = str_wrap("% of samples that exceed the Enterococci threshold for safe water use of 240 cfu per 100 mL", 20), range = c(1, 5)) +
-  theme(
-    plot.background = element_rect(fill = NA, colour = "white"),
-    panel.background = element_blank(),
-    panel.grid = element_blank(),
-    axis.text = element_blank(),
-    axis.ticks = element_blank(),
-    axis.title = element_blank(),
-    legend.position = "none",
-    text = element_text(family = "Century Gothic", colour = "white")
-        ))
-
-# Coastline title
-atlantic_title <- ggplot() +
-    geom_text(aes(x = 0, y = 1, label = "Atlantic Coast"), hjust = 1, size = unit(12, "mm"), family = "Century Gothic", colour = "white", fontface = "bold") +
-  
-  # Styles
-  theme(
-    plot.background = element_blank(),
-    axis.text = element_blank(),
-    axis.title = element_blank(),
-    panel.grid = element_blank(),
-    axis.ticks = element_blank(),
-    panel.background = element_blank()
-  )
-
-# Combine plots
-(atlantic_overview <- atlantic +
-    inset_element(subplot, left = 0.05, top = 0.5, right = 0.7, bottom = 0, align_to = "plot") +
-    inset_element(atlantic_title, left = 0, top = 1, right = 1, bottom = 0.9))
-
-# ggsave("atlantic_overview.jpg", plot = atlantic_overview, path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/", width = 210, height = 297, unit = "mm", dpi = 600)
-```
-
-```{r plot-false_bay, fig.width = 8.27, fig.height = 11.69, dpi = 600}
-# Plot the data
-(false_bay <- ggplot() +
-  geom_sf(data = cct_coastline$osm_lines, colour = "white") +
-  geom_sf(data = entire_coast_summary |> filter(coastline == "False Bay"), aes(size = samples_exceed_pct, colour = fct_rev(hazen_category))) +
-   labs(caption = "Data shown for reporting period (October 2023 to May 2025)") +
-    
-  # Add labels to some sites
-  geom_text_repel(
-      data = entire_coast_summary |> filter(coastline == "False Bay", site_id %in% c("XCS30", "XCS19", "XCS34", "XCS08", "XCS09")),
-      aes(geometry = geom, label = site_description),
-      stat = "sf_coordinates",
-      size = unit(3, "mm"),
-      xlim = c(18.4, 18.9),
-      ylim = c(-34.4, -34.0),
-      force = 150,
-      hjust = 1,
-      nudge_x = -0.01,
-      nudge_y = -0.01,
-      colour = "white",
-      family = "Century Gothic"
-      ) +
-  geom_text_repel(
-      data = entire_coast_summary |> filter(coastline == "False Bay", site_id %in% c("CS37", "XCS15", "XCS17", "CS34", "CS11", "CS45")),
-      aes(geometry = geom, label = site_description),
-      stat = "sf_coordinates",
-      size = unit(3, "mm"),
-      xlim = c(18.4, 18.9),
-      ylim = c(-34.4, -34.0),
-      force = 150,
-      hjust = 0,
-      nudge_x = 0.01,
-      nudge_y = -0.01,
-      colour = "white",
-      family = "Century Gothic"
-      ) +
-  coord_sf(xlim = c(18.44, 18.86), ylim = c(-34.42, -34.0)) +
-
-  scale_colour_manual(name = "Water Quality Category", values = c("TFD" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
-  scale_size_continuous(name = str_wrap("% of samples that exceed the Enterococci threshold for safe water use of 240 cfu per 100 mL", 35), range = c(1, 5)) +
-  theme(
-    plot.background = element_rect(fill = city_teal, colour = NA),
-    panel.background = element_blank(),
-    panel.grid = element_blank(),
-    axis.title = element_blank(),
-    axis.text = element_blank(),
-    axis.ticks = element_blank(),
-    legend.position = "bottom",
-    legend.title.position = "left",
-    legend.direction = "vertical",
-    legend.title = element_text(hjust = 0.5),
-    text = element_text(family = "Century Gothic", colour = "white"),
-    legend.background = element_blank(),
-    legend.box.just = "right"
-        ) +
-  guides(size = guide_legend(override.aes = list(colour = "white"))))
-
-# Coastline title
-false_bay_title <- ggplot() +
-    geom_text(aes(x = 0, y = 1, label = "False Bay Coast"), hjust = 1, size = unit(12, "mm"), family = "Century Gothic", colour = "white", fontface = "bold") +
-  
-  # Styles
-  theme(
-    plot.background = element_blank(),
-    axis.text = element_blank(),
-    axis.title = element_blank(),
-    panel.grid = element_blank(),
-    axis.ticks = element_blank(),
-    panel.background = element_blank()
-  )
-
-# Combine plots
-(false_bay_overview <- false_bay +
-    inset_element(false_bay_title, left = 0, top = 1, right = 1.2, bottom = 0.9))
-
-ggsave("false_bay_overview.jpg", plot = false_bay_overview, path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/", width = 210, height = 297, unit = "mm", dpi = 600)
-```
-
-### Entire Coastline
+## Entire Coastline
 
 ```{r coastline-overview, fig.width = 3.5, fig.height = 3.5, dpi = 600}
 # Plot overview of entire coastline
 site_overview <- ggplot() +
   geom_sf(data = cct_coastline$osm_lines, colour = "white", linewidth = 0.4) +
   geom_sf(data = sites_sf, aes(colour = category, size = category), shape = 16) +
-  geom_sf(data = sites_sf |> filter(site_id == site_code), colour = city_pink, size = unit(2, "mm"), alpha = 0.7, shape = 16) +
+  geom_sf(data = sites_sf |> filter(site_id == site_code), colour = city_pink, size = unit(4, "mm"), alpha = 0.5, shape = 16) +
    geom_sf(data = bbox_htb |> st_as_sfc(), colour = "white", fill = NA) +
   
   # Plot styling
@@ -415,11 +195,11 @@ site_overview <- ggplot() +
   
   # Add beaches
   geom_sf(data = beaches$osm_polygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
-  # geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
+  geom_sf(data = beaches$osm_multipolygons |> st_transform("ESRI: 102562"), fill = "lightyellow", colour = NA, alpha = 0.5) +
   
   # Add rivers
   # geom_sf(data = river$osm_lines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
-  # geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
+  geom_sf(data = river$osm_multilines |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   geom_sf(data = river$osm_polygons |> st_transform("ESRI: 102562"), colour = "lightblue", alpha = 0.7) +
   
   # Add other water
@@ -472,15 +252,15 @@ site_overview <- ggplot() +
    
   # Add the monitoring sites with labels
   geom_sf(data = sites_sf |> st_transform("ESRI: 102562"), aes(colour = category), size = 1) +
-  geom_label_repel(data = sites_sf |> filter(category == "Recreational Node"), aes(label = site_description, geometry = geom), stat = "sf_coordinates",
+  geom_label_repel(data = sites_sf |> filter(category == "Recreational Node"), aes(label = str_wrap(site_description, 20), geometry = geom), stat = "sf_coordinates",
   # geom_label_repel(data = sites_sf |> filter(category == "Recreational Node"), aes(label = str_wrap(site_description, 16), geometry = geom), stat = "sf_coordinates",
             colour = "white",
             size = unit(3, "mm"),
-            # nudge_x = 150,
+            # nudge_x = -50,
             family = "Century Gothic",
             label.padding = 0.20,
             # point.padding = 5,
-            # hjust = 1,
+            # hjust = 0,
             # force = 0.5,
             fill = city_teal,
             label.size = NA,
@@ -490,7 +270,7 @@ site_overview <- ggplot() +
             ylim = c(bbox_htb[2] - 5000, bbox_htb[4] + 5000)
             ) +
    
-  # Add the current monitoring poin3
+  # Add the current monitoring point
   geom_sf(data = sites_sf |> filter(site_id == site_code) |> st_transform("ESRI: 102562"), colour = city_pink, size = 3, shape = 16) +
   
   scale_colour_manual(values = c("Recreational Node" = city_green, "Coastal Monitoring Point" = "grey")) +
@@ -524,8 +304,9 @@ exceedances <- sites |>
     samples_exceed_pct = round(sum(numeric_value > 240) / n() * 100, 0)
   ) |>
   mutate(
-    label = str_c(samples_exceed, " out of ", all_samples, " samples taken\nexceeded the threshold\nvalue for Enterococci\nof 240 cfu per 100 mL", sep = "")
-    )
+    label = str_c(samples_exceed, " out of ", all_samples, " samples", sep = ""),
+    extra_text = " taken exceeded the\nthreshold value for\nEnterococci of\n240 cfu per 100 mL"
+  )
 
 # Winter and summer data
 seasonal_exceedances <- sites |>
@@ -565,7 +346,8 @@ group_by(season) |>
 ```{r exceedances-figure, fig.width = 6, fig.height = 3, dpi = 600}
 # Create a figure for the percentage exceedances
 exceed_text <- ggplot(data = exceedances) +
-  geom_text(aes(x = 0, y = 0, label = label), family = "Century Gothic", size = 4, colour = "white", lineheight = 1) +
+  geom_text(aes(x = 0, y = 0, label = label), family = "Century Gothic", size = 4, colour = "white", lineheight = 1, vjust = -0.1, fontface = "bold") +
+  geom_text(aes(x = 0, y = 0, label = extra_text), family = "Century Gothic", size = 4, colour = "white", lineheight = 1, vjust = 1.1) +
   theme(
     axis.text = element_blank(),
     axis.ticks = element_blank(),
@@ -669,7 +451,7 @@ all <- sites |>
     hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
     hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
   hazen_category = case_when(
-      n < 10 ~ "TFD",
+      n < 10 ~ "TFD*",
       hazen95 <= 100 ~ "Excellent",
       hazen95 <= 200 ~ "Good",
       hazen95 > 200 & hazen90 > 185 ~ "Poor",
@@ -693,7 +475,7 @@ summer <- sites |>
     hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
     hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
   hazen_category = case_when(
-      n < 10 ~ "TFD",
+      n < 10 ~ "TFD*",
       hazen95 <= 100 ~ "Excellent",
       hazen95 <= 200 ~ "Good",
       hazen95 > 200 & hazen90 > 185 ~ "Poor",
@@ -717,7 +499,7 @@ winter <- sites |>
     hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
     hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
   hazen_category = case_when(
-      n < 10 ~ "TFD",
+      n < 10 ~ "TFD*",
       hazen95 <= 100 ~ "Excellent",
       hazen95 <= 200 ~ "Good",
       hazen95 > 200 & hazen90 > 185 ~ "Poor",
@@ -728,20 +510,22 @@ winter <- sites |>
 # Combine the three categories
 
 hazen_categories <- bind_rows(all, summer, winter) |>
-  mutate(hazen_category = fct(hazen_category, levels = c("TFD", "Poor", "Sufficient", "Good", "Excellent"))) |>
+  mutate(hazen_category = fct(hazen_category, levels = c("TFD*", "Poor", "Sufficient", "Good", "Excellent"))) |>
   complete(hazen_category, season) |>
   mutate(alpha_value = if_else(!is.na(n), 100, 50)) |>
   dplyr::select(hazen_category, season, alpha_value) |>
   ggplot() +
+  labs(caption = "* Too Few Data: More samples needed to calculate water quality category using the Hazen method") +
   geom_tile(aes(x = hazen_category, y = "Season", fill = hazen_category, alpha = alpha_value, colour = as.character(alpha_value)), height = 0.8, width = 0.9, linewidth = unit(1, "mm")) +
   geom_text(aes(x = hazen_category, y = "Season", label = hazen_category), family = "Century Gothic", colour = "white", size = unit(5, "mm"), fontface = "bold") +
-  scale_fill_manual(name = "Hazen Water Quality Category", values = c("TFD" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
+  scale_fill_manual(name = "Hazen Water Quality Category", values = c("TFD*" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
   scale_colour_manual(values = c("50" = city_teal, "100" = "white")) +
   facet_grid(rows = vars(str_to_title(season)), switch = "y") +
   
 # Style components
   theme(
     plot.background = element_blank(),
+    plot.caption = element_text(family = "Century Gothic", colour = "white"),
     panel.background = element_blank(),
     panel.border = element_rect(colour = "white", fill = NA, linewidth = unit(0.5, "mm")),
     panel.grid = element_blank(),
@@ -925,7 +709,7 @@ reporting_period <- ggplot() +
 
 # Add title for percentage exceedances
 sample_threshold_title <- ggplot() +
-  annotate(geom = "text", x = 0, y = 0, label = "Samples that exceed threshold\nfor safe water use", family = "Century Gothic", colour = "white", size = unit(4, "mm"), fontface = "bold") +
+  annotate(geom = "text", x = 0, y = 0, label = "Samples that exceeded threshold\nfor safe water use", family = "Century Gothic", colour = "white", size = unit(4, "mm"), fontface = "bold") +
   theme(
     plot.background = element_blank(),
     panel.background = element_blank(),
@@ -947,7 +731,7 @@ sample_threshold_title <- ggplot() +
   inset_element(hazen_categories, left = unit(15, "mm"), bottom = unit(200, "mm"), right = unit(200, "mm"), top = unit(290, "mm"), align_to = "full") +
   inset_element(wheel, left = unit(120+5, "mm"), bottom = unit(145-10, "mm"), right = unit(210+2+5, "mm"), top = unit(175+10, "mm")) +
   inset_element(text, left = unit(120+5, "mm"), bottom = unit(100-5-5-3+20+20, "mm"), right = unit(210+2+5, "mm"), top = unit(145-5-3+20+10+20, "mm")) +
-  inset_element(exceed_text, left = unit(118+5-2, "mm"), bottom = unit(30+20+5+5, "mm"), right = unit(208+5-2, "mm"), top = unit(60 + 10 +20+5+5, "mm")) +
+  inset_element(exceed_text, left = unit(118+5-2, "mm"), bottom = unit(30+20+5+5, "mm"), right = unit(208+5-2, "mm"), top = unit(60 + 10 +20+20, "mm")) +
   inset_element(wheel_seasonal, left = unit(125-1-10+1+5, "mm"), bottom = unit(70+2+40, "mm"), right = unit(205+1+10+1+5, "mm"), top = unit(110-5+5-5+2+40, "mm")) +
   inset_element(text_seasonal, left = unit(132+1+4+5, "mm"), bottom = unit(77+1-3+2+40, "mm"), right = unit(198+1-4+5, "mm"), top = unit(107+1-3+2+40, "mm")) +
   inset_element(sample_threshold_title, left = unit(132, "mm"), bottom = unit(182, "mm"), right = unit(202, "mm"), top = unit(199, "mm")) +
@@ -955,5 +739,252 @@ sample_threshold_title <- ggplot() +
 ```
 
 ```{r save-figure}
+site_code
+# ggsave(str_c(site_code, ".jpg", sep = ""), plot = infographic, path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Recreational Node Overviews/", width = 210, height = 297, units = "mm", dpi = 600)
 ggsave(str_c(site_code, ".jpg", sep = ""), plot = infographic, path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Recreational Node Overviews/", width = 210, height = 297, units = "mm", dpi = 600)
 ```
+
+## Coastline Overview
+
+### Atlantic Coastline
+
+```{r atlantic-coast, fig.width = 8.27, fig.height = 11.69, dpi = 600}
+# Calculate percentage exceedances
+all_sites_exceedances <- sites |>
+  inner_join(results, by = "site_id") |>
+  filter(between(sample_date, "2023-10-01", "2025-05-31"), monitoring_group %in% c("routine", "daily"), category == "Recreational Node") |>
+  collect() |>
+  group_by(site_id) |>
+  summarise(
+    all_samples = n(),
+    samples_exceed = sum(numeric_value > 240),
+    samples_exceed_pct = round(sum(numeric_value > 240) / n() * 100, 0)
+  )
+
+# Calculate Hazen percentages
+all_sites_hazen <- sites |>
+  inner_join(results, by = "site_id") |>
+  filter(
+         between(sample_date, "2023-10-01", "2025-05-31"),
+         monitoring_group %in% c("routine", "daily"),
+         category == "Recreational Node") |>
+  collect() |>
+  group_by(site_id) |>
+  summarise(
+    min_date = min(sample_date),
+    max_date = max(sample_date),
+    n = sum(!is.na(numeric_value)),
+    hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
+    hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
+  hazen_category = case_when(
+      n < 10 ~ "TFD*",
+      hazen95 <= 100 ~ "Excellent",
+      hazen95 <= 200 ~ "Good",
+      hazen95 > 200 & hazen90 > 185 ~ "Poor",
+      hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+  ))
+
+# Join these on site id
+entire_coast_summary <- sites_sf |>
+  inner_join(all_sites_hazen, by = "site_id") |>
+  inner_join(all_sites_exceedances, by = "site_id") |>
+  mutate(hazen_category = fct(hazen_category, levels = c("TFD", "Poor", "Sufficient", "Good", "Excellent")))
+```
+
+```{r plot-atlantic, fig.width = 8.27, fig.height = 11.69, dpi = 600}
+# Plot the data
+(atlantic <- ggplot() +
+  geom_sf(data = cct_coastline$osm_lines, colour = "white") +
+  geom_sf(data = entire_coast_summary |> filter(coastline == "Atlantic"), aes(colour = fct_rev(hazen_category)), size = 2) +
+   labs(caption = "Data shown for reporting period (October 2023 to May 2025)") +
+    
+  # Add labels to some sites
+  geom_text_repel(
+      data = entire_coast_summary |> filter(coastline == "Atlantic", site_id %in% c("XCN08", "XCN12", "XCN07", "XCN02", "XCN04", "CS40", "XCN11")),
+      aes(geometry = geom, label = site_description),
+      stat = "sf_coordinates",
+      size = unit(3, "mm"),
+      xlim = c(17.9, 19.0),
+      ylim = c(-34.6, -33.5),
+      force = 100,
+      hjust = 1,
+      nudge_x = -0.14,
+      colour = "white",
+      family = "Century Gothic"
+      ) +
+  coord_sf(xlim = c(17.57, 18.45)) +
+
+  scale_colour_manual(name = "Water Quality Category", values = c("TFD" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
+  theme(
+    plot.background = element_rect(fill = city_teal, colour = NA),
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    legend.position = "bottom",
+    legend.title.position = "left",
+    legend.direction = "horizontal",
+    legend.title = element_text(hjust = 0.5),
+    text = element_text(family = "Century Gothic", colour = "white"),
+    legend.background = element_blank()
+        ) +
+  guides(size = guide_legend(override.aes = list(colour = "white"))))
+
+# Zoom in on town
+(subplot <- ggplot() +
+  geom_sf(data = cct_coastline$osm_lines, colour = "white") +
+  geom_sf(data = entire_coast_summary |> filter(coastline == "Atlantic"), aes(colour = fct_rev(hazen_category)), size = 2) +
+    geom_text_repel(
+      data = entire_coast_summary |> filter(coastline == "Atlantic", site_id %in% c("CN22", "CN36", "CN39", "XCN09", "HB13", "CN42", "XCN03", "CN16O", "CN14")),
+      aes(geometry = geom, label = site_description),
+      stat = "sf_coordinates",
+      size = unit(3, "mm"),
+      xlim = c(18, 19.0),
+      ylim = c(-34.3, -33.5),
+      force = 100,
+      hjust = 1,
+      nudge_x = -0.04,
+      colour = "white",
+      family = "Century Gothic"
+      ) +
+  coord_sf(xlim = c(18.2, 18.5), ylim = c(-34.07, -33.87)) +
+  
+  scale_colour_manual(name = "Hazen Water Quality Category", values = c("TFD" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
+  theme(
+    plot.background = element_rect(fill = NA, colour = "white"),
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    legend.position = "none",
+    text = element_text(family = "Century Gothic", colour = "white")
+        ))
+
+# Coastline title
+atlantic_title <- ggplot() +
+    geom_text(aes(x = 0, y = 1, label = "Atlantic Coast"), hjust = 1, size = unit(12, "mm"), family = "Century Gothic", colour = "white", fontface = "bold") +
+  
+  # Styles
+  theme(
+    plot.background = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    axis.ticks = element_blank(),
+    panel.background = element_blank()
+  )
+
+# Combine plots
+(atlantic_overview <- atlantic +
+    inset_element(subplot, left = 0.05, top = 0.5, right = 0.7, bottom = 0, align_to = "plot") +
+    inset_element(atlantic_title, left = 0, top = 1, right = 1, bottom = 0.9))
+
+ggsave("atlantic_overview_v0.3.jpg", plot = atlantic_overview, path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/", width = 210, height = 297, unit = "mm", dpi = 600)
+```
+
+```{r plot-false_bay, fig.width = 8.27, fig.height = 11.69, dpi = 600}
+# Plot the data
+(false_bay <- ggplot() +
+  geom_sf(data = cct_coastline$osm_lines, colour = "white") +
+  geom_sf(data = entire_coast_summary |> filter(coastline == "False Bay"), aes(colour = fct_rev(hazen_category)), size = 2) +
+   labs(caption = "Data shown for reporting period (October 2023 to May 2025)") +
+    
+  # Add labels to some sites
+  geom_text_repel(
+      data = entire_coast_summary |> filter(coastline == "False Bay", site_id %in% c("XCS30", "XCS19", "XCS34")),
+      aes(geometry = geom, label = site_description),
+      stat = "sf_coordinates",
+      size = unit(3, "mm"),
+      xlim = c(18.4, 18.9),
+      ylim = c(-34.4, -34.0),
+      force = 150,
+      hjust = 1,
+      nudge_x = -0.01,
+      nudge_y = -0.01,
+      colour = "white",
+      family = "Century Gothic"
+      ) +
+  geom_text_repel(
+      data = entire_coast_summary |> filter(coastline == "False Bay", site_id %in% c("XCS15", "CS34", "CS11", "CS45", "CS03")),
+      aes(geometry = geom, label = site_description),
+      stat = "sf_coordinates",
+      size = unit(3, "mm"),
+      xlim = c(18.4, 18.9),
+      ylim = c(-34.4, -34.0),
+      force = 150,
+      hjust = 0,
+      nudge_x = 0.01,
+      nudge_y = -0.01,
+      colour = "white",
+      family = "Century Gothic"
+      ) +
+   geom_text_repel(
+      data = entire_coast_summary |> filter(coastline == "False Bay", site_id %in% c("CS37", "XCS32")),
+      aes(geometry = geom, label = site_description),
+      stat = "sf_coordinates",
+      size = unit(3, "mm"),
+      xlim = c(18.4, 18.9),
+      ylim = c(-34.4, -34.0),
+      force = 150,
+      hjust = 0,
+      nudge_x = 0.01,
+      colour = "white",
+      family = "Century Gothic"
+      ) +
+   geom_text_repel(
+      data = entire_coast_summary |> filter(coastline == "False Bay", site_id %in% c("XCS09", "XCS08", "XCS29")),
+      aes(geometry = geom, label = site_description),
+      stat = "sf_coordinates",
+      size = unit(3, "mm"),
+      xlim = c(18.4, 18.9),
+      ylim = c(-34.4, -34.0),
+      force = 150,
+      hjust = 1,
+      nudge_x = -0.01,
+      colour = "white",
+      family = "Century Gothic"
+      ) +
+  coord_sf(xlim = c(18.44, 18.86), ylim = c(-34.42, -33.9)) +
+
+  scale_colour_manual(name = "Water Quality Category", values = c("TFD" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")) +
+  theme(
+    plot.background = element_rect(fill = city_teal, colour = NA),
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    legend.position = "bottom",
+    legend.title.position = "left",
+    legend.direction = "horizontal",
+    legend.title = element_text(hjust = 0.5),
+    text = element_text(family = "Century Gothic", colour = "white"),
+    legend.background = element_blank(),
+    legend.box.just = "right"
+        ) +
+  guides(size = guide_legend(override.aes = list(colour = "white"))))
+
+# Coastline title
+false_bay_title <- ggplot() +
+    geom_text(aes(x = 0, y = 1, label = "False Bay Coast"), hjust = 1, size = unit(12, "mm"), family = "Century Gothic", colour = "white", fontface = "bold") +
+  
+  # Styles
+  theme(
+    plot.background = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    axis.ticks = element_blank(),
+    panel.background = element_blank()
+  )
+
+# Combine plots
+(false_bay_overview <- false_bay +
+    inset_element(false_bay_title, left = 0, top = 1, right = 1.2, bottom = 0.9))
+
+ggsave("false_bay_overview_v0.3.jpg", plot = false_bay_overview, path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/", width = 210, height = 297, unit = "mm", dpi = 600)
+```
+
+
