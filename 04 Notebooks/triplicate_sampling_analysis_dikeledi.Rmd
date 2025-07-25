@@ -20,7 +20,6 @@ library(tidyverse)
 
 # Read in triplicate sampling data
 ```{r read-in-triplicate-sampling-data}
-
 trip_data <- read_csv("01 Input Data/triplicate_results.csv")
 ```
 
@@ -43,6 +42,17 @@ trip_data$enterococci_cfu_per_100ml[trip_data$enterococci_cfu_per_100ml == "<1"]
 trip_data$enterococci_cfu_per_100ml <- as.numeric(trip_data$enterococci_cfu_per_100ml) #remove ND and <1
 str(trip_data)
 any(names(trip_data) == "lab_code")
+
+summary_df <- trip_data %>%
+  group_by(lab_code, sample_date) %>%
+  summarise(
+    mean_enterococci = mean(enterococci_cfu_per_100ml, na.rm = TRUE),
+    sd = sd(enterococci_cfu_per_100ml, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+summary_df$mean_enterococci <- as.numeric(summary_df$mean_enterococci)
+summary_df$sd <- as.numeric(summary_df$sd)
 ```
 
 # Visualise triplicate data
@@ -113,6 +123,10 @@ summary_df <- trip_data %>%
   )
 ggplot(summary_df, aes(x = lab_code, y = mean_enterococci, fill = as.factor(sample_date))) +
   geom_col(position = position_dodge()) +
+  geom_errorbar(aes(
+    ymin = mean_enterococci - sd,
+    ymax = mean_enterococci + sd),
+                width = 0.2, color = "black") +
   labs(
     title = "Enterococci Concentration per Lab and Sampling Date",
     x = "Lab",
