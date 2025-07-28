@@ -44,6 +44,7 @@ dbGetInfo(con)
 ```
 
 # Data Import
+
 ## Weekly Samples
 
 ### Check which pdf files have not yet been imported
@@ -153,7 +154,7 @@ tbl <- tibble(number = sample_number,
   summarise(text = str_c(text, collapse = ""), result = first(result)) |>
   select(text, result) |>
   mutate(
-    site_id = str_extract(text, "[:upper:]{2,3}\\d{2}\\d?[AOIWETC]?") |> str_remove_all("\\s"),
+    site_id = str_extract(text, "[:upper:]{2,3}\\s?\\d{2}\\d?[AOIWETC]?") |> str_remove_all("\\s"),
     sample_time = str_extract(text, "\\d{1,2}h\\d{2}") |> str_replace("h", ":"),
     sample_date = sample_date,
     analysis_completed = analysis_completed,
@@ -207,7 +208,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml, sample_temp_c, filename
 FROM coastal.results
-WHERE sample_date = '2025-07-21' AND monitoring_group = 'routine';
+WHERE sample_date = '2025-07-23' AND monitoring_group = 'routine';
 ```
 
 ```{sql, connection = con}
