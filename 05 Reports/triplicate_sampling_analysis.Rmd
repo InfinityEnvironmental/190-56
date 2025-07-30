@@ -16,6 +16,7 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 library(tidyverse)
 library(dbplyr)
 library(DBI)
+library(extrafont)
 ```
 
 ## Database Connection
@@ -30,6 +31,7 @@ con <- dbConnect(RPostgres::Postgres(),
   password = rstudioapi::askForPassword(),
   dbname = "postgres"
 )
+DBI::dbGetInfo(con)
 ```
 
 # Analysis
@@ -44,27 +46,50 @@ triplicates <- tbl(con, I("coastal.triplicate_results")) |>
     .default = "field sample"
   )) |>
   collect()
+
+sites <- tbl(con, I("coastal.sites_view")) |>
+  collect()
+
+df <- sites |>
+  inner_join(triplicates, by = "site_id")
 ```
+
+```{r data-check}
+# Overview of the data
+df
+head(df)
+summary(df)
+```
+
 
 How do the results compare between labs?
 
 ```{r, fig.height = 11, fig.width = 8.7, dpi = 600}
-triplicates |>
-  select(sample_date, lab_code, sample_type, enterococci_cfu_per_100ml) |>
-  group_by(sample_date, lab_code, sample_type) |>
+fig1 <- df |>
+  select(site_id, site_description, long, lat, sample_date, lab_code, sample_type, enterococci_cfu_per_100ml) |>
+  group_by(site_description, sample_date, lab_code, sample_type) |>
   rename(censored_value = enterococci_cfu_per_100ml) |>
   mutate(numeric_value = if_else(censored_value %in% c("ND", "<1"), 0, censored_value |> as.numeric())) |>
   mutate(sample_type = str_to_title(sample_type) |> fct(levels = c("Field Sample", "Field Control", "Lab Control"))) |>
   summarise(mean = mean(numeric_value), sd = sd(numeric_value)) |>
-  ggplot(aes(x = sample_type, y = mean, ymin = mean - sd, ymax = mean + sd, fill = lab_code)) +
+  # mutate(mean = if_else(sample_type %in% c("Field Control", "Lab Control") & mean == 0, 1, mean)) |>
+  ggplot(aes(x = fct(lab_code), y = mean, ymin = mean - sd, ymax = mean + sd, fill = sample_type)) +
   labs(y = expression("Mean (±SD) enterococci (cfu per 100 mL)")) +
   geom_errorbar(position = position_dodge(preserve = "single", width = 1), width = 0.3) +
   geom_col(position = position_dodge(preserve = "single", width = 1)) +
-  facet_wrap(~sample_date, ncol = 3, scales = "free_y") +
-  scale_fill_brewer(name = "Laboratory", type = "qual", palette = 3) +
+  facet_wrap(~str_c(sample_date, site_description, sep = "\n"), ncol = 3, scales = "free") +
+  scale_fill_brewer(name = "Sample Type", type = "qual", palette = 3) +
   theme(
     axis.title.x = element_blank(),
     legend.position = "bottom",
     text = element_text(family = "Century Gothic")
   )
+
+ggsave(filename = "triplicate_results.jpg", plot = fig1, path = "02 Output Data/", width = 8.7, height = 11, dpi = 600)
+
+# Export the data
+df |>
+  select(-site_order, -category, -coastline, -active) |>
+  arrange(sample_date, lab_code, sample_type) |>
+  write_csv("02 Output Data/triplicate_sampling_results.csv")
 ```
