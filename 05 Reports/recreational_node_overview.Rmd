@@ -27,9 +27,15 @@ library(patchwork)
 library(units)
 library(osmdata)
 library(ggrepel)
+library(keyring)
 ```
 
 ## Database Connection
+
+```{r db-connection, include=FALSE}
+# Use the following code to add your credentials to the 
+# key_set(service = "supabase", username = "francois")
+```
 
 ```{r db-connection}
 # Connect to the Postgres database
@@ -37,10 +43,18 @@ library(ggrepel)
 con <- dbConnect(RPostgres::Postgres(),
   host = "aws-0-eu-central-1.pooler.supabase.com",
   port = 5432,
-  user = str_c(rstudioapi::askForPassword(prompt = "Username: "), "wnrvdvesovnkmqbhkhjz", sep = "."),
-  password = rstudioapi::askForPassword(),
+  user = str_c(
+    key_list(service = "supabase")$username,
+    ".wnrvdvesovnkmqbhkhjz"
+  ),
+  password = key_get(
+    service = "supabase",
+    username = key_list(service = "supabase")$username
+  ),
   dbname = "postgres"
 )
+
+dbGetInfo(con)
 ```
 
 ## Load the City colours
