@@ -31,6 +31,7 @@ tail(dat)
 glimpse(dat)
 summary(dat)
 ```
+
 #Clean the data
 ```{r clean enterococci data}
 data_clean <- dat %>%  #Cleaning enterococci values
@@ -50,6 +51,7 @@ sample_time = na_if(sample_time, "NULL")# Treat NULL as NA
 sample_temp_c = na_if(sample_temp_c, "NULL")
 sample_temp_c = as.numeric(sample_temp_c)
 ```
+
 #Summary statistics
 ```{r summary stats}
 summary(data_clean$enterococci_cfu_per_100ml)
@@ -61,6 +63,7 @@ ggplot(data_clean, aes(x = lab_code, y = enterococci_cfu_per_100ml)) +
   geom_boxplot() +
   labs(title = "Enterococci Levels by Lab", y = "CFU per 100ml", x = "Lab")
 ```
+
 #Box plot by site
 ```{r}
 ggplot(data_clean, aes(x = site_id, y = enterococci_cfu_per_100ml)) +
@@ -71,11 +74,12 @@ ggplot(data_clean, aes(x = site_id, y = enterococci_cfu_per_100ml)) +
 
 #Time series trend by site
 ```{r}
-ggplot(data_clean, aes(x = sample_date, y = enterococci_cfu_per_100ml, color = site_id)) +
+ggplot(data_clean, aes(x = site_id, y = enterococci_cfu_per_100ml, color = sample_date)) +
   geom_point() +
   geom_smooth(method = "loess", se = FALSE) +
-  labs(title = "Enterococci Over Time by Site", y = "CFU per 100ml", x = "Date")
+  labs(title = "Enterococci Over Time by Site", y = "CFU per 100ml", x = "Site")
 ```
+
 
 #Mean enterococci per site
 ```{r}
@@ -87,6 +91,17 @@ data_clean %>%
     sample_count = n()
   ) %>%
   arrange(desc(mean_cfu))
+```
+
+#Bar Plot
+```{r}
+ggplot(dat, aes(x = site_id, y = enterococci_cfu_per_100ml, fill = sample_date)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Enterococci Levels by Site",
+    x = "Site",
+    y = "Enterococci_cfu_per_100ml"
+  )
 ```
 
 #Bar plot 
