@@ -27,9 +27,15 @@ library(patchwork)
 library(units)
 library(osmdata)
 library(ggrepel)
+library(keyring)
 ```
 
 ## Database Connection
+
+```{r db-connection, include=FALSE}
+# Use the following code to add your credentials to the 
+# key_set(service = "supabase", username = "francois")
+```
 
 ```{r db-connection}
 # Connect to the Postgres database
@@ -37,10 +43,18 @@ library(ggrepel)
 con <- dbConnect(RPostgres::Postgres(),
   host = "aws-0-eu-central-1.pooler.supabase.com",
   port = 5432,
-  user = str_c(rstudioapi::askForPassword(prompt = "Username: "), "wnrvdvesovnkmqbhkhjz", sep = "."),
-  password = rstudioapi::askForPassword(),
+  user = str_c(
+    key_list(service = "supabase")$username,
+    ".wnrvdvesovnkmqbhkhjz"
+  ),
+  password = key_get(
+    service = "supabase",
+    username = key_list(service = "supabase")$username
+  ),
   dbname = "postgres"
 )
+
+dbGetInfo(con)
 ```
 
 ## Load the City colours
@@ -1001,6 +1015,63 @@ false_bay_title <- ggplot() +
     inset_element(false_bay_title, left = 0, top = 1, right = 1.2, bottom = 0.9))
 
 ggsave("false_bay_overview_v0.3.jpg", plot = false_bay_overview, path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/", width = 210, height = 297, unit = "mm", dpi = 600)
+```
+
+## Create a site comparison to show overview of sites at a glance
+
+```{r site-comparison, fig.width = 8.27, fig.height = 11.69, dpi = 600}
+# Have a look at the data
+all_sites_summary <- entire_coast_summary |>
+  mutate(samples_compliant_pct = 100 - samples_exceed_pct)
+
+poorest_sites_summary <- all_sites_summary |> filter(samples_compliant_pct < 84)
+  
+# Plot the data
+(compliance_plot <- ggplot(data = all_sites_summary, aes(x = samples_compliant_pct, fill = hazen_category)) +
+  labs(x = "What % of samples at each site are compliant with the 240 cfu per 100 mL threshold?",
+       caption = "Reporting period: October 2023 to May 2025") +
+  geom_dotplot(
+    method = "histodot",
+    stackgroups = TRUE,
+    colour = NA,
+    dotsize = 0.7,
+    stackratio = 1.2
+  ) +
+  geom_text(data = poorest_sites_summary,
+                  aes(label = site_description, y = 0),
+                  angle = 90,
+                  family = "Century Gothic",
+                  colour = "white",
+                  nudge_y = 0.05,
+                  vjust = 0.5,
+                  hjust = 0
+                  ) +
+  scale_fill_manual(name = "Water Quality Category", values = c(
+    "Poor" = "#D73027",
+    "Sufficient" = "#FECC5C",
+    "Good" = "#A6D96A",
+    "Excellent" = "#3288BD"
+    )) +
+  theme(
+    legend.position = "bottom",
+    legend.background = element_blank(),
+    plot.background = element_rect(fill = city_teal),
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    text = element_text(family = "Century Gothic", colour = "white"),
+    axis.line.x = element_blank(),
+    axis.ticks.x = element_line(colour = "white"),
+    axis.text.x = element_text(colour = "white"),
+    axis.title.x = element_text(vjust = -1),
+    axis.text.y = element_blank(),
+    axis.line.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.title.y = element_blank()
+    ) +
+  coord_cartesian(xlim = c(40, 100)) +
+  scale_x_continuous(breaks = seq(40, 100, 10)))
+
+ggsave("compliance_plot.jpg", plot = compliance_plot, path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/", width = 8.27, height = 11.69, dpi = 600)
 ```
 
 

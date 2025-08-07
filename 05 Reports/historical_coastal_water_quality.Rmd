@@ -97,17 +97,18 @@ height = 20 / 25.4
 
 ```{r select-sites}
 tbl(con, I("coastal.sites")) |>
-  filter(str_detect(site_description |> str_to_lower(), "jager"))
+  filter(str_detect(site_description |> str_to_lower(), "bikini"))
 ```
 
 ```{r select-site}
-current_site_id <- "CS35"
+current_site_id <- "XCS08"
 ```
 
-```{r hazen-over-time, fig.width = 7.267717, fig.height = 1.3, dpi = 600}
+```{r hazen-over-time, fig.width = 7.267717, fig.height = 1.2, dpi = 600}
 # Annual summary of Hazen categories
 hazen_data <- results |>
   filter(site_id == current_site_id, monitoring_group %in% c("daily", "routine")) |>
+  filter(sample_date < "2025-06-01") |>
   group_by(
     year = year(sample_date) |> as.character()
   ) |>
@@ -125,6 +126,15 @@ hazen_data <- results |>
       hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
   ) |> fct(levels = c("TFD", "Poor", "Sufficient", "Good", "Excellent"))) |>
   ungroup()
+
+# Make sure all years are present
+hazen_data <- seq(min(hazen_data$year), max(hazen_data$year)) |>
+  as.character() |>
+  as_tibble() |>
+  left_join(
+    hazen_data, by = c("value" = "year")
+  ) |>
+  rename(year = value)
 
 # Plot the Hazen data for each year
 (hazen_strip <- hazen_data |>
@@ -151,10 +161,11 @@ hazen_data <- results |>
 RColorBrewer::display.brewer.all(type = "div")
 ```
 
-```{r sample-exceedance-dotplot, fig.width = 7.267717, fig.height = 3, dpi = 600}
+```{r sample-exceedance-dotplot, fig.width = 7.267717, fig.height = 1.5, dpi = 600}
 # Prepare the data
 exceedance_data <- results |>
   filter(site_id == current_site_id, monitoring_group %in% c("routine", "daily")) |>
+  filter(sample_date < "2025-06-01") |>
   mutate(
     exceedance = if_else(numeric_value > 240, "Yes", "No")
   ) |>
@@ -167,8 +178,8 @@ exceedance_data <- results |>
     method = "histodot",
     colour = NA,
     stackgroups = TRUE,
-    # dotsize = 10,
-    binwidth = 80,
+    dotsize = 0.7,
+    binwidth = 60,
     stackratio = 1.3
     ) +
   scale_fill_manual(name = "Exceeds safe water use threshold", values = c("Yes" = "red", "No" = city_dark_green)) +
@@ -185,11 +196,11 @@ exceedance_data <- results |>
 ```
 
 ```{r save-plots}
-ggsave(filename = str_c(current_site_id, "_exceedance.jpg", sep = ""), path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Long-term Plots/", plot = exceedance_plot, width = (210-2*12.7), height = 70, units = "mm", dpi = 600)
+ggsave(filename = str_c(current_site_id, "_exceedance.jpg", sep = ""), path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Long-term Plots/", plot = exceedance_plot, width = (210-2*12.7), height = 50, units = "mm", dpi = 600)
 ```
 
 ```{r save-plots}
-ggsave(filename = str_c(current_site_id, "_hazen.jpg", sep = ""), path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Long-term Plots/", plot = hazen_strip, width = 7.3, height = 1.3, dpi = 600)
+ggsave(filename = str_c(current_site_id, "_hazen.jpg", sep = ""), path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Long-term Plots/", plot = hazen_strip, width = 7.3, height = 1.2, dpi = 600)
 ```
 
 # Percentage exceedances over time
