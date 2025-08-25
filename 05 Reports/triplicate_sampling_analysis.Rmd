@@ -61,7 +61,6 @@ head(df)
 summary(df)
 ```
 
-
 How do the results compare between labs?
 
 ```{r, fig.height = 11, fig.width = 8.7, dpi = 600}
@@ -93,3 +92,8 @@ df |>
   arrange(sample_date, lab_code, sample_type) |>
   write_csv("02 Output Data/triplicate_sampling_results.csv")
 ```
+
+```{r plot-linegraph, fig.width = 8.7, fig.height = }
+
+```
+

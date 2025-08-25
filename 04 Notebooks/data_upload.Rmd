@@ -1139,7 +1139,7 @@ COMMIT;
 ## Upload manually
 
 ```{r read-triplicate-data}
-triplicates <- read_xlsx("../../Infinity/Coastal Water Quality - Documents/Shared Results/Triplicate Sampling/triplicate_sampling_to_populate.xlsx") |>
+triplicates <- read_xlsx("../../Infinity/Coastal Water Quality - Documents/Shared Results/Triplicate Sampling/to_populate_202508.xlsx") |>
   mutate(sample_time = hms::as_hms(sample_time))
 ```
 
@@ -1166,7 +1166,7 @@ BEGIN;
 ```
 
 ```{sql, connection = con}
-SELECT * FROM triplicates WHERE sample_date >= '2025-06-30';
+SELECT * FROM triplicates;
 ```
 
 ```{sql, connection = con}
@@ -1175,7 +1175,6 @@ SELECT
   lab_code,
   count(*)
 FROM triplicates a
-WHERE sample_date >= '2025-06-30'
 GROUP BY to_char(sample_date, 'month'), lab_code
 ORDER BY month, lab_code;
 ```
@@ -1186,7 +1185,6 @@ SELECT
   lab_code,
   count(*)
 FROM coastal.triplicate_results
-WHERE sample_date >= '2025-06-30'
 GROUP BY to_char(sample_date, 'month'), lab_code
 ORDER BY month, lab_code;
 ```
@@ -1198,12 +1196,11 @@ SELECT
   site_id,
   sample_date,
   sample_time,
-  sample_temperature_c,
+  sample_temp_c,
   enterococci_cfu_per_100ml,
   filename,
   lab_code::coastal.lab
-FROM triplicates
-WHERE sample_date >= '2025-06-30';
+FROM triplicates;
 ```
 
 ```{sql, connection = con}
@@ -1214,6 +1211,11 @@ SELECT
 FROM coastal.triplicate_results
 GROUP BY to_char(sample_date, 'month'), lab_code
 ORDER BY to_char(sample_date, 'month'), lab_code;
+```
+
+```{sql, connection = con}
+SELECT filename, enterococci_cfu_per_100ml FROM coastal.triplicate_results WHERE sample_date > '2025-08-01'
+ORDER BY sample_date, lab_code;
 ```
 
 ```{sql, connection = con}

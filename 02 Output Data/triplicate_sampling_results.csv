@@ -4,11 +4,11 @@ Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,NA,NA,CN11D,8.3,ND,M048
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,NA,NA,CN11E,8.5,ND,M0487.pdf,SABS,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,NA,NA,CN11F,8.3,ND,M0487.pdf,SABS,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,NA,NA,LB001,8.2,ND,M0487.pdf,SABS,lab control
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,NA,NA,FB001,NA,<1,Coastal adhocs 2025-04-01.pdf,SSVC,field control
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,NA,NA,CN11,NA,111,Coastal adhocs 2025-04-01.pdf,SSVC,field sample
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,NA,NA,CN11,NA,184,Coastal adhocs 2025-04-01.pdf,SSVC,field sample
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,NA,NA,CN11,NA,185,Coastal adhocs 2025-04-01.pdf,SSVC,field sample
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,NA,NA,LB001,NA,<1,Coastal adhocs 2025-04-01.pdf,SSVC,lab control
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,NA,NA,FB001,NA,<1,Coastal adhocs 2025-04-01.pdf,SSB,field control
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,NA,NA,CN11,NA,185,Coastal adhocs 2025-04-01.pdf,SSB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,NA,NA,CN11,NA,111,Coastal adhocs 2025-04-01.pdf,SSB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,NA,NA,CN11,NA,184,Coastal adhocs 2025-04-01.pdf,SSB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,NA,NA,LB001,NA,<1,Coastal adhocs 2025-04-01.pdf,SSB,lab control
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,10:41:00,2025-04-03,FB001,7.1,ND,Infinity Environmental AD.92(CN).pdf,WLAB,field control
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,10:50:00,2025-04-03,CN11A,7.1,ND,Infinity Environmental AD.92(CN).pdf,WLAB,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-04-01,10:50:00,2025-04-03,CN11B,7.1,ND,Infinity Environmental AD.92(CN).pdf,WLAB,field sample
@@ -18,10 +18,10 @@ Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,NA,NA,FB001,5.1,N
 Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,NA,NA,CS34D,5.2,ND,M0506.pdf,SABS,field sample
 Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,NA,NA,CS34E,5.1,ND,M0506.pdf,SABS,field sample
 Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,NA,NA,CS34F,5,ND,M0506.pdf,SABS,field sample
-Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,NA,NA,FB001,NA,<1,coastal adhocs 2025-04-03.pdf,SSVC,field control
-Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,NA,NA,CS34,NA,192,coastal adhocs 2025-04-03.pdf,SSVC,field sample
-Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,NA,NA,CS34,NA,291,coastal adhocs 2025-04-03.pdf,SSVC,field sample
-Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,NA,NA,CS34,NA,308,coastal adhocs 2025-04-03.pdf,SSVC,field sample
+Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,NA,NA,FB001,NA,<1,coastal adhocs 2025-04-03.pdf,SSB,field control
+Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,NA,NA,CS34,NA,291,coastal adhocs 2025-04-03.pdf,SSB,field sample
+Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,NA,NA,CS34,NA,192,coastal adhocs 2025-04-03.pdf,SSB,field sample
+Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,NA,NA,CS34,NA,308,coastal adhocs 2025-04-03.pdf,SSB,field sample
 Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,09:15:00,2025-04-05,FB001,5.6,ND,Infinity Environmental AD.94(CS).pdf,WLAB,field control
 Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,09:23:00,2025-04-05,CS34A,5.6,3,Infinity Environmental AD.94(CS).pdf,WLAB,field sample
 Muizenberg Surfers Corner,CS34,18.470834,-34.108983,2025-04-03,09:23:00,2025-04-05,CS34B,5.6,5,Infinity Environmental AD.94(CS).pdf,WLAB,field sample
@@ -30,10 +30,10 @@ Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,NA,FB001,7.8,ND,M051
 Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,NA,XCN04G,7.7,16,M0518.pdf,SABS,field sample
 Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,NA,XCN04H,7.5,15,M0518.pdf,SABS,field sample
 Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,NA,XCN04I,7.3,17,M0518.pdf,SABS,field sample
-Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,NA,FB001,NA,<1,Coastal adhocs 2025-04-07.pdf,SSVC,field control
-Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,NA,XCN04,NA,73,Coastal adhocs 2025-04-07.pdf,SSVC,field sample
-Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,NA,XCN04,NA,65,Coastal adhocs 2025-04-07.pdf,SSVC,field sample
-Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,NA,XCN04,NA,50,Coastal adhocs 2025-04-07.pdf,SSVC,field sample
+Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,NA,FB001,NA,<1,Coastal adhocs 2025-04-07.pdf,SSB,field control
+Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,NA,XCN04,NA,73,Coastal adhocs 2025-04-07.pdf,SSB,field sample
+Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,NA,XCN04,NA,65,Coastal adhocs 2025-04-07.pdf,SSB,field sample
+Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,NA,XCN04,NA,50,Coastal adhocs 2025-04-07.pdf,SSB,field sample
 Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,2025-04-09,FB001,8.2,ND,Infinity Environmental AD.98(CN).pdf,WLAB,field control
 Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,2025-04-09,XCN04A,8.2,22,Infinity Environmental AD.98(CN).pdf,WLAB,field sample
 Milnerton Lighthouse,XCN04,18.48665,-33.88135,2025-04-07,NA,2025-04-09,XCN04B,8.2,20,Infinity Environmental AD.98(CN).pdf,WLAB,field sample
@@ -43,11 +43,11 @@ Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,10:45:00,NA,XCN12D,5.1,ND,M0602.pd
 Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,10:45:00,NA,XCN12E,5.2,ND,M0602.pdf,SABS,field sample
 Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,10:45:00,NA,XCN12F,5.3,ND,M0602.pdf,SABS,field sample
 Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,10:55:00,NA,LB001,5.2,ND,M0602.pdf,SABS,lab control
-Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,NA,NA,FB001,NA,<1,coastal ad hocs 2025-05-05.pdf,SSVC,field control
-Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,NA,NA,XCN12,NA,47,coastal ad hocs 2025-05-05.pdf,SSVC,field sample
-Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,NA,NA,XCN12,NA,42,coastal ad hocs 2025-05-05.pdf,SSVC,field sample
-Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,NA,NA,XCN12,NA,35,coastal ad hocs 2025-05-05.pdf,SSVC,field sample
-Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,NA,NA,LB001,NA,<1,coastal ad hocs 2025-05-05.pdf,SSVC,lab control
+Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,NA,NA,FB001,NA,<1,coastal ad hocs 2025-05-05.pdf,SSB,field control
+Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,NA,NA,XCN12,NA,35,coastal ad hocs 2025-05-05.pdf,SSB,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,NA,NA,XCN12,NA,47,coastal ad hocs 2025-05-05.pdf,SSB,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,NA,NA,XCN12,NA,42,coastal ad hocs 2025-05-05.pdf,SSB,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,NA,NA,LB001,NA,<1,coastal ad hocs 2025-05-05.pdf,SSB,lab control
 Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,10:48:00,2025-05-07,FB001,3.1,ND,Infinity Environmental AD.117(LB).pdf,WLAB,field control
 Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,10:45:00,2025-05-07,XCN12A,3.1,ND,Infinity Environmental AD.117(LB).pdf,WLAB,field sample
 Big Bay,XCN12,18.45666667,-33.7938,2025-05-05,10:45:00,2025-05-07,XCN12B,3.1,1,Infinity Environmental AD.117(LB).pdf,WLAB,field sample
@@ -57,10 +57,10 @@ Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,NA,NA,FB001,6,ND,M0608.
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,NA,NA,CN11D,6.1,ND,M0608.pdf,SABS,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,NA,NA,CN11E,6,ND,M0608.pdf,SABS,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,NA,NA,CN11F,6.1,ND,M0608.pdf,SABS,field sample
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,NA,NA,FB001,NA,<1,coastal ad hocs 2025-05-06.pdf,SSVC,field control
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,NA,NA,CN11,NA,21,coastal ad hocs 2025-05-06.pdf,SSVC,field sample
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,NA,NA,CN11,NA,11,coastal ad hocs 2025-05-06.pdf,SSVC,field sample
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,NA,NA,CN11,NA,9,coastal ad hocs 2025-05-06.pdf,SSVC,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,NA,NA,FB001,NA,<1,coastal ad hocs 2025-05-06.pdf,SSB,field control
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,NA,NA,CN11,NA,21,coastal ad hocs 2025-05-06.pdf,SSB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,NA,NA,CN11,NA,11,coastal ad hocs 2025-05-06.pdf,SSB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,NA,NA,CN11,NA,9,coastal ad hocs 2025-05-06.pdf,SSB,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,NA,2025-05-08,FB001,7.1,ND,Infinity Environmental AD.119(FB).pdf,WLAB,field control
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,10:55:00,2025-05-08,CN11A,7.1,3,Infinity Environmental AD.119(FB).pdf,WLAB,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-05-06,10:55:00,2025-05-08,CN11B,7.1,4,Infinity Environmental AD.119(FB).pdf,WLAB,field sample
@@ -69,10 +69,10 @@ Llandudno,XCN03,18.34031,-34.007816,2025-05-13,10:35:00,NA,FB001,6.1,ND,M0633.pd
 Llandudno,XCN03,18.34031,-34.007816,2025-05-13,10:25:00,NA,XCN03D,5.9,ND,M0633.pdf,SABS,field sample
 Llandudno,XCN03,18.34031,-34.007816,2025-05-13,10:25:00,NA,XCN03E,5.8,ND,M0633.pdf,SABS,field sample
 Llandudno,XCN03,18.34031,-34.007816,2025-05-13,10:25:00,NA,XCN03F,6,ND,M0633.pdf,SABS,field sample
-Llandudno,XCN03,18.34031,-34.007816,2025-05-13,NA,NA,FB001,NA,24,Coastal adhocs 2025-05-13.pdf,SSVC,field control
-Llandudno,XCN03,18.34031,-34.007816,2025-05-13,NA,NA,XCN03,NA,23,Coastal adhocs 2025-05-13.pdf,SSVC,field sample
-Llandudno,XCN03,18.34031,-34.007816,2025-05-13,NA,NA,XCN03,NA,34,Coastal adhocs 2025-05-13.pdf,SSVC,field sample
-Llandudno,XCN03,18.34031,-34.007816,2025-05-13,NA,NA,XCN03,NA,<1,Coastal adhocs 2025-05-13.pdf,SSVC,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-05-13,NA,NA,FB001,NA,24,Coastal adhocs 2025-05-13.pdf,SSB,field control
+Llandudno,XCN03,18.34031,-34.007816,2025-05-13,NA,NA,XCN03,NA,23,Coastal adhocs 2025-05-13.pdf,SSB,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-05-13,NA,NA,XCN03,NA,34,Coastal adhocs 2025-05-13.pdf,SSB,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-05-13,NA,NA,XCN03,NA,<1,Coastal adhocs 2025-05-13.pdf,SSB,field sample
 Llandudno,XCN03,18.34031,-34.007816,2025-05-13,NA,2025-05-15,FB001,4,ND,Infinity Environmental AD.126(FB).pdf,WLAB,field control
 Llandudno,XCN03,18.34031,-34.007816,2025-05-13,10:25:00,2025-05-15,XCN03A,4,2,Infinity Environmental AD.126(FB).pdf,WLAB,field sample
 Llandudno,XCN03,18.34031,-34.007816,2025-05-13,10:25:00,2025-05-15,XCN03B,4,ND,Infinity Environmental AD.126(FB).pdf,WLAB,field sample
@@ -82,11 +82,11 @@ Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,NA,XCN12G,6.1,1,M0716.pdf,SABS,
 Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,NA,XCN12H,6.1,4,M0716.pdf,SABS,field sample
 Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,NA,XCN12I,6,ND,M0716.pdf,SABS,field sample
 Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,NA,LB001,5.8,ND,M0716.pdf,SABS,lab control
-Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,NA,FB001,NA,<1,coastal ad hocs 2025-06-02.pdf,SSVC,field control
-Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,NA,XCN12,NA,41,coastal ad hocs 2025-06-02.pdf,SSVC,field sample
-Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,NA,XCN12,NA,61,coastal ad hocs 2025-06-02.pdf,SSVC,field sample
-Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,NA,XCN12,NA,66,coastal ad hocs 2025-06-02.pdf,SSVC,field sample
-Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,NA,LB001,NA,<1,coastal ad hocs 2025-06-02.pdf,SSVC,lab control
+Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,NA,FB001,NA,<1,coastal ad hocs 2025-06-02.pdf,SSB,field control
+Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,NA,XCN12,NA,61,coastal ad hocs 2025-06-02.pdf,SSB,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,NA,XCN12,NA,41,coastal ad hocs 2025-06-02.pdf,SSB,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,NA,XCN12,NA,66,coastal ad hocs 2025-06-02.pdf,SSB,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,NA,LB001,NA,<1,coastal ad hocs 2025-06-02.pdf,SSB,lab control
 Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,NA,2025-06-04,FB001,2.6,ND,Infinity Environmental AD.152(FB).pdf,WLAB,field control
 Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,10:00:00,2025-06-04,XCN12A,2.6,8,Infinity Environmental AD.152(FB).pdf,WLAB,field sample
 Big Bay,XCN12,18.45666667,-33.7938,2025-06-02,10:00:00,2025-06-04,XCN12B,2.6,7,Infinity Environmental AD.152(FB).pdf,WLAB,field sample
@@ -96,10 +96,10 @@ Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,NA,NA,FB001,6,ND,M0717.
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,NA,NA,CN11D,6,142,M0717.pdf,SABS,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,NA,NA,CN11E,5.9,98,M0717.pdf,SABS,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,NA,NA,CN11F,5.8,92,M0717.pdf,SABS,field sample
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,NA,NA,FB001,NA,<1,Camps bay adhocs 2025-06-03.pdf,SSVC,field control
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,NA,NA,CN11,NA,313,Camps bay adhocs 2025-06-03.pdf,SSVC,field sample
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,NA,NA,CN11,NA,189,Camps bay adhocs 2025-06-03.pdf,SSVC,field sample
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,NA,NA,CN11,NA,291,Camps bay adhocs 2025-06-03.pdf,SSVC,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,NA,NA,FB001,NA,<1,Camps bay adhocs 2025-06-03.pdf,SSB,field control
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,NA,NA,CN11,NA,313,Camps bay adhocs 2025-06-03.pdf,SSB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,NA,NA,CN11,NA,189,Camps bay adhocs 2025-06-03.pdf,SSB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,NA,NA,CN11,NA,291,Camps bay adhocs 2025-06-03.pdf,SSB,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,10:57:00,2025-06-05,FB001,2.8,ND,Infinity Environmental AD.154(FB).pdf,WLAB,field control
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,10:30:00,2025-06-05,CN11G,2.8,195,Infinity Environmental AD.154(FB).pdf,WLAB,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-06-03,10:30:00,2025-06-05,CN11H,2.8,155,Infinity Environmental AD.154(FB).pdf,WLAB,field sample
@@ -108,10 +108,10 @@ Llandudno,XCN03,18.34031,-34.007816,2025-06-10,NA,NA,FB001,6.1,ND,M0746.pdf,SABS
 Llandudno,XCN03,18.34031,-34.007816,2025-06-10,NA,NA,XCN03D,6.2,ND,M0746.pdf,SABS,field sample
 Llandudno,XCN03,18.34031,-34.007816,2025-06-10,NA,NA,XCN03E,6,ND,M0746.pdf,SABS,field sample
 Llandudno,XCN03,18.34031,-34.007816,2025-06-10,NA,NA,XCN03F,6.1,ND,M0746.pdf,SABS,field sample
-Llandudno,XCN03,18.34031,-34.007816,2025-06-10,NA,NA,FB001,NA,15,Coastal adhocs 2025-06-10.pdf,SSVC,field control
-Llandudno,XCN03,18.34031,-34.007816,2025-06-10,NA,NA,XCN03,NA,4,Coastal adhocs 2025-06-10.pdf,SSVC,field sample
-Llandudno,XCN03,18.34031,-34.007816,2025-06-10,NA,NA,XCN03,NA,6,Coastal adhocs 2025-06-10.pdf,SSVC,field sample
-Llandudno,XCN03,18.34031,-34.007816,2025-06-10,NA,NA,XCN03,NA,<1,Coastal adhocs 2025-06-10.pdf,SSVC,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-06-10,NA,NA,FB001,NA,15,Coastal adhocs 2025-06-10.pdf,SSB,field control
+Llandudno,XCN03,18.34031,-34.007816,2025-06-10,NA,NA,XCN03,NA,<1,Coastal adhocs 2025-06-10.pdf,SSB,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-06-10,NA,NA,XCN03,NA,6,Coastal adhocs 2025-06-10.pdf,SSB,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-06-10,NA,NA,XCN03,NA,4,Coastal adhocs 2025-06-10.pdf,SSB,field sample
 Llandudno,XCN03,18.34031,-34.007816,2025-06-10,NA,2025-06-12,FB001,3.1,ND,Infinity Environmental AD.161(FB).pdf,WLAB,field control
 Llandudno,XCN03,18.34031,-34.007816,2025-06-10,09:51:00,2025-06-12,XCN03G,3.1,3,Infinity Environmental AD.161(FB).pdf,WLAB,field sample
 Llandudno,XCN03,18.34031,-34.007816,2025-06-10,09:51:00,2025-06-12,XCN03H,3.1,ND,Infinity Environmental AD.161(FB).pdf,WLAB,field sample
@@ -120,10 +120,10 @@ Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,10:05:00,NA,FB001,6.8,ND,M0842.pdf
 Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,10:09:00,NA,XCN12A,6.9,ND,M0842.pdf,SABS,field sample
 Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,10:09:00,NA,XCN12B,7.2,ND,M0842.pdf,SABS,field sample
 Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,10:09:00,NA,XCN12C,7,ND,M0842.pdf,SABS,field sample
-Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,NA,NA,FB001,NA,<1,Coastal adhocs 2025-06-30.pdf,SSVC,field control
-Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,NA,NA,XCN12,NA,25,Coastal adhocs 2025-06-30.pdf,SSVC,field sample
-Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,NA,NA,XCN12,NA,32,Coastal adhocs 2025-06-30.pdf,SSVC,field sample
-Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,NA,NA,XCN12,NA,47,Coastal adhocs 2025-06-30.pdf,SSVC,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,NA,NA,FB001,NA,<1,Coastal adhocs 2025-06-30.pdf,SSB,field control
+Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,NA,NA,XCN12,NA,47,Coastal adhocs 2025-06-30.pdf,SSB,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,NA,NA,XCN12,NA,32,Coastal adhocs 2025-06-30.pdf,SSB,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,NA,NA,XCN12,NA,25,Coastal adhocs 2025-06-30.pdf,SSB,field sample
 Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,NA,2025-07-02,FB001,4.1,ND,Infinity Environmental AD.176(FB).pdf,WLAB,field control
 Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,10:09:00,2025-07-02,XCN12G,4.1,6,Infinity Environmental AD.176(FB).pdf,WLAB,field sample
 Big Bay,XCN12,18.45666667,-33.7938,2025-06-30,10:09:00,2025-07-02,XCN12H,4.1,6,Infinity Environmental AD.176(FB).pdf,WLAB,field sample
@@ -132,10 +132,10 @@ Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,10:20:00,NA,FB001,6.9,N
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,10:22:00,NA,CN11A,6.7,ND,M0846.pdf,SABS,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,10:22:00,NA,CN11B,6.5,ND,M0846.pdf,SABS,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,10:22:00,NA,CN11C,7,ND,M0846.pdf,SABS,field sample
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,NA,NA,FB002,NA,<1,coastal adhocs 2025-07-01.pdf,SSVC,field control
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,NA,NA,CN11,NA,55,coastal adhocs 2025-07-01.pdf,SSVC,field sample
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,NA,NA,CN11,NA,71,coastal adhocs 2025-07-01.pdf,SSVC,field sample
-Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,NA,NA,CN11,NA,67,coastal adhocs 2025-07-01.pdf,SSVC,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,NA,NA,FB002,NA,<1,coastal adhocs 2025-07-01.pdf,SSB,field control
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,NA,NA,CN11,NA,71,coastal adhocs 2025-07-01.pdf,SSB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,NA,NA,CN11,NA,67,coastal adhocs 2025-07-01.pdf,SSB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,NA,NA,CN11,NA,55,coastal adhocs 2025-07-01.pdf,SSB,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,10:20:00,2025-07-03,FB001,4.6,ND,Infinity Environmental AD.178(FB).pdf,WLAB,field control
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,10:22:00,2025-07-03,CN11G,4.6,9,Infinity Environmental AD.178(FB).pdf,WLAB,field sample
 Camps Bay South,CN11,18.37566417,-33.95262556,2025-07-01,10:22:00,2025-07-03,CN11H,4.6,11,Infinity Environmental AD.178(FB).pdf,WLAB,field sample
@@ -144,11 +144,47 @@ Llandudno,XCN03,18.34031,-34.007816,2025-07-08,10:42:00,NA,FB001,7.3,ND,M0865.pd
 Llandudno,XCN03,18.34031,-34.007816,2025-07-08,10:40:00,NA,XCN03D,7.1,ND,M0865.pdf,SABS,field sample
 Llandudno,XCN03,18.34031,-34.007816,2025-07-08,10:40:00,NA,XCN03E,7.2,ND,M0865.pdf,SABS,field sample
 Llandudno,XCN03,18.34031,-34.007816,2025-07-08,10:40:00,NA,XCN03F,6.8,ND,M0865.pdf,SABS,field sample
-Llandudno,XCN03,18.34031,-34.007816,2025-07-08,NA,NA,FB001,NA,<1,coastal ad hocs 2025-07-08.pdf,SSVC,field control
-Llandudno,XCN03,18.34031,-34.007816,2025-07-08,NA,NA,XCN03,NA,18,coastal ad hocs 2025-07-08.pdf,SSVC,field sample
-Llandudno,XCN03,18.34031,-34.007816,2025-07-08,NA,NA,XCN03,NA,16,coastal ad hocs 2025-07-08.pdf,SSVC,field sample
-Llandudno,XCN03,18.34031,-34.007816,2025-07-08,NA,NA,XCN03,NA,17,coastal ad hocs 2025-07-08.pdf,SSVC,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-07-08,NA,NA,FB001,NA,<1,coastal ad hocs 2025-07-08.pdf,SSB,field control
+Llandudno,XCN03,18.34031,-34.007816,2025-07-08,NA,NA,XCN03,NA,16,coastal ad hocs 2025-07-08.pdf,SSB,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-07-08,NA,NA,XCN03,NA,18,coastal ad hocs 2025-07-08.pdf,SSB,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-07-08,NA,NA,XCN03,NA,17,coastal ad hocs 2025-07-08.pdf,SSB,field sample
 Llandudno,XCN03,18.34031,-34.007816,2025-07-08,10:42:00,2025-07-10,FB001,2.6,ND,Infinity Environmental AD.184(FB).pdf,WLAB,field control
 Llandudno,XCN03,18.34031,-34.007816,2025-07-08,10:40:00,2025-07-10,XCN03G,2.6,1,Infinity Environmental AD.184(FB).pdf,WLAB,field sample
 Llandudno,XCN03,18.34031,-34.007816,2025-07-08,10:40:00,2025-07-10,XCN03H,2.6,ND,Infinity Environmental AD.184(FB).pdf,WLAB,field sample
 Llandudno,XCN03,18.34031,-34.007816,2025-07-08,10:40:00,2025-07-10,XCN03I,2.6,ND,Infinity Environmental AD.184(FB).pdf,WLAB,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-08-04,11:23:00,NA,FB001,7,ND,M0969.pdf,SABS,field control
+Big Bay,XCN12,18.45666667,-33.7938,2025-08-04,11:23:00,NA,XCN12A,6.7,ND,M0969.pdf,SABS,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-08-04,11:23:00,NA,XCN12B,6.9,ND,M0969.pdf,SABS,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-08-04,11:23:00,NA,XCN12C,7.3,ND,M0969.pdf,SABS,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-08-04,NA,NA,FB001,NA,<1,coastal ad hocs 2025-08-04.pdf,SSB,field control
+Big Bay,XCN12,18.45666667,-33.7938,2025-08-04,NA,NA,XCN12,NA,214,coastal ad hocs 2025-08-04.pdf,SSB,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-08-04,NA,NA,XCN12,NA,236,coastal ad hocs 2025-08-04.pdf,SSB,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-08-04,NA,NA,XCN12,NA,157,coastal ad hocs 2025-08-04.pdf,SSB,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-08-04,11:23:00,NA,FB001,4.1,ND,Infinity Environmental AD.205(CN).pdf,WLAB,field control
+Big Bay,XCN12,18.45666667,-33.7938,2025-08-04,11:23:00,NA,XCN12G,4.1,26,Infinity Environmental AD.205(CN).pdf,WLAB,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-08-04,11:23:00,NA,XCN12H,4.1,20,Infinity Environmental AD.205(CN).pdf,WLAB,field sample
+Big Bay,XCN12,18.45666667,-33.7938,2025-08-04,11:23:00,NA,XCN12I,4.1,16,Infinity Environmental AD.205(CN).pdf,WLAB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-08-05,11:54:00,NA,FB001,6.8,ND,M0975.pdf,SABS,field control
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-08-05,11:55:00,NA,CN11A,6.9,18,M0975.pdf,SABS,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-08-05,11:55:00,NA,CN11B,7.3,10,M0975.pdf,SABS,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-08-05,11:55:00,NA,CN11C,7,16,M0975.pdf,SABS,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-08-05,NA,NA,FB001,NA,<1,coastal adhocs 2025-08-05.pdf,SSB,field control
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-08-05,NA,NA,CN11,NA,420,coastal adhocs 2025-08-05.pdf,SSB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-08-05,NA,NA,CN11,NA,361,coastal adhocs 2025-08-05.pdf,SSB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-08-05,NA,NA,CN11,NA,281,coastal adhocs 2025-08-05.pdf,SSB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-08-05,11:54:00,NA,FB001,4.3,ND,Infinity Environmental AD.207(CN).pdf,WLAB,field control
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-08-05,11:55:00,NA,CN11G,4.3,22,Infinity Environmental AD.207(CN).pdf,WLAB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-08-05,11:55:00,NA,CN11H,4.3,15,Infinity Environmental AD.207(CN).pdf,WLAB,field sample
+Camps Bay South,CN11,18.37566417,-33.95262556,2025-08-05,11:55:00,NA,CN11I,4.3,21,Infinity Environmental AD.207(CN).pdf,WLAB,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-08-12,08:53:00,NA,FB001,6.6,ND,M0995.pdf,SABS,field control
+Llandudno,XCN03,18.34031,-34.007816,2025-08-12,08:53:00,NA,XCN03A,6.3,ND,M0995.pdf,SABS,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-08-12,08:53:00,NA,XCN03B,6.5,ND,M0995.pdf,SABS,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-08-12,08:53:00,NA,XCN03C,6.9,ND,M0995.pdf,SABS,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-08-12,NA,NA,FB001,NA,<1,coastal ad hocs 2025-08-12.pdf,SSB,field control
+Llandudno,XCN03,18.34031,-34.007816,2025-08-12,NA,NA,XCN03,NA,13,coastal ad hocs 2025-08-12.pdf,SSB,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-08-12,NA,NA,XCN03,NA,11,coastal ad hocs 2025-08-12.pdf,SSB,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-08-12,NA,NA,XCN03,NA,16,coastal ad hocs 2025-08-12.pdf,SSB,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-08-12,08:53:00,NA,FB001,4.4,ND,Infinity Environmental AD.215(CN).pdf,WLAB,field control
+Llandudno,XCN03,18.34031,-34.007816,2025-08-12,08:53:00,NA,XCN03G,4.4,1,Infinity Environmental AD.215(CN).pdf,WLAB,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-08-12,08:53:00,NA,XCN03H,4.4,ND,Infinity Environmental AD.215(CN).pdf,WLAB,field sample
+Llandudno,XCN03,18.34031,-34.007816,2025-08-12,08:53:00,NA,XCN03I,4.4,ND,Infinity Environmental AD.215(CN).pdf,WLAB,field sample

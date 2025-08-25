@@ -9,8 +9,8 @@ WITH schedule_insert AS
 (SELECT
 	sample_date::date,
 	trim(initcap(to_char(sample_date, 'day')))::varchar(9) AS day,
-	((date_trunc('week', sample_date)::date - '2025-06-30') / 7 + 1)::varchar(1) AS week
-FROM generate_series('2025-06-30'::date, '2025-07-25'::date, '1 day'::interval) sample_date) -- Change start and end dates
+	((date_trunc('week', sample_date)::date - '2025-08-25') / 7 + 1)::varchar(1) AS week
+FROM generate_series('2025-08-25'::date, '2025-09-19'::date, '1 day'::interval) sample_date) -- Change start and end dates
 SELECT
 	a.sample_date,
 	a.week,
@@ -20,10 +20,20 @@ SELECT
 		WHEN b.samplers = 'Coastal Management Branch' THEN 'cmb'::coastal.branch
 		WHEN b.samplers = 'Scientific Services Branch' THEN 'ssb'::coastal.branch
 		END AS samplers
-FROM schedule a LEFT JOIN coastal.schedule b ON a.week = b.week AND a.day = b.day
-WHERE version = 4) -- Which version of the schedule do I want to use as a template
+FROM schedule a JOIN coastal.schedule b ON a.week = b.week AND a.day = b.day
+WHERE version = 4 AND a.day NOT IN ('Saturday', 'Sunday')) -- Which version of the schedule do I want to use as a template
 INSERT INTO coastal.schedule_planned (date, week, day, site_id, samplers)
 SELECT * FROM schedule_insert;
+
+SELECT * FROM coastal.planned_schedule_view
+WHERE date >= '2025-08-25'
+ORDER BY date, samplers, site_id;
+
+ROLLBACK;
+COMMIT;
+
+SELECT * FROM coastal.planned_schedule_view WHERE date >= '2025-08-25'
+ORDER BY date, samplers, site_id;
 
 BEGIN;
 -- Add the Silwerstroom and Oudekraal sites to week 4 of version 3 of planned schedule
