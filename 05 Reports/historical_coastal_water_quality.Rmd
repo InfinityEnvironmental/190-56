@@ -931,3 +931,22 @@ inland_sites |>
 ggsave(path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Long-term Plots/", filename = str_c(inland_shortlist |> slice(site) |> pull(site_id), ".jpg"), plot = inland_bubble_plot, width = 8, height = 4, dpi = 600)
 ```
 
+```{r check-inland-water-quality-data}
+inland_data |>
+  rename(site_id = "SMPL_PNT", sample_date = "SMPL_DATE", parameter = "PRMT_CODE") |>
+  filter(site_id == "HB11", parameter |> str_detect("coli")) |>
+  mutate(censored_value = if_else(PRMT_ORGN_ == "=", PRMT_VL |> as.character(), str_c(PRMT_ORGN_, PRMT_VL))) |>
+  mutate(numeric_value = case_when(
+    str_detect(censored_value, ">") ~ censored_value |> str_remove(">") |> as.numeric() * 3,
+    str_detect(censored_value, "<") ~ censored_value |> str_remove("<") |> as.numeric() / 3,
+    .default = censored_value |> as.numeric()
+    )) |>
+  select(site_id, sample_date, parameter, censored_value, numeric_value, geometry) |>
+  filter(sample_date >= "2024-07-01") |>
+  summary()
+  ggplot() +
+  geom_point(aes(x = sample_date, y = numeric_value)) +
+  geom_line(aes(x = sample_date, y = numeric_value, group = site_id)) +
+  scale_y_log10(labels = scales::label_number())
+```
+
