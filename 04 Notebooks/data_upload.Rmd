@@ -84,7 +84,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_172(10.09.2025).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_173(11.09.2025).pdf"
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
@@ -175,7 +175,8 @@ tbl <- tibble(number = sample_number,
 tbl
 
 # Copy to database
-copy_to(con, tbl, name = "coastal", overwrite = TRUE)
+tbl |>
+  copy_to(dest = con, name = "coastal", overwrite = TRUE)
 ```
 
 ### Upload to database
