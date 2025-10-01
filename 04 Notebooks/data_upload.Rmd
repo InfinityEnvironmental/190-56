@@ -591,6 +591,71 @@ ROLLBACK;
 COMMIT;
 ```
 
+## Daily Samples Saunders Rocks
+
+```{r check-files}
+# Prepare the data for
+upload <- tibble(
+  filename_short = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Saunders Rocks/"),
+  filename_long = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Saunders Rocks/", full.names = T)
+) |>
+  mutate(pdf_data = map(filename_long, ~ pdf_text(.x) |>
+    str_split("\n") |>
+    unlist())) |>
+  mutate(sample_date = map(pdf_data, ~keep(.x, ~str_detect(.x, "Sample taken")) |> str_remove("\\*Sample taken:") |> str_trim() |> dmy())) |>
+  mutate(analysis_completed = map(pdf_data, ~keep(.x, ~str_detect(.x, "Analysis completed")) |> str_remove("Analysis completed:") |> str_trim() |> dmy())) |>
+  mutate(sample_temp_c = map(pdf_data, ~keep(.x, ~str_detect(.x, "Sample temperature")) |> str_remove("Sample temperature:") |> str_trim() |> str_remove("ºC") |> as.numeric())) |>
+  mutate(data = map(pdf_data, ~{
+    .x |> tail_while(~!str_detect(.x, "Sample number")) |> head_while(~!str_detect(.x, "colony forming")) |> keep(~str_length(.x) > 0)
+  })) |>
+  mutate(site_id = map(data, ~str_extract(.x, "CN16\\s[BIO]") |> str_replace("\\s", ""))) |>
+  mutate(sample_time = map(data, ~str_extract(.x, "\\d{2}h\\d{2}") |> str_replace("h", ":"))) |>
+  mutate(censored_value = map(data, ~str_sub(.x, 35) |> str_trim() |> str_split("\\s{5,}"))) |>
+  unnest(sample_date, analysis_completed, sample_temp_c, site_id, sample_time, censored_value) |>
+  mutate(censored_value = map(censored_value, ~.x[[1]])) |>
+  unnest(censored_value) |>
+  select(site_id, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename_short) |>
+  rename(enterococci_cfu_per_100ml = censored_value) |>
+  mutate(enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "None found", "ND")) |>
+  filter(site_id != "CN16B")
+
+# Upload to temporary table in the database
+copy_to(con, upload, name = "saunders", temporary = T, overwrite = T)
+```
+
+```{sql, connection = con}
+BEGIN;
+```
+
+```{sql, connection = con}
+SELECT * FROM saunders;
+```
+
+```{sql, connection = con}
+SELECT * FROM coastal.results;
+```
+
+```{sql, connection = con}
+WITH cte AS
+(SELECT
+  site_id, sample_date, sample_time::time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename_short AS filename, 'WLAB'::coastal.lab AS lab_code, 'daily'::coastal.monitoring_group AS monitoring_group
+FROM saunders)
+INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code, monitoring_group)
+SELECT * FROM cte;
+```
+
+```{sql, connection = con}
+SELECT * FROM coastal.results WHERE monitoring_group = 'daily' AND site_id IN ('CN16I', 'CN16O');
+```
+
+```{sql, connection = con}
+ROLLBACK;
+```
+
+```{sql, connection = con}
+COMMIT;
+```
+
 ## High-frequency Camps Bay sampling to database
 
 ### Check which pdf files have not yet been imported
