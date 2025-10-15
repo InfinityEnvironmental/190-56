@@ -111,7 +111,7 @@ site_id <- sites |>
 ```
 
 ```{r choose-site}
-site_code <- site_id |> keep_at(73)
+site_code <- site_id |> keep_at(68)
 width <- 1500
 ```
 

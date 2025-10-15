@@ -101,7 +101,7 @@ tbl(con, I("coastal.sites")) |>
 ```
 
 ```{r select-site}
-current_site_id <- "XCS08"
+current_site_id <- "XCS26"
 ```
 
 ```{r hazen-over-time, fig.width = 7.267717, fig.height = 1.2, dpi = 600}
@@ -161,7 +161,7 @@ hazen_data <- seq(min(hazen_data$year), max(hazen_data$year)) |>
 RColorBrewer::display.brewer.all(type = "div")
 ```
 
-```{r sample-exceedance-dotplot, fig.width = 7.267717, fig.height = 1.5, dpi = 600}
+```{r sample-exceedance-dotplot, fig.width = 7.267717, fig.height = 4.5, dpi = 600}
 # Prepare the data
 exceedance_data <- results |>
   filter(site_id == current_site_id, monitoring_group %in% c("routine", "daily")) |>
@@ -196,7 +196,7 @@ exceedance_data <- results |>
 ```
 
 ```{r save-plots}
-ggsave(filename = str_c(current_site_id, "_exceedance.jpg", sep = ""), path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Long-term Plots/", plot = exceedance_plot, width = (210-2*12.7), height = 50, units = "mm", dpi = 600)
+ggsave(filename = str_c(current_site_id, "_exceedance.jpg", sep = ""), path = "../../Infinity/Coastal Water Quality - Documents/KYC 2025/Draft Long-term Plots/", plot = exceedance_plot, width = (210-2*12.7), height = 100, units = "mm", dpi = 600)
 ```
 
 ```{r save-plots}
