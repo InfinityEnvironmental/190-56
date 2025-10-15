@@ -12,7 +12,7 @@ library(janitor)
 library(tidyr)
 library(ggplot2)
 
-# Set a wroking directory
+# Set a working directory
 setwd("C:/Users/RobynDaniels/Desktop/Weather/All months")
 
 # Read and Combine All Files
@@ -106,6 +106,17 @@ daily_weather_data <- combined_data %>%
   ungroup()
 
 
+weekly_rainfall <- daily_weather_data %>%
+  mutate(Week_Start = floor_date(Date_Only, "week")) %>%
+  group_by(Week_Start) %>%
+  summarise(
+    LOUR06BRS_WeeklySum = sum(LOUR06BRS_DailySum, na.rm = TRUE),
+    CITY11BR_WeeklySum  = sum(CITY11BR_DailySum, na.rm = TRUE),
+    DIEP05ER_WeeklySum  = sum(DIEP05ER_DailySum, na.rm = TRUE),
+    STRA01RS_WeeklySum  = sum(STRA01RS_DailySum, na.rm = TRUE),
+    .groups = 'drop' 
+  )
+
 monthly_data <- daily_weather_data %>%
   mutate(Date_Only = as.Date(Date_Only)) %>%
   mutate(
@@ -130,86 +141,129 @@ monthly_data <- monthly_data %>%
 # --- Plot 1: LOUR06BRS and STRA01RS ---
 
 # 1. Select the relevant columns and calculate the average
-plot1_data <- monthly_data %>%
-  select(Year_Month, LOUR06BRS_MonthlySum, STRA01RS_MonthlySum) %>%
-  # Convert Date_Only to Date type if it isn't already
-  mutate(Year_Month = as.Date(Year_Month)) %>%
+plot1_data <- weekly_rainfall %>%
+  select(Week_Start, LOUR06BRS_WeeklySum, STRA01RS_WeeklySum) %>%
+  mutate(Week_Start = as.Date(Week_Start)) %>%
   # Calculate the average
   mutate(
-    Average_strand = (LOUR06BRS_MonthlySum + STRA01RS_MonthlySum) / 2
+    Average_strand = (LOUR06BRS_WeeklySum + STRA01RS_WeeklySum) / 2
   )
 
 # 2. Reshape the data for plotting all three lines (2 stations + 1 average)
 plot1_long <- plot1_data %>%
   pivot_longer(
-    cols = c(LOUR06BRS_MonthlySum, STRA01RS_MonthlySum, Average_strand),
+    cols = c(LOUR06BRS_WeeklySum, STRA01RS_WeeklySum, Average_strand),
     names_to = "Station",
-    values_to = "MonthlySum"
+    values_to = "WeeklySum"
   ) %>%
   mutate(
-    Series = factor(Station, levels = c("LOUR06BRS_MonthlySum", "STRA01RS_MonthlySum", "Average_strand"))
+    Series = factor(Station, levels = c("LOUR06BRS_WeeklySum", "STRA01RS_WeeklySum", "Average_strand"))
+  ) %>%
+  # Create cleaner labels for the legend
+  mutate(
+    Station_Label = case_when(
+      Station == "LOUR06BRS_WeeklySum" ~ "LOUR06BRS",
+      Station == "STRA01RS_WeeklySum" ~ "STRA01RS",
+      Station == "Average_strand" ~ "Average",
+      .default = Station # Fallback
+    )
   )
 
 # 3. Create the plot
-plot1 <- ggplot(plot1_long, aes(x = Year_Month, y = MonthlySum, color = Station)) +
+plot1 <- ggplot(plot1_long, aes(x = Week_Start, y = WeeklySum, color = Station_Label)) +
   geom_line(aes(
     # Make the Average line thicker and maybe dashed
     linetype = ifelse(Series == "Average_strand", "Average_strand", "Station"),
-    size = ifelse(Series == "Average_strand", 0.6, 0.6)
+    size = ifelse(Series == "Average_strand", 0.4, 0.4)
   )) +
   scale_linetype_manual(values = c("Average_strand" = "dashed", "Station" = "solid"), guide = "none") +
   scale_size_identity(guide = "none") +
   labs(
-    title = "Total monthly rainfall for Strand",
+    title = "Total weekly rainfall for Strand",
     x = "Date",
-    y = "Total monthly rainfall (mm)",
+    y = "Total weekly rainfall (mm)",
     color = "Station"
   ) +
-  theme_bw()
+  scale_x_date(
+    date_labels = "%d %b %Y",
+    limits = as.Date(c("2024-04-28", "2025-08-31")),
+    # Manually define breaks every 3 months, starting May 1st, 2024
+    breaks = seq(from = as.Date("2024-04-28"), to = as.Date("2025-09-14"), by = "3 weeks"),
+    oob = scales::oob_keep  
+  ) +
+  theme_bw()+
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5)
+  )
 
 print(plot1)
+ggsave(filename = "Strand_Weekly_Rainfall.png",
+       plot = plot1, width = 170, height = 90, units = "mm", dpi = 600)
 
 
 # --- Plot 2: CITY11BR and DIEP05ER ---
 
 # 1. Select the relevant columns and calculate the average
 
-plot2_data <- monthly_data %>%
-  select(Year_Month, CITY11BR_MonthlySum, DIEP05ER_MonthlySum) %>%
-  mutate(Year_Month = as.Date(Year_Month)) %>%
+plot2_data <- weekly_rainfall %>%
+  select(Week_Start, CITY11BR_WeeklySum, DIEP05ER_WeeklySum) %>%
+  mutate(Week_Start = as.Date(Week_Start)) %>%
   # Calculate the average
   mutate(
-    Average_cb = (CITY11BR_MonthlySum + DIEP05ER_MonthlySum) / 2
+    Average_cb = (CITY11BR_WeeklySum + DIEP05ER_WeeklySum) / 2
   )
 
 # 2. Reshape the data for plotting all three lines
 plot2_long <- plot2_data %>%
   pivot_longer(
-    cols = c(CITY11BR_MonthlySum, DIEP05ER_MonthlySum, Average_cb),
+    cols = c(CITY11BR_WeeklySum, DIEP05ER_WeeklySum, Average_cb),
     names_to = "Station",
-    values_to = "MonthlySum"
+    values_to = "WeeklySum"
   ) %>%
   mutate(
-    Series = factor(Station, levels = c("CITY11BR_MonthlySum", "DIEP05ER_MonthlySum", "Average_cb"))
+    Series = factor(Station, levels = c("CITY11BR_WeeklySum", "DIEP05ER_WeeklySum", "Average_cb"))
+  )%>%
+  # Create cleaner labels for the legend
+  mutate(
+    Station_Label = case_when(
+      Station == "CITY11BR_WeeklySum" ~ "CITY11BR",
+      Station == "DIEP05ER_WeeklySum" ~ "DIEP05ER",
+      Station == "Average_cb" ~ "Average",
+      .default = Station # Fallback
+    )
   )
 
 # 3. Create the plot
-plot2 <- ggplot(plot2_long, aes(x = Year_Month, y = MonthlySum, color = Station)) +
+plot2 <- ggplot(plot2_long, aes(x = Week_Start, y = WeeklySum, color = Station_Label)) +
   geom_line(aes(
     linetype = ifelse(Series == "Average_cb", "Average_cb", "Station"),
-    size = ifelse(Series == "Average_cb", 0.6, 0.6)
+    size = ifelse(Series == "Average_cb", 0.4, 0.4)
   )) +
   scale_linetype_manual(values = c("Average_cb" = "dashed", "Station" = "solid"), guide = "none") +
   scale_size_identity(guide = "none") +
   labs(
-    title = "Total monthly rainfall for Camps Bay",
+    title = "Total weekly rainfall for Camps Bay",
     x = "Date",
-    y = "Total monthly rainfall (mm)",
+    y = "Total weekly rainfall (mm)",
     color = "Station"
   ) +
-  theme_bw()
+  scale_x_date(
+    date_labels = "%d %b %Y",
+    limits = as.Date(c("2024-04-28", "2025-08-31")),
+    # Manually define breaks every 3 months, starting May 1st, 2024
+    breaks = seq(from = as.Date("2024-04-28"), to = as.Date("2025-09-14"), by = "3 weeks"),
+    oob = scales::oob_keep  
+  ) +
+  theme_bw()+
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5)
+  )
 
 print(plot2)
+ggsave(filename = "CB_Weekly_Rainfall.png",
+       plot = plot2, width = 170, height = 90, units = "mm", dpi = 600)
 
 #####Monthly bar plots#############################
 
