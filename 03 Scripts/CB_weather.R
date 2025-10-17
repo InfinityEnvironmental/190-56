@@ -2,7 +2,6 @@
 #CB vs Strand
 #Robyn Daniels
 
-###############################Rainfall###########################################################################################
 library(readr)
 library(readxl)
 library(dplyr)
@@ -11,7 +10,20 @@ library(lubridate)
 library(janitor)
 library(tidyr)
 library(ggplot2)
+library(tidyverse)
+library(DBI)
+library(readODS)
+library(pdftools)
+library(sf)
+library(gpx)
+library(units)
+#install.packages("ggpattern")
+library(ggpattern)
+library(extrafont)
+library(stringr)
+loadfonts()
 
+###############################Rainfall###########################################################################################
 # Set a working directory
 setwd("C:/Users/RobynDaniels/Desktop/Weather/All months")
 
@@ -136,7 +148,7 @@ dates_to_exclude <- as.Date()
 monthly_data <- monthly_data %>%
   filter(!Year_Month %in% c("2024-04-01", "2025-09-01", "2025-10-01"))
 
-#########Plotting daily/monthly time series######################################################################
+#########Plotting daily/monthly rainfall time series######################################################################
 ###Strand
 # --- Plot 1: LOUR06BRS and STRA01RS ---
 
@@ -265,7 +277,7 @@ print(plot2)
 ggsave(filename = "CB_Weekly_Rainfall.png",
        plot = plot2, width = 170, height = 90, units = "mm", dpi = 600)
 
-#####Monthly bar plots#############################
+#####Monthly rainfall bar plots#############################
 
 # --- Plot 1: Strand Stations (LOUR06BRS & STRA01RS) ---
 plot1_data <- monthly_data %>%
@@ -396,21 +408,309 @@ ggsave(filename = "Camps_Bay_Monthly_Rainfall.png",
 
 
 
+###############################Camps Bay bacteria ###############################################################
+#Connect to the database ####
+con <- dbConnect(RPostgres::Postgres(),
+                 host = "aws-0-eu-central-1.pooler.supabase.com",
+                 port = 5432,
+                 user = str_c(rstudioapi::askForPassword(prompt = "Username: "), "wnrvdvesovnkmqbhkhjz", sep = "."),
+                 password = rstudioapi::askForPassword(),
+                 dbname = "postgres"
+)
+
+#### Data preparation ####
+cb_high <- tbl(con, I("coastal.high_frequency_sampling_view")) %>%
+ # filter(period == "2024-02-01") %>%
+  collect()
+
+coastal <- tbl(con, I("coastal.results_view")) %>%
+  collect()
+
+coastal_sites <- tbl(con, I("coastal.sites_view")) %>%
+  collect()
+
+coastal_data <- left_join(
+  x = coastal, 
+  y = coastal_sites, 
+  by = "site_id"
+)
+
+coastal_data <- coastal_data %>%
+  mutate(
+    sample_date = ymd(sample_date)
+  ) %>%
+  filter(
+    site_id %in% c("CN11", "CN31", "CN41", "CN10", "XCS34", "XCS26") &
+      monitoring_group == "daily" &
+      sample_date >= as.Date("2024-06-01") &
+      sample_date <= as.Date("2025-08-30")
+  ) %>%
+  mutate(
+    site_group = case_when(
+      str_detect(site_id, "^CN") ~ "Camps Bay",
+      str_detect(site_id, "^XCS") ~ "Strand",
+      TRUE ~ "Other Site" # This catches any other sites if they exist
+    )
+  )
+
+#### Create the boxplot (Yearly) #########################################################################
+p <- ggplot(data = coastal_data, aes(x = site_id, y = numeric_value + 1, fill = site_group)) +
+  geom_boxplot(
+    colour = "black"
+  ) +
+  scale_y_log10(
+    labels = scales::label_comma(), # Formats labels (e.g., 1000 instead of 1e+03)
+    breaks = c(1, 10, 100, 1000, 10000) # Sets specific log intervals for clarity
+  ) +
+  # Manually set the patterns for the two groups
+  scale_fill_manual(
+    values = c(
+      "Camps Bay" = "grey",
+      "Strand" = "white"
+    )
+  ) +
+  # Add titles and labels for clarity
+  labs(
+    title = "Yearly Distribution of Enterococci Counts \n (June 2024 - August 2025)",
+    x = "Site ID",
+    y = "log(Enterococci Counts (CFU per 100 ml) + 1)",
+    fill = "Site Group"
+  ) +
+  theme_bw() +
+  theme(text = element_text(family = "Century Gothic"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(hjust = 0.5)
+  )
+p
+ggsave(filename = "Yearly_boxplots.png",
+       plot = p, width = 170, height = 90, units = "mm", dpi = 600)
+
+######Monthly Boxplots####################################
+#Filter only for Camps Bay
+coastal_cb <- coastal_data %>%
+  filter(
+    site_id %in% c("CN11", "CN31", "CN41", "CN10") 
+  ) %>%
+  mutate(
+    sample_date = ymd(sample_date), 
+    sample_month_abbr = month(sample_date, label = TRUE, abbr = TRUE),
+    sample_year = year(sample_date)
+  ) %>%
+    arrange(sample_date) %>%
+  mutate(
+    sample_month_year = factor(
+      paste(sample_month_abbr, sample_year),
+      levels = unique(paste(sample_month_abbr, sample_year))
+    )
+  )
 
 
+#Create the monthly boxplots for Camps Bay
+p <- ggplot(data = coastal_cb, aes(x = sample_month_year, y = numeric_value + 1, fill = site_group)
+) +
+  # Use geom_boxplot for the distribution
+  geom_boxplot(colour = "black", linewidth = 0.3
+  ) +
+  # Use facet_wrap to create a separate plot for each site_id
+  facet_wrap(~ site_id, scales = "free_x", ncol = 1) + 
+  # Log scale for y-axis (using +1 to handle zeros)
+  scale_y_log10(
+    labels = scales::label_comma(),
+    breaks = c(1, 10, 100, 1000, 10000)
+  ) +
+  # Manual Fill Colors
+  scale_fill_manual(
+    values = c(
+      "Camps Bay (CN)" = "grey50", 
+      "Strand (XCS)" = "white"     
+    )
+  ) +
+  labs(
+    title = "Monthly Distribution of Enterococci Counts \n (Camps Bay June 2024 - August 2025)",
+    x = "Month",
+    y = "log(Enterococci Counts (CFU per 100 ml) + 1)",
+ #   fill = "Site Group" 
+  ) +
+  theme_bw() +
+  theme(
+    # Apply Century Gothic font
+    text = element_text(family = "Century Gothic", size = 9),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 7),
+    axis.text.y = element_text(size = 7),
+    axis.title = element_text(size = 9),
+    plot.title = element_text(hjust = 0.5, size = 10),
+    strip.text = element_text(face = "bold", family = "Century Gothic", size = 9) 
+  )
+p
+ggsave(filename = "Monthly_boxplots_CB.png",
+       plot = p, width = 170, height = 120, units = "mm", dpi = 600)
+
+#Filter only for Strand
+coastal_strand <- coastal_data %>%
+  filter(
+    site_id %in% c("XCS34", "XCS26") 
+  ) %>%
+  mutate(
+    sample_date = ymd(sample_date), 
+    sample_month_abbr = month(sample_date, label = TRUE, abbr = TRUE),
+    sample_year = year(sample_date)
+  ) %>%
+  arrange(sample_date) %>%
+  mutate(
+    sample_month_year = factor(
+      paste(sample_month_abbr, sample_year),
+      levels = unique(paste(sample_month_abbr, sample_year))
+    )
+  )
+
+#Create the monthly boxplots for Camps Bay
+p <- ggplot(data = coastal_strand, aes(x = sample_month_year, y = numeric_value + 1, fill = site_group)
+) +
+  # Use geom_boxplot for the distribution
+  geom_boxplot(colour = "black", linewidth = 0.3
+  ) +
+  # Use facet_wrap to create a separate plot for each site_id
+  facet_wrap(~ site_id, scales = "free_x", ncol = 1) + 
+  # Log scale for y-axis (using +1 to handle zeros)
+  scale_y_log10(
+    labels = scales::label_comma(),
+    breaks = c(1, 10, 100, 1000, 10000)
+  ) +
+  # Manual Fill Colors
+  scale_fill_manual(
+    values = c(
+      "Camps Bay (CN)" = "grey50", 
+      "Strand (XCS)" = "white"     
+    )
+  ) +
+  labs(
+    title = "Monthly Distribution of Enterococci Counts \n (Strand September 2024 - August 2025)",
+    x = "Month",
+    y = "log(Enterococci Counts (CFU per 100 ml) + 1)",
+    #   fill = "Site Group" 
+  ) +
+  theme_bw() +
+  theme(
+    # Apply Century Gothic font
+    text = element_text(family = "Century Gothic", size = 9),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 7),
+    axis.text.y = element_text(size = 7),
+    axis.title = element_text(size = 9),
+    plot.title = element_text(hjust = 0.5, size = 10),
+    strip.text = element_text(face = "bold", family = "Century Gothic", size = 9)  
+  )
+p
+ggsave(filename = "Monthly_boxplots_strand.png",
+       plot = p, width = 170, height = 120, units = "mm", dpi = 600)
+
+#######Seasonal box plots###########################
+coastal_cb_seasonal <- coastal_cb %>%
+  mutate(
+    season = case_when(
+      sample_month_abbr %in% c("Apr", "May", "Jun", "Jul", "Aug", "Sept") ~ "Wet Season",
+      sample_month_abbr %in% c("Oct", "Nov", "Dec", "Jan", "Feb", "Mar") ~ "Dry Season",
+      TRUE ~ "Unknown"
+    )
+  ) %>%
+  arrange(sample_date) %>%
+  mutate(
+    season = factor(season, levels = c("Wet Season", "Dry Season"), ordered = TRUE)
+  )
 
 
+#Create the monthly boxplots for Camps Bay
+p <- ggplot(data = coastal_cb_seasonal, aes(x = season, y = numeric_value + 1, fill = site_group)
+) +
+  # Use geom_boxplot for the distribution
+  geom_boxplot(colour = "black", linewidth = 0.3
+  ) +
+  # Use facet_wrap to create a separate plot for each site_id
+  facet_wrap(~ site_id, scales = "free_x", ncol = 3) + 
+  # Log scale for y-axis (using +1 to handle zeros)
+  scale_y_log10(
+    labels = scales::label_comma(),
+    breaks = c(1, 10, 100, 1000, 10000)
+  ) +
+  # Manual Fill Colors
+  scale_fill_manual(
+    values = c(
+      "Camps Bay (CN)" = "grey50", 
+      "Strand (XCS)" = "white"     
+    )
+  ) +
+  labs(
+    title = "Seasonal Distribution of Enterococci Counts \n (Camps Bay June 2024 - August 2025)",
+    x = "Season",
+    y = "log(Enterococci Counts (CFU per 100 ml) + 1)",
+    #   fill = "Site Group" 
+  ) +
+  theme_bw() +
+  theme(
+    # Apply Century Gothic font
+    text = element_text(family = "Century Gothic", size = 9),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 7),
+    axis.text.y = element_text(size = 7),
+    axis.title = element_text(size = 9),
+    plot.title = element_text(hjust = 0.5, size = 10),
+    strip.text = element_text(face = "bold", family = "Century Gothic", size = 9) 
+  )
+p
+ggsave(filename = "Seasonal_boxplots_CB.png",
+       plot = p, width = 170, height = 120, units = "mm", dpi = 600)
 
+#Filter only for Strand
+coastal_strand_seasonal <- coastal_strand %>%
+  mutate(
+    season = case_when(
+      sample_month_abbr %in% c("Apr", "May", "Jun", "Jul", "Aug", "Sept") ~ "Wet Season",
+      sample_month_abbr %in% c("Oct", "Nov", "Dec", "Jan", "Feb", "Mar") ~ "Dry Season",
+      TRUE ~ "Unknown"
+    )
+  ) %>%
+  arrange(sample_date) %>%
+  mutate(
+    season = factor(season, levels = c("Wet Season", "Dry Season"), ordered = TRUE)
+  )
 
-
-
-
-
-
-
-
-
-
+#Create the monthly boxplots for Camps Bay
+p <- ggplot(data = coastal_strand_seasonal, aes(x = season, y = numeric_value + 1, fill = site_group)
+) +
+  # Use geom_boxplot for the distribution
+  geom_boxplot(colour = "black", linewidth = 0.3
+  ) +
+  # Use facet_wrap to create a separate plot for each site_id
+  facet_wrap(~ site_id, scales = "free_x", ncol = 3) + 
+  # Log scale for y-axis (using +1 to handle zeros)
+  scale_y_log10(
+    labels = scales::label_comma(),
+    breaks = c(1, 10, 100, 1000, 10000)
+  ) +
+  # Manual Fill Colors
+  scale_fill_manual(
+    values = c(
+      "Camps Bay (CN)" = "grey50", 
+      "Strand (XCS)" = "white"     
+    )
+  ) +
+  labs(
+    title = "Seasonal Distribution of Enterococci Counts \n (Strand September 2024 - August 2025)",
+    x = "Season",
+    y = "log(Enterococci Counts (CFU per 100 ml) + 1)",
+    #   fill = "Site Group" 
+  ) +
+  theme_bw() +
+  theme(
+    # Apply Century Gothic font
+    text = element_text(family = "Century Gothic", size = 9),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 7),
+    axis.text.y = element_text(size = 7),
+    axis.title = element_text(size = 9),
+    plot.title = element_text(hjust = 0.5, size = 10),
+    strip.text = element_text(face = "bold", family = "Century Gothic", size = 9)  
+  )
+p
+ggsave(filename = "Seasonal_boxplots_strand.png",
+       plot = p, width = 170, height = 120, units = "mm", dpi = 600)
 
 
 
