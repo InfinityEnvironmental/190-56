@@ -17,17 +17,19 @@ library(pdftools)
 library(sf)
 library(gpx)
 library(units)
-#install.packages("ggpattern")
+#install.packages("gtable")
 library(ggpattern)
 library(extrafont)
 library(stringr)
 loadfonts()
+library(scales)
+library(patchwork)
 
 ###############################Rainfall###########################################################################################
 # Set a working directory
 setwd("C:/Users/RobynDaniels/Desktop/Weather/All months")
 
-# Read and Combine All Files
+###### Read and Combine All Weather Files ######
 # list.files() gets the names of all files in the directory ending with .csv
 # map_dfr() reads each file and automatically combines them into a single data frame by row.
 combined_data <- list.files(
@@ -68,7 +70,7 @@ combined_data <- combined_data %>%
 # Save the combined data
 #write_csv(combined_data, "combined_5min_weather_data.csv")
 
-#####Filter needed weather stations and aggregate to daily data
+#####Filter needed weather stations and aggregate to daily data #####
 
 target_stations <- c("LOUR06BRS", "CITY11BR", "DIEP05ER", "STRA01RS")
 
@@ -107,12 +109,52 @@ daily_weather_data <- combined_data %>%
   select(Date_Only, all_of(target_stations)) %>%
   group_by(Date_Only) %>%
   
-  # Aggregate (take the mean) for the selected weather stations.
+  # Aggregate (take the sum) for the selected weather stations.
   summarise(
     across(
       .cols = all_of(target_stations), 
       .fns = \(x) sum(x, na.rm = TRUE), 
       .names = "{.col}_DailySum"
+    )
+  ) %>%
+  ungroup()
+
+hourly_weather_data <- combined_data %>%
+  
+  # === 1. Ensure Weather Columns are Numeric ===
+  mutate(
+    across(
+      .cols = all_of(target_stations),
+      .fns = as.numeric
+    )
+  ) %>%
+  
+  # === 2. Data Cleaning and Conversion (Ensures DATE_Time is accurate) ===
+  # (Steps for creating DATE_Time column remain the same)
+  mutate(DATE_Numeric = as.numeric(as.character(DATE))) %>%
+  mutate(DATE_BaseR = as_datetime(DATE_Numeric * 86400, origin = "1899-12-30", tz = "UTC")) %>%
+  mutate(DATE_Time = coalesce(
+    DATE_BaseR,              
+    as_datetime(as.character(DATE)) 
+  )) %>%
+  
+  # 🔴 CRITICAL FIX: Create a new column with the time floored to the nearest hour
+  mutate(Hourly_Timestamp = floor_date(DATE_Time, unit = "hour")) %>%
+  
+  # === 3. Filter Columns and Aggregate ===
+  # Select the new hourly timestamp and the target columns
+  select(Hourly_Timestamp, all_of(target_stations)) %>%
+  
+  # 🔴 FIX: Group by the new Hourly_Timestamp
+  # This groups all 5-minute entries (e.g., 10:00, 10:05, ... 10:55) under the 10:00 timestamp.
+  group_by(Hourly_Timestamp) %>%
+  
+  # Aggregate (take the sum) for the selected weather stations.
+  summarise(
+    across(
+      .cols = all_of(target_stations), 
+      .fns = \(x) sum(x, na.rm = TRUE), 
+      .names = "{.col}_HourlySum"
     )
   ) %>%
   ungroup()
@@ -420,7 +462,6 @@ con <- dbConnect(RPostgres::Postgres(),
 
 #### Data preparation ####
 cb_high <- tbl(con, I("coastal.high_frequency_sampling_view")) %>%
- # filter(period == "2024-02-01") %>%
   collect()
 
 coastal <- tbl(con, I("coastal.results_view")) %>%
@@ -452,8 +493,10 @@ coastal_data <- coastal_data %>%
       TRUE ~ "Other Site" # This catches any other sites if they exist
     )
   )
+#write.csv(coastal_data, "filtered_coastal_data.csv", row.names = FALSE)
+#write.csv(cb_high, "cb_high_freq_data.csv", row.names = FALSE)
 
-#### Create the boxplot (Yearly) #########################################################################
+#### Yearly Box plots #########################################################################
 p <- ggplot(data = coastal_data, aes(x = site_id, y = numeric_value + 1, fill = site_group)) +
   geom_boxplot(
     colour = "black"
@@ -521,8 +564,7 @@ p <- ggplot(data = coastal_cb, aes(x = sample_month_year, y = numeric_value + 1,
   # Manual Fill Colors
   scale_fill_manual(
     values = c(
-      "Camps Bay (CN)" = "grey50", 
-      "Strand (XCS)" = "white"     
+      "Camps Bay" = "grey50"   
     )
   ) +
   labs(
@@ -579,8 +621,7 @@ p <- ggplot(data = coastal_strand, aes(x = sample_month_year, y = numeric_value 
   # Manual Fill Colors
   scale_fill_manual(
     values = c(
-      "Camps Bay (CN)" = "grey50", 
-      "Strand (XCS)" = "white"     
+      "Strand" = "white"     
     )
   ) +
   labs(
@@ -634,8 +675,7 @@ p <- ggplot(data = coastal_cb_seasonal, aes(x = season, y = numeric_value + 1, f
   # Manual Fill Colors
   scale_fill_manual(
     values = c(
-      "Camps Bay (CN)" = "grey50", 
-      "Strand (XCS)" = "white"     
+      "Camps Bay" = "grey50"     
     )
   ) +
   labs(
@@ -679,17 +719,17 @@ p <- ggplot(data = coastal_strand_seasonal, aes(x = season, y = numeric_value + 
   geom_boxplot(colour = "black", linewidth = 0.3
   ) +
   # Use facet_wrap to create a separate plot for each site_id
-  facet_wrap(~ site_id, scales = "free_x", ncol = 3) + 
+  facet_wrap(~ site_id, scales = "free_y", ncol = 3) + 
   # Log scale for y-axis (using +1 to handle zeros)
   scale_y_log10(
+    trans = scales::log10_trans(add = 1),
     labels = scales::label_comma(),
     breaks = c(1, 10, 100, 1000, 10000)
   ) +
   # Manual Fill Colors
   scale_fill_manual(
     values = c(
-      "Camps Bay (CN)" = "grey50", 
-      "Strand (XCS)" = "white"     
+      "Strand" = "white"     
     )
   ) +
   labs(
@@ -712,6 +752,209 @@ p
 ggsave(filename = "Seasonal_boxplots_strand.png",
        plot = p, width = 170, height = 120, units = "mm", dpi = 600)
 
+########Camps Bay High Frequency Data Plotting ###############################################
+cb_high_prepared <- cb_high %>%
+  mutate(tag = replace_na(tag, "single")) %>%
+  mutate(sample_date = ymd(sample_date)) %>%
+  mutate(
+    date_time = as.POSIXct(paste(sample_date, sample_time), format = "%Y-%m-%d %H:%M:%S")
+  ) %>%
+  mutate(tag = as.factor(tag))
+
+#Filtering hourly rainfall data
+target_hourly_cols <- c("LOUR06BRS_HourlySum", "CITY11BR_HourlySum", 
+                        "DIEP05ER_HourlySum", "STRA01RS_HourlySum")
+rainfall_6_hourly <- hourly_weather_data %>%
+  mutate(Date_Only = as_date(Hourly_Timestamp)) %>% 
+  filter(
+    # 1. Filter the overall date range (19 May 2025 to 30 May 2025)
+    Date_Only >= as_date("2025-05-19") & Date_Only <= as_date("2025-05-30")
+  ) %>%
+  filter(
+    # 2. Exclude the dates 24 May 2025 and 25 May 2025
+    !(Date_Only %in% as_date(c("2025-05-24", "2025-05-25")))
+  ) %>%
+  
+  # Create the 'week' column based on the filtered dates
+  mutate(
+    week = case_when(
+      # Week 1: 19 May to 23 May
+      Date_Only >= as_date("2025-05-19") & Date_Only <= as_date("2025-05-23") ~ "Week 1", 
+      # Week 2: 26 May to 30 May
+      Date_Only >= as_date("2025-05-26") & Date_Only <= as_date("2025-05-30") ~ "Week 2", 
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  # Floor the Hourly_Timestamp down to the start of the 6-hour interval
+  mutate(Six_Hourly_Timestamp = floor_date(Hourly_Timestamp, unit = "6 hours")) %>% 
+  group_by(week, Six_Hourly_Timestamp) %>%
+  summarise(
+    across(
+      .cols = all_of(target_hourly_cols), 
+      .fns = \(x) sum(x, na.rm = TRUE), 
+      # Rename columns to reflect the new 6-hourly sum
+      .names = "{.col}_6HourlySum"
+    ),
+    .groups = "drop" 
+  ) %>%
+  # Clean up column names by removing the intermediate "_HourlySum" part
+  rename_with(~ sub("_HourlySum", "", .x), .cols = ends_with("_HourlySum_6HourlySum")) %>%
+  rename_with(~ sub("_6HourlySum", "", .x), .cols = ends_with("_6HourlySum")) %>%
+  
+  # Final tidy-up of column names for clarity
+  rename_with(~ paste0(.x, "_6HourlySum"), .cols = all_of(target_stations))
 
 
+rainfall_to_plot <- rainfall_6_hourly %>%
+  mutate(
+    # Calculate the average rainfall between the two specified stations
+    Rainfall_Avg = (CITY11BR_6HourlySum + DIEP05ER_6HourlySum) / 2
+  ) %>%
+  # Select columns needed for the rainfall layer and for faceting
+  select(
+    Six_Hourly_Timestamp,
+    Rainfall_Avg,
+    week
+  )
+
+# Add the 'week' column to your bacteria data for consistent faceting.
+# The week definition must match the one used in the rainfall prep.
+cb_high_plotting <- cb_high_prepared %>%
+  mutate(
+    Date_Only = as_date(date_time), # Create Date_Only column to join/match week
+    # Define the week using the *same logic* as in your rainfall preparation
+    week = case_when(
+      Date_Only >= as_date("2025-05-19") & Date_Only <= as_date("2025-05-23") ~ "Week 1",
+      Date_Only >= as_date("2025-05-26") & Date_Only <= as_date("2025-05-30") ~ "Week 2",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  # Filter out NA weeks if any bacteria data falls in the excluded dates (May 24/25)
+  filter(!is.na(week)) %>%
+  filter(numeric_value >= 0, !is.na(numeric_value))
+
+
+# Redefine the custom transformation to use +0.1 for the axis
+log_plus_01_trans <- scales::trans_new(
+  name = "log10_plus_01",
+  transform = function(x) log10(x + 0.1),
+  inverse = function(x) 10^x - 0.1
+)
+
+TARGET_SITE_ID <- "CN11"
+
+# --- Primary (Bacteria) Axis Parameters ---
+# --- DYNAMIC BACTERIA MAX (Standard Breaks) ---
+ACTUAL_MAX_BACT <- max(cb_high_plotting$numeric_value, na.rm = TRUE)
+# Find the next highest standard log break (e.g., 10000)
+BACT_MAX_RAW <- 10^ceiling(log10(ACTUAL_MAX_BACT + 0.1)) 
+BACT_MAX_RAW <- max(BACT_MAX_RAW, 10) 
+
+# 💥 NEW: Max plot height is the log of BACT_MAX_RAW (This is the plot's Y-max coordinate)
+BACT_MAX_PLOT_HEIGHT <- log10(BACT_MAX_RAW + 0.1) 
+# Min plot height (corresponds to 0 CFU)
+Y_MIN_LOG <- log10(0 + 0.1) # -1.0
+
+# --- DYNAMIC RAINFALL MAX ---
+RAIN_MAX_LIN <- max(rainfall_to_plot$Rainfall_Avg, na.rm = TRUE)
+RAIN_MAX_LIN <- RAIN_MAX_LIN * 1.05 # 5% buffer
+RAIN_MIN_LIN <- 0 
+
+# --- Calculate Factor Z ---
+# Z = (Total Plot Height) / (Total Rainfall Range)
+# Total Plot Height: BACT_MAX_PLOT_HEIGHT - Y_MIN_LOG (e.g., 4.0 - (-1.0) = 5.0)
+Z_PLOT_RANGE <- BACT_MAX_PLOT_HEIGHT - Y_MIN_LOG
+RAIN_RANGE <- RAIN_MAX_LIN - RAIN_MIN_LIN
+
+z <- Z_PLOT_RANGE / RAIN_RANGE
+if (is.infinite(z) || is.nan(z)) z <- 1 
+
+# --- Dynamic Breaks and Labels for Primary Axis ---
+# Breaks are the LOG COORDINATES (0, 1, 2, 3, 4, ...)
+final_breaks_log_coords <- seq(0, BACT_MAX_PLOT_HEIGHT, by = 1) 
+# Labels are the RAW VALUES (1, 10, 100, 1000, ...)
+final_labels_raw <- 10^final_breaks_log_coords
+
+# -----------------------------------------------------------
+# 4. PLOTTING (MANUAL LOGGING - NO TRANS FUNCTION)
+# -----------------------------------------------------------
+
+single_site_plot <- ggplot() +
+  
+  # Layer 1: 6-hourly Rainfall (Bars)
+  geom_col(
+    data = rainfall_to_plot %>% filter(Rainfall_Avg > 0),
+    aes(
+      x = Six_Hourly_Timestamp, 
+      # If Rainfall_Avg > 0, the bar's top is: Scaled_Rain + Y_MIN_LOG.
+      # If Rainfall_Avg == 0, the bar's top is: Y_MIN_LOG (-1.0), meaning the bar is invisible or reduced to a line.
+      y = Rainfall_Avg * z + Y_MIN_LOG
+    ),
+    fill = "lightgrey",
+    color = NA,
+    alpha = 0.7,
+    width = 6 * 3600
+  ) +
+  
+  # Layer 2: Hourly Bacteria Data 
+  geom_point(
+    data = cb_high_plotting,
+    # 💥 FIX: MANUALLY LOG THE Y-AESTHETIC (Data is now plotted on a linear y-axis of log values)
+    aes(x = date_time, y = log10(numeric_value + 0.1), color = tag), 
+    size = 1.5,
+    alpha = 0.7
+  ) +
+  
+  # Faceting: Only by Week
+  facet_wrap(
+    ~ week,
+    scales = "free_x", 
+    ncol = 1
+  ) +
+  
+  # --- Y-Axis with sec_axis and Factor Z ---
+  scale_y_continuous(
+    # Primary Y-Axis (Manual Log Scale)
+    # NO 'trans' ARGUMENT!
+    breaks = c(Y_MIN_LOG, final_breaks_log_coords), # Use log coordinates for breaks
+    labels = c("ND", scales::label_comma()(final_labels_raw)), # Label -1 as ND
+    name = paste0("log(Enterococci Counts (CFU/100 ml) + 0.1)"),
+    limits = c(Y_MIN_LOG, BACT_MAX_PLOT_HEIGHT), # Limits are the plot coordinates (-1 to 4.x)
+    
+    # Secondary Y-Axis (Rainfall - LINEAR SCALE)
+    sec.axis = sec_axis(
+      # Inverse transform: (y - Y_MIN_LOG) / z
+      # This correctly reverses the manual scaling done in geom_col
+      trans = ~ (. - Y_MIN_LOG) / z, 
+      breaks = unique(c(0, pretty(c(RAIN_MIN_LIN, RAIN_MAX_LIN), n = 5))),
+      name = "6-Hourly Rainfall Avg (mm)"
+    )
+  ) +
+  
+  # --- X-Axis and Theme (Unchanged) ---
+  scale_x_datetime(
+    labels = date_format("%b %d\n%H:%M"),
+    breaks = "6 hours"
+  ) +
+  scale_color_brewer(type = "qual", palette = "Set1", name = "Replicates") +
+  theme_bw() +
+  labs(
+    title = paste("Enterococci vs. Rainfall for Site:", TARGET_SITE_ID),
+    x = "Date and Time"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    legend.position = "bottom",
+    axis.title.y.right = element_text(color = "darkred", face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.background = element_rect(fill = "gray")
+  )
+
+print(single_site_plot)
+
+ 
+ 
+ 
+ 
+ 
 
