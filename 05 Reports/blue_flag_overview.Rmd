@@ -1,0 +1,72 @@
+---
+title: "Blue Flag Data Analysis"
+author: "Francois van Schalkwyk"
+date: "`r Sys.Date()`"
+output: bookdown::pdf_document2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, include = F, message = F)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+```{r load-packages, message = FALSE}
+library(tidyverse)
+library(dbplyr)
+library(DBI)
+library(sf)
+library(keyring)
+library(kableExtra)
+library(extrafont)
+```
+
+```{r db-connection}
+# Enter credentials when prompted
+con <- dbConnect(RPostgres::Postgres(),
+  host = "aws-0-eu-central-1.pooler.supabase.com",
+  port = 5432,
+  user = str_c(key_list(service = "supabase")$username, "wnrvdvesovnkmqbhkhjz", sep = "."),
+  password = key_get(service = "supabase", username = key_list(service = "supabase")$username),
+  dbname = "postgres"
+)
+```
+
+```{r load-data, include = F}
+blue_flag <- tbl(con, I("coastal.sites_view")) |>
+  inner_join(tbl(con, I("coastal.results_view"))) |>
+  filter(monitoring_group == "blue_flag") |>
+  select(site_id, site_description, long, lat, sample_date, censored_value, numeric_value, filename, lab_code) |>
+  collect()
+```
+# Sample distribution over time
+
+```{r sites, warning = F, include = T}
+blue_flag |>
+  distinct(site_id, site_description) |>
+  arrange(site_description) |>
+  kbl(col.names = c("Site ID", "Site Description"), caption = "Blue Flag beaches sampled as part of the Blue Flag program between 2013 and 2025")
+```
+
+```{r sample-distribution, fig.width = 8, dpi = 600, include = T, fig.cap = "Distribution of samples over time for Blue Flag program between 2013 and 2025"}
+blue_flag |>
+  ggplot(aes(x = sample_date, y = site_description)) +
+  geom_point() +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  theme(
+    text = element_text(family = "Century Gothic"),
+    axis.title = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+```
+
+```{r data-analysis, include = T, fig.width = 8, dpi = 600}
+blue_flag |>
+  mutate(season = if_else(month(sample_date) %in% c(10, 11, 12), year(sample_date), year(sample_date) - 1)) |>
+  mutate(season = str_c(season, season + 1, sep = "/")) |>
+  ggplot() +
+  geom_area(aes(x = sample_date, y = numeric_value)) +
+  facet_grid(site_description ~ season, scales = "free")
+```
+
+The following observations can be made from 
+
