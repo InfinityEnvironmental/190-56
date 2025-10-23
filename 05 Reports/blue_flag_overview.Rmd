@@ -58,15 +58,7 @@ blue_flag |>
     panel.grid.minor = element_blank()
   )
 ```
-
-```{r data-analysis, include = T, fig.width = 8, dpi = 600}
-blue_flag |>
-  mutate(season = if_else(month(sample_date) %in% c(10, 11, 12), year(sample_date), year(sample_date) - 1)) |>
-  mutate(season = str_c(season, season + 1, sep = "/")) |>
-  ggplot() +
-  geom_area(aes(x = sample_date, y = numeric_value)) +
-  facet_grid(site_description ~ season, scales = "free")
+```{r weekly-samples}
+blue_flag
 ```
-
-The following observations can be made from 
 
