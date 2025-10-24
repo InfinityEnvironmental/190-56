@@ -24,6 +24,7 @@ library(dbplyr)
 library(DBI)
 library(pdftools)
 library(readxl)
+library(tesseract)
 ```
 
 ## Database Connection
@@ -1820,3 +1821,32 @@ ROLLBACK;
 COMMIT;
 ```
 
+```{r}
+
+```
+
+# Extract data from scanned pdfs
+
+```{r exctract-scanned-data}
+pdf_data <- pdf_convert("../../Infinity/Coastal Water Quality - Documents/Shared Results/00_Admin and old programmes/Weekly Coastal WQ/2023-10-03/K1237.pdf", dpi = 600)
+
+eng <- tesseract(options = list(tessedit_pageseg_mode = 1))
+
+pdf_data |>
+  ocr(engine = eng) |>
+  str_split("\n")
+
+extracted <- tibble(
+  filename_long = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/00_Admin and old programmes/Weekly Coastal WQ/2023-10-03/", pattern = "*.pdf", full.names = T),
+  filename_short = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/00_Admin and old programmes/Weekly Coastal WQ/2023-10-03/", pattern = "*.pdf")
+) |>
+  mutate(pdf_image = map(filename_long, ~pdf_convert(.x, dpi = 600))) |>
+  mutate(text = map(pdf_image, ~ocr(.x, engine = eng) |> str_split("\n")))
+
+extracted |>
+  mutate(text = map(text, ~unlist(.x))) |>
+  mutate(sample_date = map(text, ~keep(.x, str_detect(.x, "Date sampled:")))) |>
+  mutate(sample_information = map(text, ~keep(.x, str_detect(.x, "Temperature on arrival")))) |>
+  mutate(results = )
+  pull(sample_information)
+```
