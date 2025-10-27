@@ -24,6 +24,9 @@ library(stringr)
 loadfonts()
 library(scales)
 library(patchwork)
+install.packages("ggpubr")
+library(ggpubr)
+library(ggh4x)
 
 ###############################Rainfall###########################################################################################
 # Set a working directory
@@ -70,7 +73,7 @@ combined_data <- combined_data %>%
 # Save the combined data
 #write_csv(combined_data, "combined_5min_weather_data.csv")
 
-#####Filter needed weather stations and aggregate to daily data #####
+#####Filter needed weather stations and aggregate to daily, weekly, monthly data #####
 
 target_stations <- c("LOUR06BRS", "CITY11BR", "DIEP05ER", "STRA01RS")
 
@@ -118,6 +121,8 @@ daily_weather_data <- combined_data %>%
     )
   ) %>%
   ungroup()
+#write.csv(daily_weather_data, "daily_rainfall_data.csv", row.names = FALSE)
+
 
 hourly_weather_data <- combined_data %>%
   
@@ -158,6 +163,7 @@ hourly_weather_data <- combined_data %>%
     )
   ) %>%
   ungroup()
+#write.csv(hourly_weather_data, "hourly_rainfall_data.csv", row.names = FALSE)
 
 
 weekly_rainfall <- daily_weather_data %>%
@@ -450,7 +456,7 @@ ggsave(filename = "Camps_Bay_Monthly_Rainfall.png",
 
 
 
-###############################Camps Bay bacteria ###############################################################
+###############################Import coastal FIB data ###############################################################
 #Connect to the database ####
 con <- dbConnect(RPostgres::Postgres(),
                  host = "aws-0-eu-central-1.pooler.supabase.com",
@@ -497,13 +503,21 @@ coastal_data <- coastal_data %>%
 #write.csv(cb_high, "cb_high_freq_data.csv", row.names = FALSE)
 
 #### Yearly Box plots #########################################################################
-p <- ggplot(data = coastal_data, aes(x = site_id, y = numeric_value + 1, fill = site_group)) +
+p <- ggplot(data = coastal_data, aes(x = site_id, y = numeric_value + 0.1, fill = site_group)) +
   geom_boxplot(
     colour = "black"
   ) +
-  scale_y_log10(
-    labels = scales::label_comma(), # Formats labels (e.g., 1000 instead of 1e+03)
-    breaks = c(1, 10, 100, 1000, 10000) # Sets specific log intervals for clarity
+  scale_y_continuous(
+    # 💥 CRITICAL: Apply the log10 transformation
+    trans = "log10", 
+    # Use the raw counts + 0.1 as the breaks
+    breaks = FINAL_BREAKS_RAW_PLUS_OFFSET, 
+    # Use the clean labels (ND, 1, 10, etc.)
+    labels = FINAL_LABELS_DISPLAY,
+    # Set the axis name correctly
+    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
+    # Ensure limits cover the data range (from 0.1 for ND up to max data + 0.1)
+    limits = c(0.1, max(coastal_all$numeric_value, na.rm = TRUE) + 0.1)
   ) +
   # Manually set the patterns for the two groups
   scale_fill_manual(
@@ -557,9 +571,17 @@ p <- ggplot(data = coastal_cb, aes(x = sample_month_year, y = numeric_value + 1,
   # Use facet_wrap to create a separate plot for each site_id
   facet_wrap(~ site_id, scales = "free_x", ncol = 1) + 
   # Log scale for y-axis (using +1 to handle zeros)
-  scale_y_log10(
-    labels = scales::label_comma(),
-    breaks = c(1, 10, 100, 1000, 10000)
+  scale_y_continuous(
+    # 💥 CRITICAL: Apply the log10 transformation
+    trans = "log10", 
+    # Use the raw counts + 0.1 as the breaks
+    breaks = FINAL_BREAKS_RAW_PLUS_OFFSET, 
+    # Use the clean labels (ND, 1, 10, etc.)
+    labels = FINAL_LABELS_DISPLAY,
+    # Set the axis name correctly
+    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
+    # Ensure limits cover the data range (from 0.1 for ND up to max data + 0.1)
+    limits = c(0.1, max(coastal_all$numeric_value, na.rm = TRUE) + 0.1)
   ) +
   # Manual Fill Colors
   scale_fill_manual(
@@ -614,9 +636,17 @@ p <- ggplot(data = coastal_strand, aes(x = sample_month_year, y = numeric_value 
   # Use facet_wrap to create a separate plot for each site_id
   facet_wrap(~ site_id, scales = "free_x", ncol = 1) + 
   # Log scale for y-axis (using +1 to handle zeros)
-  scale_y_log10(
-    labels = scales::label_comma(),
-    breaks = c(1, 10, 100, 1000, 10000)
+  scale_y_continuous(
+    # 💥 CRITICAL: Apply the log10 transformation
+    trans = "log10", 
+    # Use the raw counts + 0.1 as the breaks
+    breaks = FINAL_BREAKS_RAW_PLUS_OFFSET, 
+    # Use the clean labels (ND, 1, 10, etc.)
+    labels = FINAL_LABELS_DISPLAY,
+    # Set the axis name correctly
+    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
+    # Ensure limits cover the data range (from 0.1 for ND up to max data + 0.1)
+    limits = c(0.1, max(coastal_all$numeric_value, na.rm = TRUE) + 0.1)
   ) +
   # Manual Fill Colors
   scale_fill_manual(
@@ -644,6 +674,100 @@ p
 ggsave(filename = "Monthly_boxplots_strand.png",
        plot = p, width = 170, height = 120, units = "mm", dpi = 600)
 
+
+#All sites
+ALL_SITES <- c("CN11", "CN31", "CN41", "XCS34", "XCS26")
+
+coastal_all <- coastal_data %>%
+  mutate(
+    sample_date = ymd(sample_date), 
+    sample_month_abbr = month(sample_date, label = TRUE, abbr = TRUE),
+    sample_year = year(sample_date)
+  ) %>%
+  arrange(sample_date) %>%
+  mutate(
+    # Create the Month-Year factor for the X-axis
+    sample_month_year = factor(
+      paste(sample_month_abbr, sample_year),
+      levels = unique(paste(sample_month_abbr, sample_year))
+    )
+  )
+
+
+FINAL_BREAKS_RAW_PLUS_OFFSET <- c(0.1, 1, 10, 100, 1000, 10000) 
+
+# These are the labels displayed on the axis
+FINAL_LABELS_DISPLAY <- c("ND", "1", "10", "100", "1,000", "10,000")
+# =========================================================================
+# 2. PLOT GENERATION: SINGLE AXIS (LINEAR Y-SCALE)
+# =========================================================================
+
+p_combined_sites_log <- ggplot(
+  data = coastal_all, 
+  aes(x = sample_month_year, y = numeric_value + 0.1, fill = site_id)
+) +
+  
+  geom_boxplot(
+    colour = "black", 
+    linewidth = 0.3,
+    position = position_dodge(width = 0.8) 
+  ) +
+  
+  # 💥 FIX: Use scale_y_continuous with the 'trans' argument
+  scale_y_continuous(
+    # 💥 CRITICAL: Apply the log10 transformation
+    trans = "log10", 
+    # Use the raw counts + 0.1 as the breaks
+    breaks = FINAL_BREAKS_RAW_PLUS_OFFSET, 
+    # Use the clean labels (ND, 1, 10, etc.)
+    labels = FINAL_LABELS_DISPLAY,
+    # Set the axis name correctly
+    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
+    # Ensure limits cover the data range (from 0.1 for ND up to max data + 0.1)
+    limits = c(0.1, max(coastal_all$numeric_value, na.rm = TRUE) + 0.1)
+  ) +
+  
+  # Manual Fill Colors
+  scale_fill_manual(
+    values = c(
+      "CN11" = "pink", 
+      "CN31" = "blue",
+      "CN41" = "lightgreen", 
+      "XCS34" = "white",
+      "XCS26" = "darkgreen" 
+    ),
+    name = "Site ID"
+  ) +
+  
+  labs(
+    title = "Monthly Distribution of Enterococci Counts (All 5 Sites)",
+    x = "Month"
+  ) +
+  theme_bw() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 10),
+    legend.position = "bottom",
+    legend.box = "horizontal",
+    legend.title = element_text(size = 7, face = "bold"),
+    legend.text = element_text(size = 6),
+    axis.title.y.right = element_text(color = "darkred", face = "bold", size = 8),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 6), 
+    axis.title.y.left = element_text(face = "bold", size = 8),
+    axis.text.y.left = element_text(size = 6), 
+    axis.text.y.right = element_text(size = 6),
+    axis.title.x = element_text(face = "bold", size = 8)
+  )
+
+print(p_combined_sites_log)
+ggsave(
+  filename = "Monthly_boxplots_All_Sites_Log.png", 
+  plot = p_combined_sites_log, 
+  width = 250, 
+  height = 120, 
+  units = "mm", 
+  dpi = 600
+)
+
 #######Seasonal box plots###########################
 coastal_cb_seasonal <- coastal_cb %>%
   mutate(
@@ -660,22 +784,29 @@ coastal_cb_seasonal <- coastal_cb %>%
 
 
 #Create the monthly boxplots for Camps Bay
-p <- ggplot(data = coastal_cb_seasonal, aes(x = season, y = numeric_value + 1, fill = site_group)
+p <- ggplot(data = coastal_cb_seasonal, aes(x = season, y = numeric_value + 0.1, fill = site_group)
 ) +
   # Use geom_boxplot for the distribution
   geom_boxplot(colour = "black", linewidth = 0.3
   ) +
   # Use facet_wrap to create a separate plot for each site_id
   facet_wrap(~ site_id, scales = "free_x", ncol = 3) + 
-  # Log scale for y-axis (using +1 to handle zeros)
-  scale_y_log10(
-    labels = scales::label_comma(),
-    breaks = c(1, 10, 100, 1000, 10000)
+  scale_y_continuous(
+    # 💥 CRITICAL: Apply the log10 transformation
+    trans = "log10", 
+    # Use the raw counts + 0.1 as the breaks
+    breaks = FINAL_BREAKS_RAW_PLUS_OFFSET, 
+    # Use the clean labels (ND, 1, 10, etc.)
+    labels = FINAL_LABELS_DISPLAY,
+    # Set the axis name correctly
+    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
+    # Ensure limits cover the data range (from 0.1 for ND up to max data + 0.1)
+    limits = c(0.1, max(coastal_all$numeric_value, na.rm = TRUE) + 0.1)
   ) +
   # Manual Fill Colors
   scale_fill_manual(
     values = c(
-      "Camps Bay" = "grey50"     
+      "Camps Bay" = "grey"     
     )
   ) +
   labs(
@@ -713,18 +844,24 @@ coastal_strand_seasonal <- coastal_strand %>%
   )
 
 #Create the monthly boxplots for Camps Bay
-p <- ggplot(data = coastal_strand_seasonal, aes(x = season, y = numeric_value + 1, fill = site_group)
+p <- ggplot(data = coastal_strand_seasonal, aes(x = season, y = numeric_value + 0.1, fill = site_group)
 ) +
   # Use geom_boxplot for the distribution
   geom_boxplot(colour = "black", linewidth = 0.3
   ) +
   # Use facet_wrap to create a separate plot for each site_id
   facet_wrap(~ site_id, scales = "free_y", ncol = 3) + 
-  # Log scale for y-axis (using +1 to handle zeros)
-  scale_y_log10(
-    trans = scales::log10_trans(add = 1),
-    labels = scales::label_comma(),
-    breaks = c(1, 10, 100, 1000, 10000)
+  scale_y_continuous(
+    # 💥 CRITICAL: Apply the log10 transformation
+    trans = "log10", 
+    # Use the raw counts + 0.1 as the breaks
+    breaks = FINAL_BREAKS_RAW_PLUS_OFFSET, 
+    # Use the clean labels (ND, 1, 10, etc.)
+    labels = FINAL_LABELS_DISPLAY,
+    # Set the axis name correctly
+    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
+    # Ensure limits cover the data range (from 0.1 for ND up to max data + 0.1)
+    limits = c(0.1, max(coastal_all$numeric_value, na.rm = TRUE) + 0.1)
   ) +
   # Manual Fill Colors
   scale_fill_manual(
@@ -735,7 +872,7 @@ p <- ggplot(data = coastal_strand_seasonal, aes(x = season, y = numeric_value + 
   labs(
     title = "Seasonal Distribution of Enterococci Counts \n (Strand September 2024 - August 2025)",
     x = "Season",
-    y = "log(Enterococci Counts (CFU per 100 ml) + 1)",
+    y = "log(Enterococci Counts (CFU per 100 ml) + 0.1)",
     #   fill = "Site Group" 
   ) +
   theme_bw() +
@@ -797,13 +934,8 @@ rainfall_6_hourly <- hourly_weather_data %>%
     ),
     .groups = "drop" 
   ) %>%
-  # Clean up column names by removing the intermediate "_HourlySum" part
-  rename_with(~ sub("_HourlySum", "", .x), .cols = ends_with("_HourlySum_6HourlySum")) %>%
-  rename_with(~ sub("_6HourlySum", "", .x), .cols = ends_with("_6HourlySum")) %>%
-  
-  # Final tidy-up of column names for clarity
-  rename_with(~ paste0(.x, "_6HourlySum"), .cols = all_of(target_stations))
-
+  # 💥 FIX: Simplify column renaming to just remove the superfluous "_HourlySum" part
+  rename_with(~ sub("_HourlySum", "", .x), .cols = contains("_HourlySum_6HourlySum"))
 
 rainfall_to_plot <- rainfall_6_hourly %>%
   mutate(
@@ -819,7 +951,13 @@ rainfall_to_plot <- rainfall_6_hourly %>%
 
 # Add the 'week' column to your bacteria data for consistent faceting.
 # The week definition must match the one used in the rainfall prep.
+TARGET_SITE_ID <- "CN41"
+
+# The data is being filtered HERE.
 cb_high_plotting <- cb_high_prepared %>%
+  # CRITICAL FIX: Filter for the target site ID
+  filter(site_id == TARGET_SITE_ID) %>% 
+  
   mutate(
     Date_Only = as_date(date_time), # Create Date_Only column to join/match week
     # Define the week using the *same logic* as in your rainfall preparation
@@ -835,34 +973,27 @@ cb_high_plotting <- cb_high_prepared %>%
 
 
 # Redefine the custom transformation to use +0.1 for the axis
+#Not used
 log_plus_01_trans <- scales::trans_new(
   name = "log10_plus_01",
   transform = function(x) log10(x + 0.1),
   inverse = function(x) 10^x - 0.1
 )
 
-TARGET_SITE_ID <- "CN11"
-
 # --- Primary (Bacteria) Axis Parameters ---
-# --- DYNAMIC BACTERIA MAX (Standard Breaks) ---
 ACTUAL_MAX_BACT <- max(cb_high_plotting$numeric_value, na.rm = TRUE)
-# Find the next highest standard log break (e.g., 10000)
-BACT_MAX_RAW <- 10^ceiling(log10(ACTUAL_MAX_BACT + 0.1)) 
+BACT_MAX_RAW <- 10^ceiling(log10(ACTUAL_MAX_BACT + 0.1))
 BACT_MAX_RAW <- max(BACT_MAX_RAW, 10) 
 
-# 💥 NEW: Max plot height is the log of BACT_MAX_RAW (This is the plot's Y-max coordinate)
 BACT_MAX_PLOT_HEIGHT <- log10(BACT_MAX_RAW + 0.1) 
-# Min plot height (corresponds to 0 CFU)
 Y_MIN_LOG <- log10(0 + 0.1) # -1.0
 
 # --- DYNAMIC RAINFALL MAX ---
-RAIN_MAX_LIN <- max(rainfall_to_plot$Rainfall_Avg, na.rm = TRUE)
-RAIN_MAX_LIN <- RAIN_MAX_LIN * 1.05 # 5% buffer
+RAIN_MAX_TRUE <- max(rainfall_to_plot$Rainfall_Avg, na.rm = TRUE)
+RAIN_MAX_LIN <- RAIN_MAX_TRUE * 1.05 
 RAIN_MIN_LIN <- 0 
 
 # --- Calculate Factor Z ---
-# Z = (Total Plot Height) / (Total Rainfall Range)
-# Total Plot Height: BACT_MAX_PLOT_HEIGHT - Y_MIN_LOG (e.g., 4.0 - (-1.0) = 5.0)
 Z_PLOT_RANGE <- BACT_MAX_PLOT_HEIGHT - Y_MIN_LOG
 RAIN_RANGE <- RAIN_MAX_LIN - RAIN_MIN_LIN
 
@@ -870,38 +1001,41 @@ z <- Z_PLOT_RANGE / RAIN_RANGE
 if (is.infinite(z) || is.nan(z)) z <- 1 
 
 # --- Dynamic Breaks and Labels for Primary Axis ---
-# Breaks are the LOG COORDINATES (0, 1, 2, 3, 4, ...)
 final_breaks_log_coords <- seq(0, BACT_MAX_PLOT_HEIGHT, by = 1) 
-# Labels are the RAW VALUES (1, 10, 100, 1000, ...)
 final_labels_raw <- 10^final_breaks_log_coords
 
-# -----------------------------------------------------------
-# 4. PLOTTING (MANUAL LOGGING - NO TRANS FUNCTION)
-# -----------------------------------------------------------
+
+#### 4. PLOTTING - LOGGING (USING GEOM_RECT) ####
+
+# Calculate the half-width of the 6-hour bar in seconds
+BAR_HALF_WIDTH_SEC <- 3 * 3600 
 
 single_site_plot <- ggplot() +
   
-  # Layer 1: 6-hourly Rainfall (Bars)
-  geom_col(
+  # Layer 1: 6-hourly Rainfall (Bars) - Now uses geom_rect
+  geom_rect(
     data = rainfall_to_plot %>% filter(Rainfall_Avg > 0),
     aes(
-      x = Six_Hourly_Timestamp, 
-      # If Rainfall_Avg > 0, the bar's top is: Scaled_Rain + Y_MIN_LOG.
-      # If Rainfall_Avg == 0, the bar's top is: Y_MIN_LOG (-1.0), meaning the bar is invisible or reduced to a line.
+      #  FIX: Define the time window (xmin/xmax) for the 6-hour bar
+      xmin = Six_Hourly_Timestamp,
+      xmax = Six_Hourly_Timestamp + seconds(2*BAR_HALF_WIDTH_SEC),
+      
+      # ymin is the BASE (ND/0)
+      ymin = Y_MIN_LOG,
+      # ymax is the TOP of the scaled bar
       y = Rainfall_Avg * z + Y_MIN_LOG
     ),
     fill = "lightgrey",
     color = NA,
-    alpha = 0.7,
-    width = 6 * 3600
+    alpha = 0.7
   ) +
   
-  # Layer 2: Hourly Bacteria Data 
+  # Layer 2: Hourly Bacteria Data (Scatterplot)
   geom_point(
     data = cb_high_plotting,
-    # 💥 FIX: MANUALLY LOG THE Y-AESTHETIC (Data is now plotted on a linear y-axis of log values)
+    # Manually log the Y-AESTHETIC
     aes(x = date_time, y = log10(numeric_value + 0.1), color = tag), 
-    size = 1.5,
+    size = 0.5,
     alpha = 0.7
   ) +
   
@@ -915,26 +1049,28 @@ single_site_plot <- ggplot() +
   # --- Y-Axis with sec_axis and Factor Z ---
   scale_y_continuous(
     # Primary Y-Axis (Manual Log Scale)
-    # NO 'trans' ARGUMENT!
-    breaks = c(Y_MIN_LOG, final_breaks_log_coords), # Use log coordinates for breaks
-    labels = c("ND", scales::label_comma()(final_labels_raw)), # Label -1 as ND
+    breaks = c(Y_MIN_LOG, final_breaks_log_coords), 
+    labels = c("ND", scales::label_comma()(final_labels_raw)), 
     name = paste0("log(Enterococci Counts (CFU/100 ml) + 0.1)"),
-    limits = c(Y_MIN_LOG, BACT_MAX_PLOT_HEIGHT), # Limits are the plot coordinates (-1 to 4.x)
+    limits = c(Y_MIN_LOG, BACT_MAX_PLOT_HEIGHT), 
     
     # Secondary Y-Axis (Rainfall - LINEAR SCALE)
     sec.axis = sec_axis(
-      # Inverse transform: (y - Y_MIN_LOG) / z
-      # This correctly reverses the manual scaling done in geom_col
       trans = ~ (. - Y_MIN_LOG) / z, 
       breaks = unique(c(0, pretty(c(RAIN_MIN_LIN, RAIN_MAX_LIN), n = 5))),
       name = "6-Hourly Rainfall Avg (mm)"
     )
   ) +
   
-  # --- X-Axis and Theme (Unchanged) ---
+  # --- X-Axis and Theme ---
   scale_x_datetime(
     labels = date_format("%b %d\n%H:%M"),
-    breaks = "6 hours"
+    # Set the break sequence to align with 00:00, 06:00, etc.
+    breaks = seq(
+      from = as.POSIXct("2025-05-19 00:00:00", tz = "UTC"), 
+      to = max(cb_high_plotting$date_time, na.rm = TRUE), # Go up to the max date
+      by = "6 hours"
+    )
   ) +
   scale_color_brewer(type = "qual", palette = "Set1", name = "Replicates") +
   theme_bw() +
@@ -943,18 +1079,1048 @@ single_site_plot <- ggplot() +
     x = "Date and Time"
   ) +
   theme(
-    plot.title = element_text(hjust = 0.5, face = "bold"),
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 10),
     legend.position = "bottom",
-    axis.title.y.right = element_text(color = "darkred", face = "bold"),
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    strip.background = element_rect(fill = "gray")
+    legend.box = "horizontal",
+    legend.title = element_text(size = 7, face = "bold"),
+    legend.text = element_text(size = 6),
+    axis.title.y.right = element_text(color = "darkred", face = "bold", size = 8),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 6), 
+    axis.title.y.left = element_text(face = "bold", size = 8),
+    axis.text.y.left = element_text(size = 6), 
+    axis.text.y.right = element_text(size = 6),
+    axis.title.x = element_text(face = "bold", size = 8)
   )
 
 print(single_site_plot)
+filename <- paste0("CB_HF_FIB_6Hourly_Log_Rainfall_", TARGET_SITE_ID, ".png")
 
+ggsave(
+  filename = filename, 
+  plot = single_site_plot, 
+  width = 170, 
+  height = 100, # Increased height to account for vertical facet strips
+  units = "mm", 
+  dpi = 600
+)
+
+
+# Plotting separately
+TARGET_SITE_ID <- "CN11"
+
+# The data is being filtered HERE.
+cb_high_plotting <- cb_high_prepared %>%
+  # CRITICAL FIX: Filter for the target site ID
+  filter(site_id == TARGET_SITE_ID) %>% 
+  
+  mutate(
+    Date_Only = as_date(date_time), # Create Date_Only column to join/match week
+    # Define the week using the *same logic* as in your rainfall preparation
+    week = case_when(
+      Date_Only >= as_date("2025-05-19") & Date_Only <= as_date("2025-05-23") ~ "Week 1",
+      Date_Only >= as_date("2025-05-26") & Date_Only <= as_date("2025-05-30") ~ "Week 2",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  # Filter out NA weeks if any bacteria data falls in the excluded dates (May 24/25)
+  filter(!is.na(week)) %>%
+  filter(numeric_value >= 0, !is.na(numeric_value)) 
+
+BAR_HALF_WIDTH_SEC <- 3 * 3600 # 3 hours in seconds 
+
+replicate_colors <- c("A" = "red", "B" = "blue", "C" = "darkgreen", 
+                      "Blank" = "gray", "single" = "orange")
+
+# --- Dynamic Axes Calculation (Adjust these if your data changes) ---
+ACTUAL_MAX_BACT <- max(cb_high_plotting$numeric_value, na.rm = TRUE)
+BACT_MAX_RAW <- 10^ceiling(log10(ACTUAL_MAX_BACT + 0.1))
+BACT_MAX_RAW <- max(BACT_MAX_RAW, 10) 
+BACT_MAX_PLOT_HEIGHT <- log10(BACT_MAX_RAW + 0.1) 
+Y_MIN_LOG <- log10(0 + 0.1) 
+
+final_breaks_log_coords <- seq(0, BACT_MAX_PLOT_HEIGHT, by = 1)
+final_labels_raw <- 10^final_breaks_log_coords
+
+RAIN_MAX_TRUE <- max(rainfall_to_plot$Rainfall_Avg, na.rm = TRUE)
+RAIN_MAX_PLOT <- RAIN_MAX_TRUE * 1.05
+
+# --- X-Axis Break Filtering ---
+# Defines the start/end of the two weeks with a gap in between.
+# 1. Define the start/end points for the breaks we want to see
+WEEK1_START <- as.POSIXct("2025-05-19 00:00:00", tz = "UTC")
+WEEK1_END <- as.POSIXct("2025-05-24 00:00:00", tz = "UTC") 
+WEEK2_START <- as.POSIXct("2025-05-26 00:00:00", tz = "UTC")
+WEEK2_END <- as.POSIXct("2025-05-31 00:00:00", tz = "UTC")
+
+# 2. Generate ALL 6-hourly breaks
+all_x_breaks_full <- seq(
+  from = min(WEEK1_START, WEEK2_START),
+  to = max(WEEK1_END, WEEK2_END),
+  by = "6 hours"
+)
+
+# 3. Filter out the breaks for the missing days (May 24 & May 25)
+master_x_breaks_filtered <- all_x_breaks_full[
+  (all_x_breaks_full < WEEK1_END) | 
+    (all_x_breaks_full >= WEEK2_START)
+]
+
+
+# =========================================================================
+# 1. PLOT 1: ENTEROCOCCI (LOG SCALE, STANDALONE)
+# =========================================================================
+
+p_entero_separate <- ggplot(data = cb_high_plotting, 
+                            aes(x = date_time, y = log10(numeric_value+0.1), color = tag)) +
+  
+  geom_point(size = 0.8, alpha = 0.9) +
+  
+  # Faceting by week with free X-scales
+  facet_wrap(
+    ~ week,
+    scales = "free_x", 
+    ncol = 1
+  ) +
+  
+  # Y-Axis (Logarithmic Scale)
+  scale_y_continuous(
+    breaks = c(Y_MIN_LOG, final_breaks_log_coords), 
+    labels = c("ND", scales::label_comma()(final_labels_raw)), 
+    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
+    limits = c(Y_MIN_LOG, BACT_MAX_PLOT_HEIGHT)
+  ) +
+  
+  # X-Axis: Use filtered 6-hourly breaks and limits
+  scale_x_datetime(
+    breaks = master_x_breaks_filtered,
+    labels = date_format("%b %d\n%H:%M")
+  ) +
+  
+  # Theme and Colors
+  scale_color_manual(values = replicate_colors, name = "Replicates") + 
+  theme_bw() +
+  labs(title = paste("Hourly Enterococci for Site:", TARGET_SITE_ID), 
+       x = "Date and Time") +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 10),
+    axis.title.y.right = element_text(color = "darkred", face = "bold", size = 8),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 6), 
+    axis.title.y.left = element_text(face = "bold", size = 8),
+    axis.text.y.left = element_text(size = 6), 
+    axis.text.y.right = element_text(size = 6),
+    axis.title.x = element_text(face = "bold", size = 8)
+  )
+
+print(p_entero_separate)
+ggsave(
+  filename = paste0("CB_HF_Log_FIB_", TARGET_SITE_ID, ".png"),
+  plot = p_entero_separate,
+  width = 170,
+  height = 90,
+  units = "mm",
+  dpi = 600
+)
+
+# =========================================================================
+# 2. PLOT 2: RAINFALL (LINEAR SCALE, STANDALONE)
+# =========================================================================
+
+p_rain_separate <- ggplot(data = rainfall_to_plot %>% filter(Rainfall_Avg >= 0), 
+                          aes(x = Six_Hourly_Timestamp, y = Rainfall_Avg)) +
+  
+  geom_col(
+    width = 6 * 3600, 
+    fill = "lightgrey",
+    color = "darkgrey",
+    alpha = 0.7,
+    position = position_nudge(x = 0) 
+  ) +
+  
+  # Faceting: Still by week with free X-scales
+  facet_wrap(
+    ~ week,
+    scales = "free_x", 
+    ncol = 1
+  ) +
+  
+  # Y-Axis (Linear Scale)
+  scale_y_continuous(
+    breaks = pretty(c(0, RAIN_MAX_TRUE), n = 5),
+    name = "6-Hourly Rainfall Avg (mm)",
+    limits = c(0, RAIN_MAX_PLOT)
+  ) +
+  
+  # X-Axis: Use filtered 6-hourly breaks and limits
+  scale_x_datetime(
+    breaks = master_x_breaks_filtered,
+    labels = date_format("%b %d\n%H:%M")
+  ) +
+  
+  # Theme
+  theme_bw() +
+  labs(title = paste("6-Hourly Rainfall for Site:", TARGET_SITE_ID), 
+       x = "Date and Time", y = "6-Hourly Rainfall Avg (mm)") +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 10),
+    axis.title.y.right = element_text(color = "darkred", face = "bold", size = 8),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 6), 
+    axis.title.y.left = element_text(face = "bold", size = 8),
+    axis.text.y.left = element_text(size = 6), 
+    axis.text.y.right = element_text(size = 6),
+    axis.title.x = element_text(face = "bold", size = 8)
+  )
+
+print(p_rain_separate)
+ggsave(
+  filename = paste0("CB_HF_rain_", TARGET_SITE_ID, ".png"),
+  plot = p_rain_separate,
+  width = 170,
+  height = 90,
+  units = "mm",
+  dpi = 600
+)
+
+
+
+####Linear FIB Camps Bay High Frequency ####
+TARGET_SITE_ID <- "CN41"
+CAP_VALUE <- 1000 # Define the linear cap value
+Y_MIN_LIN <- 0    # Define the linear minimum
+BAR_HALF_WIDTH_SEC <- 3 * 3600 # 3 hours in seconds
+
+# --- 2. Data Preparation ---
+
+cb_high_plotting <- cb_high_prepared %>%
+  # CRITICAL FIX: Filter for the target site ID
+  filter(site_id == TARGET_SITE_ID) %>% 
+  
+  mutate(
+    Date_Only = as_date(date_time), 
+    week = case_when(
+      Date_Only >= as_date("2025-05-19") & Date_Only <= as_date("2025-05-23") ~ "Week 1",
+      Date_Only >= as_date("2025-05-26") & Date_Only <= as_date("2025-05-30") ~ "Week 2",
+      TRUE ~ NA_character_
+    ),
+    # 💥 NEW: Create the CAPPED LINEAR value
+    capped_value = pmin(numeric_value, CAP_VALUE)
+  ) %>%
+  filter(!is.na(week)) %>%
+  filter(numeric_value >= 0, !is.na(numeric_value))
+
+
+# --- 3. DYNAMIC SCALING FACTOR (Z) CALCULATION (LINEAR BACTERIA RANGE) ---
+
+# 💥 CHANGE: Linear Bacteria Max Plot Height is simply the cap value
+ACTUAL_MAX_BACT <- max(cb_high_plotting$capped_value, na.rm = TRUE)
+BACT_MAX_PLOT_HEIGHT <- CAP_VALUE 
+
+# --- DYNAMIC RAINFALL MAX (Unchanged, remains linear) ---
+RAIN_MAX_LIN <- max(rainfall_to_plot$Rainfall_Avg, na.rm = TRUE)
+RAIN_MAX_LIN <- RAIN_MAX_LIN 
+RAIN_MIN_LIN <- 0 
+
+# --- Calculate Factor Z ---
+# 💥 CHANGE: Z is calculated using the LINEAR Y-range
+Z_PLOT_RANGE <- BACT_MAX_PLOT_HEIGHT - Y_MIN_LIN # e.g., 1000 - 0 = 1000
+RAIN_RANGE <- RAIN_MAX_LIN - RAIN_MIN_LIN
+
+z <- Z_PLOT_RANGE / RAIN_RANGE
+if (is.infinite(z) || is.nan(z)) z <- 1 
+
+# --- Dynamic Breaks and Labels for Primary Axis (LINEAR) ---
+# 💥 CHANGE: Use pretty() for linear breaks
+primary_breaks <- pretty(c(Y_MIN_LIN, BACT_MAX_PLOT_HEIGHT), n = 5)
+
+# Y-Axis Label function for capping
+cap_labels <- function(x) {
+  ifelse(x == CAP_VALUE, paste0(">", CAP_VALUE-1, "+"), scales::label_comma()(x))
+}
+
+
+### 4. PLOTTING - LINEAR (USING GEOM_RECT) ###
+
+single_site_plot <- ggplot() +
+  
+  # Layer 1: 6-hourly Rainfall (Bars)
+  geom_rect(
+    data = rainfall_to_plot %>% filter(Rainfall_Avg > 0),
+    aes(
+      xmin = Six_Hourly_Timestamp,
+      xmax = Six_Hourly_Timestamp + seconds(2*BAR_HALF_WIDTH_SEC),
+      
+      # ymin is the base (ND/0)
+      ymin = Y_MIN_LIN, 
+      # YMAX IS THE TOP OF THE SCALED BAR
+      y = Rainfall_Avg * z + Y_MIN_LIN
+    ),
+    fill = "lightgrey",
+    color = NA,
+    alpha = 0.7
+  ) +
+  
+  # Layer 2: Hourly Bacteria Data (Scatterplot)
+  geom_point(
+    data = cb_high_plotting,
+    # 💥 CHANGE: Use the LINEAR 'capped_value'
+    aes(x = date_time, y = capped_value, color = tag), 
+    size = 0.5,
+    alpha = 0.7
+  ) +
+  
+  # Faceting: Only by Week
+  facet_wrap(
+    ~ week,
+    scales = "free_x", 
+    ncol = 1
+  ) +
+  
+  # --- Y-Axis with sec_axis and Factor Z ---
+  scale_y_continuous(
+    # 💥 CHANGE: Use linear breaks and the custom cap_labels function
+    breaks = primary_breaks, 
+    labels = cap_labels,
+    name = paste0("Enterococci Counts (CFU/100 ml)"),
+    limits = c(Y_MIN_LIN, BACT_MAX_PLOT_HEIGHT), 
+    
+    # Secondary Y-Axis (Rainfall - LINEAR SCALE)
+    sec.axis = sec_axis(
+      # 💥 CHANGE: The trans function now uses Y_MIN_LIN (0)
+      trans = ~ (. - Y_MIN_LIN) / z, 
+      breaks = unique(c(0, pretty(c(RAIN_MIN_LIN, RAIN_MAX_LIN), n = 5))),
+      name = "6-Hourly Rainfall Avg (mm)"
+    )
+  ) +
+  
+  # --- X-Axis and Theme ---
+  scale_x_datetime(
+    labels = date_format("%b %d\n%H:%M"),
+    # Set the break sequence to align with 00:00, 06:00, etc.
+    breaks = seq(
+      from = as.POSIXct("2025-05-19 00:00:00", tz = "UTC"), 
+      to = max(cb_high_plotting$date_time, na.rm = TRUE), # Go up to the max date
+      by = "6 hours"
+    )
+  ) +
+  scale_color_brewer(type = "qual", palette = "Set1", name = "Replicates") +
+  theme_bw() +
+  labs(
+    title = paste("Hourly Enterococci vs. Rainfall for Site:", TARGET_SITE_ID),
+    x = "Date and Time"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 10),
+    legend.position = "bottom",
+    legend.box = "horizontal",
+    legend.title = element_text(size = 7, face = "bold"),
+    legend.text = element_text(size = 6),
+    axis.title.y.right = element_text(color = "darkred", face = "bold", size = 8),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 6), 
+    axis.title.y.left = element_text(face = "bold", size = 8),
+    axis.text.y.left = element_text(size = 6), 
+    axis.text.y.right = element_text(size = 6),
+    axis.title.x = element_text(face = "bold", size = 8)
+  )
+
+print(single_site_plot)
+filename <- paste0("CB_HF_FIB_6Hourly_Linear_Rainfall_", TARGET_SITE_ID, ".png")
+
+ggsave(
+  filename = filename, 
+  plot = single_site_plot, 
+  width = 170, 
+  height = 100, 
+  units = "mm", 
+  dpi = 600
+)
  
  
  
  
  
+
+
+
+###################### Strand FIB & rainfall plots############################################################
+coastal_strand <- coastal_data %>%
+  filter(
+    site_id %in% c("XCS34", "XCS26") 
+  )
+
+####Log FIB Strand####
+# Define the rainfall column name
+RAIN_COL_NAME <- "LOUR06BRS_WeeklySum"
+
+# --- 1. Data Preparation ---
+
+# Bacteria Data: Add log_value and factor for faceting
+bacteria_to_plot <- coastal_strand %>%
+  mutate(
+    # Create a factor for faceting using your site_id column
+    site_id_fct = factor(site_id),
+    # Manually log the Y-value with the +0.1 offset
+    log_value = log10(numeric_value + 0.1)
+  )
+
+# Rainfall Data: Prepare weekly data for plotting, keeping the original column name
+rainfall_to_plot <- weekly_rainfall %>%
+  select(Week_Start, all_of(RAIN_COL_NAME)) %>%
+  rename(Rainfall_Value = all_of(RAIN_COL_NAME)) 
+
+# --- 2. DYNAMIC SCALING FACTOR (Z) CALCULATION ---
+
+# Calculate plot height range (based on ALL bacteria data)
+ACTUAL_MAX_BACT <- max(bacteria_to_plot$numeric_value, na.rm = TRUE)
+BACT_MAX_RAW <- 10^ceiling(log10(ACTUAL_MAX_BACT + 0.1))
+BACT_MAX_RAW <- max(BACT_MAX_RAW, 10) 
+BACT_MAX_PLOT_HEIGHT <- log10(BACT_MAX_RAW + 0.1)
+Y_MIN_LOG <- log10(0 + 0.1) # -1.0 (The plot coordinate for ND/0 mm)
+
+# Calculate rainfall range
+RAIN_MAX_LIN <- max(rainfall_to_plot[["Rainfall_Value"]], na.rm = TRUE)
+RAIN_MAX_LIN <- RAIN_MAX_LIN * 1.05 
+RAIN_MIN_LIN <- 0
+
+# Calculate Factor Z (Harmonizes the visual height of the two axes)
+Z_PLOT_RANGE <- BACT_MAX_PLOT_HEIGHT - Y_MIN_LOG
+RAIN_RANGE <- RAIN_MAX_LIN - RAIN_MIN_LIN
+z <- Z_PLOT_RANGE / RAIN_RANGE
+if (is.infinite(z) || is.nan(z)) z <- 1
+
+# Breaks for Primary Axis
+final_breaks_log_coords <- seq(0, BACT_MAX_PLOT_HEIGHT, by = 1)
+final_labels_raw <- 10^final_breaks_log_coords
+
+# --- 3. PLOTTING (Rainfall is ANCHORED geom_rect) ---
+
+# Column width for weekly data. Width is expressed in DAYS.
+bar_width <- 7 
+
+# --- Manual Site Colors ---
+site_colors <- c(
+  "XCS34" = "purple", 
+  "XCS26" = "darkgreen" 
+)
+
+plot_single_site <- function(site, bacteria_data, rainfall_data, z_factor, y_min, y_max, rain_max, log_breaks, log_labels, bar_w) {
+  
+  # Filter data for the current site
+  site_data <- bacteria_data %>% filter(site_id == site)
+  
+  single_plot <- ggplot() +
+    
+    # Layer 1: Weekly Rainfall (Bars)
+    geom_rect(
+      data = rainfall_data %>% filter(Rainfall_Value > 0), 
+      aes(
+        xmin = Week_Start - (bar_w / 2),
+        xmax = Week_Start + (bar_w / 2),
+        ymin = y_min,
+        ymax = Rainfall_Value * z_factor + y_min
+      ),
+      fill = "lightgrey",
+      color = NA,
+      alpha = 0.7
+    ) +
+    
+    # Layer 2: Daily Bacteria Data (Scatterplot)
+    geom_point(
+      data = site_data,
+      aes(x = sample_date, y = log_value),
+      color = site_colors[site], 
+      size = 0.8,
+      alpha = 0.9
+    ) +
+    
+    # --- Y-Axis with sec_axis and Factor Z ---
+    scale_y_continuous(
+      breaks = c(y_min, log_breaks), 
+      labels = c("ND", scales::label_comma()(log_labels)), 
+      name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
+      limits = c(y_min, y_max), 
+      
+      sec.axis = sec_axis(
+        trans = ~ (. - y_min) / z_factor, 
+        breaks = unique(c(0, pretty(c(RAIN_MIN_LIN, rain_max), n = 5))),
+        name = paste("Weekly Rainfall Total (mm) - LOUR06BRS")
+      )
+    ) +
+    
+    # --- X-Axis and Theme ---
+    scale_x_date(
+      labels = date_format("%d %b %y"),
+      breaks = "2 weeks"
+    ) +
+    theme_bw() +
+    labs(
+      title = paste("Site", site, ": Daily Strand Enterococci vs. Weekly Rainfall"),
+      x = "Date"
+    ) +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 10),
+      axis.title.y.right = element_text(color = "darkred", face = "bold", size = 8),
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 6), 
+      axis.title.y.left = element_text(face = "bold", size = 8),
+      axis.text.y.left = element_text(size = 6), 
+      axis.text.y.right = element_text(size = 6),
+      axis.title.x = element_text(face = "bold", size = 8)
+    )
+  
+  return(single_plot)
+}
+
+site_ids <- unique(coastal_strand$site_id) 
+
+plot_list <- lapply(site_ids, function(id) {
+  plot_single_site(
+    site = id, bacteria_data = bacteria_to_plot, rainfall_data = rainfall_to_plot,
+    z_factor = z, y_min = Y_MIN_LOG, y_max = BACT_MAX_PLOT_HEIGHT,
+    rain_max = RAIN_MAX_LIN, log_breaks = final_breaks_log_coords, 
+    log_labels = final_labels_raw, bar_w = bar_width
+  )
+})
+names(plot_list) <- site_ids
+
+# To view all plots sequentially:
+invisible(lapply(plot_list, print))
+
+# Saving loop
+for (site_id in names(plot_list)) {
+  plot <- plot_list[[site_id]]
+  filename <- paste0("Strand_FIB_Log_Rainfall_", site_id, ".png")
+  ggsave(filename, plot, width = 170, height = 90, units = "mm", dpi = 600)
+  message(paste("Saved plot:", filename))
+}
+
+####Linear FIB ####
+
+# --- 1. Define Constants & Guidelines (LINEAR) ---
+CAP_VALUE <- 1000      # Max display value
+Y_MIN_LIN <- 0         # Minimum display value
+bar_width <- 7         
+GUIDE_BLUE_FLAG <- 100
+GUIDE_DWAF <- 185
+RAIN_COL_NAME <- "LOUR06BRS_WeeklySum" # Strand's rainfall column
+
+# --- 2. Data Preparation ---
+
+# Bacteria Data: Use the linear CAPPED value
+bacteria_to_plot <- coastal_strand %>%
+  mutate(
+    site_id_fct = factor(site_id),
+    # CENSORING STEP: Use pmin() for capping
+    capped_value = pmin(numeric_value, CAP_VALUE)
+  )
+
+# Rainfall Data: Prepare weekly data
+rainfall_to_plot <- weekly_rainfall %>%
+  select(Week_Start, all_of(RAIN_COL_NAME)) %>%
+  rename(Rainfall_Value = all_of(RAIN_COL_NAME))
+
+# --- 3. DYNAMIC SCALING FACTOR (Z) CALCULATION (LINEAR) ---
+
+ACTUAL_MAX_BACT <- max(bacteria_to_plot$capped_value, na.rm = TRUE)
+BACT_MAX_PLOT_HEIGHT <- CAP_VALUE 
+
+RAIN_MAX_LIN <- max(rainfall_to_plot$Rainfall_Value, na.rm = TRUE)
+RAIN_MAX_LIN <- RAIN_MAX_LIN * 1.05 
+RAIN_MIN_LIN <- 0
+
+# Calculate Factor Z based on linear ranges
+Z_PLOT_RANGE <- BACT_MAX_PLOT_HEIGHT - Y_MIN_LIN 
+RAIN_RANGE <- RAIN_MAX_LIN - RAIN_MIN_LIN
+z <- Z_PLOT_RANGE / RAIN_RANGE
+if (is.infinite(z) || is.nan(z)) z <- 1
+
+primary_breaks <- pretty(c(Y_MIN_LIN, BACT_MAX_PLOT_HEIGHT), n = 5)
+
+# --- 4. PLOTTING FUNCTION (LINEAR/CAPPED) ---
+
+plot_single_site <- function(site, bacteria_data, rainfall_data, z_factor, y_min, y_max, rain_max, primary_breaks, bar_w) {
+  
+  site_data <- bacteria_data %>% filter(site_id == site)
+  
+  # Y-Axis Label function for capping
+  cap_labels <- function(x) {
+    ifelse(x == CAP_VALUE, paste0(">", CAP_VALUE-1, "+"), scales::label_comma()(x))
+  }
+  
+  # Create dummy data for horizontal guidelines (LINEAR values)
+  x_min_plot <- min(bacteria_data$sample_date, na.rm=TRUE)
+  x_max_plot <- max(bacteria_data$sample_date, na.rm=TRUE)
+  
+  guideline_data_long <- tibble(
+    y_value = c(GUIDE_BLUE_FLAG, GUIDE_BLUE_FLAG, GUIDE_DWAF, GUIDE_DWAF),
+    x_value = c(x_min_plot, x_max_plot, x_min_plot, x_max_plot),
+    line_label = factor(c("Blue Flag (100)", "Blue Flag (100)", 
+                          "DWAF (185)", "DWAF (185)")) 
+  )
+  
+  # Define custom colors for the sites (Manual setting)
+  site_colors <- c("XCS34" = "purple", "XCS26" = "darkgreen")
+  
+  single_plot <- ggplot() +
+    
+    # Layer 1: Weekly Rainfall (Bars)
+    geom_rect(
+      data = rainfall_data %>% filter(Rainfall_Value > 0), 
+      aes(
+        xmin = Week_Start - (bar_w / 2),
+        xmax = Week_Start + (bar_w / 2),
+        ymin = y_min, 
+        # Rainfall value is now linear (not log)
+        ymax = (Rainfall_Value * z_factor) + y_min
+      ),
+      fill = "lightgrey", color = NA, alpha = 0.7
+    ) +
+    
+    # Guideline Lines 
+    geom_line(
+      data = guideline_data_long,
+      aes(
+        x = x_value, y = y_value,
+        color = line_label,   
+        group = line_label    
+      ),
+      linetype = "dashed", 
+      linewidth = 0.5,
+      show.legend = TRUE 
+    ) +
+    
+    # Layer 2: Daily Bacteria Data (Scatterplot)
+    geom_point(
+      data = site_data,
+      # Y-aesthetic uses the linear capped value
+      aes(x = sample_date, y = capped_value), 
+      # Manual color assignment suppresses the legend for points
+      color = site_colors[site], 
+      size = 0.8, alpha = 0.9, position = position_jitter(width = 0.5, height = 0)
+    ) +
+    
+    # --- Y-Axis with sec_axis (LINEAR) ---
+    scale_y_continuous(
+      breaks = primary_breaks, 
+      labels = cap_labels, # Uses the custom capped label function
+      name = "Enterococci Counts (CFU/100 ml)",
+      limits = c(y_min, y_max), 
+      
+      sec.axis = sec_axis(
+        trans = ~ (. - y_min) / z_factor, 
+        breaks = unique(c(0, pretty(c(RAIN_MIN_LIN, rain_max), n = 5))),
+        name = paste("Weekly Rainfall Total (mm)- LOUR06BRS")
+      )
+    ) +
+    
+    # Custom Scales for Legend Appearance (GUIDELINES ONLY)
+    scale_color_manual(
+      values = c("Blue Flag (100)" = "blue", "DWAF (185)" = "red"),
+      name = "Guideline" 
+    ) +
+    
+    # --- X-Axis and Theme ---
+    scale_x_date(labels = date_format("%d %b %y"), breaks = "2 weeks") +
+    theme_bw() +
+    labs(
+      title = paste("Site", site, ": Daily Strand Enterococci vs. Weekly Rainfall"),
+      x = "Date"
+    ) +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 10),
+      legend.position = "bottom",
+      legend.box = "horizontal",
+      legend.title = element_text(size = 7, face = "bold"),
+      legend.text = element_text(size = 6),
+      axis.title.y.right = element_text(color = "darkred", face = "bold", size = 8),
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 6), 
+      axis.title.y.left = element_text(face = "bold", size = 8),
+      axis.text.y.left = element_text(size = 6), 
+      axis.text.y.right = element_text(size = 6),
+      axis.title.x = element_text(face = "bold", size = 8)
+    ) +
+    # Guides: Override to ensure lines are shown for the 2 legend items
+    guides(color = guide_legend(override.aes = list(
+      shape = NA, 
+      linetype = 2, 
+      linewidth = 1 
+    ))) 
+  
+  return(single_plot)
+}
+
+# --- 5. Generate and Save Plots ---
+
+site_ids <- unique(bacteria_to_plot$site_id) # XCS34, XCS26
+plot_list <- lapply(site_ids, function(id) {
+  plot_single_site(
+    site = id, bacteria_data = bacteria_to_plot, rainfall_data = rainfall_to_plot,
+    z_factor = z, y_min = Y_MIN_LIN, y_max = BACT_MAX_PLOT_HEIGHT,
+    rain_max = RAIN_MAX_LIN, primary_breaks = primary_breaks, bar_w = bar_width
+  )
+})
+names(plot_list) <- site_ids
+
+# To view plots:
+invisible(lapply(plot_list, print))
+
+# Saving loop
+for (site_id in names(plot_list)) {
+  plot <- plot_list[[site_id]]
+  filename <- paste0("Strand_FIB_Linear_Rainfall_", site_id, ".png")
+  ggsave(filename, plot, width = 170, height = 90, units = "mm", dpi = 600)
+  message(paste("Saved plot:", filename))
+}
+
+
+
+
+
+
+
+
+#########################Camps Bay daily & rainfall plots###########################################
+
+coastal_cb <- coastal_data %>%
+  filter(
+    site_id %in% c("CN11", "CN31", "CN41") 
+  ) 
+
+####Log FIB Camps Bay####
+bacteria_to_plot <- coastal_cb %>%
+  mutate(
+    # Create a factor for faceting
+    site_id_fct = factor(site_id),
+    # Manually log the Y-value with the +0.1 offset
+    log_value = log10(numeric_value + 0.1)
+  )
+
+# 1.B. Rainfall Data: Calculate the average of CITY and DIEP stations (Weekly)
+RAIN_COL_AVG <- "AVG_CITY_DIEP_WeeklySum"
+
+rainfall_to_plot <- weekly_rainfall %>%
+  # 💥 REVISED CALCULATION using specific column names (WeeklySum assumed)
+  mutate(
+    "{RAIN_COL_AVG}" := (CITY11BR_WeeklySum + DIEP05ER_WeeklySum) / 2
+  ) %>%
+  select(Week_Start, all_of(RAIN_COL_AVG)) %>%
+  rename(Rainfall_Avg = all_of(RAIN_COL_AVG)) 
+
+# --- 2. DYNAMIC SCALING FACTOR (Z) CALCULATION ---
+
+# Calculate plot height range
+ACTUAL_MAX_BACT <- max(bacteria_to_plot$numeric_value, na.rm = TRUE)
+BACT_MAX_RAW <- 10^ceiling(log10(ACTUAL_MAX_BACT + 0.1))
+BACT_MAX_RAW <- max(BACT_MAX_RAW, 10) 
+BACT_MAX_PLOT_HEIGHT <- log10(BACT_MAX_RAW + 0.1)
+Y_MIN_LOG <- log10(0 + 0.1) # -1.0
+
+# Calculate rainfall range
+RAIN_MAX_LIN <- max(rainfall_to_plot$Rainfall_Avg, na.rm = TRUE)
+RAIN_MAX_LIN <- RAIN_MAX_LIN * 1.05 
+RAIN_MIN_LIN <- 0
+
+# Calculate Factor Z 
+Z_PLOT_RANGE <- BACT_MAX_PLOT_HEIGHT - Y_MIN_LOG
+RAIN_RANGE <- RAIN_MAX_LIN - RAIN_MIN_LIN
+z <- Z_PLOT_RANGE / RAIN_RANGE
+if (is.infinite(z) || is.nan(z)) z <- 1
+
+# Breaks for Primary Axis
+final_breaks_log_coords <- seq(0, BACT_MAX_PLOT_HEIGHT, by = 1)
+final_labels_raw <- 10^final_breaks_log_coords
+
+# --- 3. PLOTTING (Rainfall is UNANCHORED geom_col) ---
+
+# Column width for weekly data (DAYS)
+bar_width <- 7 
+site_colors <- c(
+  "CN11" = "red", 
+  "CN31" = "blue", 
+  "CN41" = "green4"
+)
+
+plot_single_site <- function(site, bacteria_data, rainfall_data, z_factor, y_min, y_max, rain_max, log_breaks, log_labels, bar_w) {
+  
+  # Filter data for the current site
+  site_data <- bacteria_data %>% filter(site_id == site)
+  
+  single_plot <- ggplot() +
+    
+    # Layer 1: Weekly Rainfall (Bars)
+    geom_rect(
+      data = rainfall_data %>% filter(Rainfall_Avg > 0), 
+      aes(
+        xmin = Week_Start - (bar_w / 2),
+        xmax = Week_Start + (bar_w / 2),
+        ymax = Rainfall_Avg * z_factor + y_min,
+        ymin = y_min 
+      ),
+      fill = "grey",
+      color = NA,
+      alpha = 0.7
+    ) +
+    
+    # Layer 2: Daily Bacteria Data (Scatterplot)
+    geom_point(
+      data = site_data,
+      aes(x = sample_date, y = log_value),
+      color = site_colors[site], 
+      size = 0.8, 
+      alpha = 0.9
+    ) +
+    
+    # --- Y-Axis with sec_axis and Factor Z ---
+    scale_y_continuous(
+      breaks = c(y_min, log_breaks), 
+      labels = c("ND", scales::label_comma()(log_labels)), 
+      name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
+      limits = c(y_min, y_max), 
+      
+      sec.axis = sec_axis(
+        trans = ~ (. - y_min) / z_factor, 
+        breaks = unique(c(0, pretty(c(RAIN_MIN_LIN, rain_max), n = 5))),
+        name = "Avg. Weekly Rainfall (mm) - CITY & DIEP"
+      )
+    ) +
+    
+    # --- X-Axis and Theme ---
+    scale_x_date(
+      labels = date_format("%b %d"),
+      breaks = "2 weeks"
+    ) +
+    theme_bw() +
+    labs(
+      title = paste("Site", site, ": Daily Camps Bay Enterococci vs. Avg. Weekly Rainfall"),
+      x = "Date"
+    ) +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 10),
+      axis.title.y.right = element_text(color = "darkred", face = "bold", size = 8),
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 6), 
+      axis.title.y.left = element_text(face = "bold", size = 8),
+      axis.text.y.left = element_text(size = 6), 
+      axis.text.y.right = element_text(size = 6),
+      axis.title.x = element_text(face = "bold", size = 8)
+    )
+  
+  return(single_plot)
+}
+
+# --- 3. Generate and Save Plots ---
+
+# 💥 CHANGE 3: Only three site IDs will be found
+site_ids <- unique(coastal_cb$site_id) 
+
+plot_list <- lapply(site_ids, function(id) {
+  plot_single_site(
+    site = id, bacteria_data = bacteria_to_plot, rainfall_data = rainfall_to_plot,
+    z_factor = z, y_min = Y_MIN_LOG, y_max = BACT_MAX_PLOT_HEIGHT,
+    rain_max = RAIN_MAX_LIN, log_breaks = final_breaks_log_coords, 
+    log_labels = final_labels_raw, bar_w = bar_width
+  )
+})
+names(plot_list) <- site_ids
+
+# To view all plots sequentially:
+invisible(lapply(plot_list, print))
+
+# Saving loop
+for (site_id in names(plot_list)) {
+  plot <- plot_list[[site_id]]
+  filename <- paste0("CB_FIB_Log_Rainfall_", site_id, ".png")
+  ggsave(filename, plot, width = 170, height = 90, units = "mm", dpi = 600)
+  message(paste("Saved plot:", filename))
+}
+
+####Linear FIB Camps Bay####
+
+# --- 1. Define Constants & Guidelines ---
+CAP_VALUE <- 1000
+Y_MIN_LIN <- 0 
+bar_width <- 7 
+GUIDE_BLUE_FLAG <- 100
+GUIDE_DWAF <- 185
+RAIN_COL_AVG <- "AVG_CITY_DIEP_WeeklySum"
+
+# --- 2. Data Preparation ---
+
+bacteria_to_plot <- coastal_cb %>%
+  mutate(
+    site_id_fct = factor(site_id),
+    # CENSORING STEP
+    capped_value = pmin(numeric_value, CAP_VALUE)
+  )
+
+rainfall_to_plot <- weekly_rainfall %>%
+  mutate(
+    "{RAIN_COL_AVG}" := (CITY11BR_WeeklySum + DIEP05ER_WeeklySum) / 2
+  ) %>%
+  select(Week_Start, all_of(RAIN_COL_AVG)) %>%
+  rename(Rainfall_Avg = all_of(RAIN_COL_AVG)) 
+
+# --- 3. DYNAMIC SCALING FACTOR (Z) CALCULATION ---
+
+ACTUAL_MAX_BACT <- max(bacteria_to_plot$capped_value, na.rm = TRUE)
+BACT_MAX_PLOT_HEIGHT <- CAP_VALUE 
+
+RAIN_MAX_LIN <- max(rainfall_to_plot$Rainfall_Avg, na.rm = TRUE)
+RAIN_MAX_LIN <- RAIN_MAX_LIN * 1.05 
+RAIN_MIN_LIN <- 0
+
+Z_PLOT_RANGE <- BACT_MAX_PLOT_HEIGHT - Y_MIN_LIN 
+RAIN_RANGE <- RAIN_MAX_LIN - RAIN_MIN_LIN
+z <- Z_PLOT_RANGE / RAIN_RANGE
+if (is.infinite(z) || is.nan(z)) z <- 1
+
+primary_breaks <- pretty(c(Y_MIN_LIN, BACT_MAX_PLOT_HEIGHT), n = 5)
+
+
+# --- 5. PLOTTING FUNCTION  ---
+
+plot_single_site <- function(site, bacteria_data, rainfall_data, z_factor, y_min, y_max, rain_max, primary_breaks, bar_w) {
+  
+  site_data <- bacteria_data %>% filter(site_id == site)
+  
+  # CORRECTED: Create dummy data spanning the X-axis for geom_line
+  x_min_plot <- min(bacteria_data$sample_date, na.rm=TRUE)
+  x_max_plot <- max(bacteria_data$sample_date, na.rm=TRUE)
+  
+  guideline_data_long <- tibble(
+    y_value = c(GUIDE_BLUE_FLAG, GUIDE_BLUE_FLAG, GUIDE_DWAF, GUIDE_DWAF),
+    x_value = c(x_min_plot, x_max_plot, x_min_plot, x_max_plot),
+    # Use a factor for the line label and grouping
+    line_label = factor(c("Blue Flag Guideline (100)", "Blue Flag Guideline (100)", 
+                          "DWAF Guideline (185)", "DWAF Guideline (185)")) 
+  )
+  
+  cap_labels <- function(x) {
+    ifelse(x == CAP_VALUE, paste0(">", CAP_VALUE-1, "+"), scales::label_comma()(x))
+  }
+  
+  # Define custom colors for the sites
+  site_colors <- c("CN11" = "red", "CN31" = "blue", "CN41" = "green4")
+  
+  single_plot <- ggplot() +
+    
+    # Layer 1: Weekly Rainfall (Bars)
+    geom_rect(
+      data = rainfall_data %>% filter(Rainfall_Avg > 0), 
+      aes(
+        xmin = Week_Start - (bar_w / 2),
+        xmax = Week_Start + (bar_w / 2),
+        ymin = y_min, 
+        ymax = (Rainfall_Avg * z_factor) + y_min
+      ),
+      fill = "grey", color = NA, alpha = 0.7
+    ) +
+    
+    # Guideline Lines: Color is mapped to 'line_label' to create the legend
+    geom_line(
+      data = guideline_data_long,
+      aes(
+        x = x_value, y = y_value,
+        color = line_label,   
+        group = line_label    
+      ),
+      linetype = "dashed", 
+      linewidth = 0.5,
+      show.legend = TRUE 
+    ) +
+    
+    # Layer 2: Daily Bacteria Data (Scatterplot)
+    geom_point(
+      data = site_data,
+      aes(x = sample_date, y = capped_value), 
+      color = site_colors[site], 
+      size = 0.8, alpha = 0.9, position = position_jitter(width = 0.5, height = 0)
+    ) +
+    
+    # --- Y-Axis with sec_axis ---
+    scale_y_continuous(
+      breaks = primary_breaks, 
+      labels = cap_labels,
+      name = "Enterococci Count (CFU/100 ml)",
+      limits = c(y_min, y_max), 
+      
+      sec.axis = sec_axis(
+        trans = ~ (. - y_min) / z_factor, 
+        breaks = unique(c(0, pretty(c(RAIN_MIN_LIN, rain_max), n = 5))),
+        name = "Avg. Weekly Rainfall (mm) - CITY & DIEP"
+      )
+    ) +
+    
+    # 💥 CHANGE 2: Simplify scale_color_manual for guidelines ONLY
+    scale_color_manual(
+      values = c("Blue Flag Guideline (100)" = "blue", "DWAF Guideline (185)" = "red"),
+      breaks = c("Blue Flag Guideline (100)", "DWAF Guideline (185)"),
+      name = "Guideline" 
+    ) +
+    
+    # --- X-Axis and Theme ---
+    scale_x_date(labels = date_format("%d %b %y"), breaks = "2 weeks") +
+    theme_bw() +
+    labs(
+      title = paste("Site", site, ": Daily Enterococci vs. Avg. Weekly Rainfall"),
+      x = "Date"
+    ) +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 10),
+      legend.position = "bottom",
+      legend.box = "horizontal",
+      legend.title = element_text(size = 7, face = "bold"),
+      legend.text = element_text(size = 6),
+      axis.title.y.right = element_text(color = "darkred", face = "bold", size = 8),
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 6), 
+      axis.title.y.left = element_text(face = "bold", size = 8),
+      axis.text.y.left = element_text(size = 6), 
+      axis.text.y.right = element_text(size = 6),
+      axis.title.x = element_text(face = "bold", size = 8)
+    ) +
+    guides(color = guide_legend(override.aes = list(
+      shape = NA, # No shape/point
+      linetype = 2, # Dashed line
+      linewidth = 1 # Ensure line is visible
+    ))) 
+  
+  return(single_plot)
+}
+
+# --- 6. Generate and View/Save Plots ---
+
+site_ids <- unique(bacteria_to_plot$site_id)
+plot_list <- lapply(site_ids, function(id) {
+  plot_single_site(
+    site = id, bacteria_data = bacteria_to_plot, rainfall_data = rainfall_to_plot,
+    z_factor = z, y_min = Y_MIN_LIN, y_max = BACT_MAX_PLOT_HEIGHT,
+    rain_max = RAIN_MAX_LIN, primary_breaks = primary_breaks, bar_w = bar_width
+  )
+})
+names(plot_list) <- site_ids
+
+# To view all three plots sequentially:
+invisible(lapply(plot_list, print))
+
+for (site_id in names(plot_list)) {
+     plot <- plot_list[[site_id]]
+     filename <- paste0("CB_FIB_Linear_rainfall", site_id, ".png")
+     ggsave(filename, plot, width = 170, height = 90, units = "mm", dpi = 600)
+     message(paste("Saved plot:", filename))
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
