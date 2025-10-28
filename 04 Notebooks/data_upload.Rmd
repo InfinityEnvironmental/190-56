@@ -1850,3 +1850,116 @@ extracted |>
   mutate(results = )
   pull(sample_information)
 ```
+# Upload ad-hoc samples
+
+```{r data-import}
+tibble(
+  filename_short = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Saunders Rocks/", pattern = "*.pdf"),
+  filename_long = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Saunders Rocks/", pattern = "*.pdf", full.names = T)
+) |>
+  mutate(pdf_data = map(filename_long, ~ pdf_text(.x) |>
+    str_split("\n") |>
+    unlist())) |>
+  mutate(sample_date = map(pdf_data, ~keep(.x, ~str_detect(.x, "Sample taken")) |> str_remove("\\*Sample taken:") |> str_trim() |> dmy())) |>
+  mutate(analysis_completed = map(pdf_data, ~keep(.x, ~str_detect(.x, "Analysis completed")) |> str_remove("Analysis completed:") |> str_trim() |> dmy())) |>
+  mutate(sample_temp_c = map(pdf_data, ~keep(.x, ~str_detect(.x, "Sample temperature")) |> str_remove("Sample temperature:") |> str_trim() |> str_remove("ºC") |> as.numeric())) |>
+  mutate(data = map(pdf_data, ~{
+    .x |> tail_while(~!str_detect(.x, "Sample number")) |> head_while(~!str_detect(.x, "colony forming")) |> keep(~str_length(.x) > 0)
+  })) |>
+  mutate(site_id = map(data, ~str_extract(.x, "CN16\\s[BIO]") |> str_replace("\\s", ""))) |>
+  mutate(sample_time = map(data, ~str_extract(.x, "\\d{2}h\\d{2}") |> str_replace("h", ":"))) |>
+  mutate(censored_value = map(data, ~str_sub(.x, 35) |> str_trim() |> str_split("\\s{5,}"))) |>
+  unnest(sample_date, analysis_completed, sample_temp_c, site_id, sample_time, censored_value) |>
+  unnest_wider(censored_value, names_sep = "_") |>
+  rename("Enterococci" = censored_value_1, "Escherichia coli" = censored_value_2) |>
+  pivot_longer(cols = c("Enterococci", "Escherichia coli"), names_to = "parameter", values_to = "censored_value") |>
+  select(site_id, sample_date, sample_time, analysis_completed, sample_temp_c, parameter, censored_value, filename_short) |>
+  mutate(censored_value = str_replace(censored_value, "None found", "ND")) |>
+  filter(!is.na(censored_value)) |>
+  
+  # Remove the data that have been uploaded to the CWQ database
+  filter(site_id == "CN16B") |>
+  
+  # Upload to database
+  copy_to(dest = con, name = "saunders", temporary = T, overwrite = T)
+```
+
+```{sql, connection = con}
+BEGIN;
+```
+
+```{sql, connection = con}
+SELECT
+  site_id,
+  sample_date,
+  sample_time,
+  analysis_completed,
+  sample_temp_c,
+  parameter,
+  censored_value,
+  'cfu per 100 mL' AS unit,
+  filename_short
+FROM saunders;
+```
+
+```{sql, connection = con}
+INSERT INTO coastal.results_adhoc(description, sample_date, sample_time, analysis_completed, sample_temp_c, parameter, censored_value, unit, filename, lab_code)
+SELECT
+  site_id,
+  sample_date,
+  sample_time::time,
+  analysis_completed,
+  sample_temp_c,
+  parameter,
+  censored_value,
+  'cfu per 100 mL' AS unit,
+  filename_short,
+  'WLAB' AS lab_code
+FROM saunders;
+```
+
+```{sql, connection = con}
+SELECT
+  filename,
+  description,
+  parameter,
+  censored_value
+FROM coastal.results_adhoc
+ORDER BY random()
+LIMIT 5;
+```
+
+```{sql, connection = con}
+SELECT * FROM coastal.results_adhoc;
+```
+
+```{sql, connection = con}
+ROLLBACK;
+```
+
+```{sql, connection = con}
+COMMIT;
+```
+
+## Find Simons Town diving school and Woolies paddle pool samples
+
+```{r extract-data}
+tibble(
+  filename_long = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/", pattern = "*.pdf", full.names = T) |> keep(~str_detect(.x, "CWQ")),
+  filename_short = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/", pattern = "*.pdf") |> keep(~str_detect(.x, "CWQ"))
+) |>
+  mutate(pdf_data = map(filename_long, ~pdf_text(.x) |> str_split("\n"))) |>
+  mutate(data = map(pdf_data, ~map(.x, ~{
+    .x |>
+      head_while(~!str_detect(.x, "colony")) |>
+      tail_while(~!str_detect(.x, "Sample number")) |>
+      keep(~str_length(.x)>0)
+  }) |> unlist())) |>
+  arrange(filename_short) |>
+  unnest(data) |>
+  select(filename_short, data) |>
+  mutate(sample_date = str_extract(filename_short, "\\d{1,2}\\.\\d{2}\\.\\d{4}") |> dmy()) |>
+  filter(sample_date |> between(ymd("2025-09-01"), ymd("2025-11-01"))) |>
+  filter(data |> str_to_lower() |> str_detect("(simon)|(driving)|(diving)|(wool)|(adhoc)|(ad hoc)"))
+  
+```
