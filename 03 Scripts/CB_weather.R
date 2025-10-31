@@ -24,7 +24,7 @@ library(stringr)
 loadfonts()
 library(scales)
 library(patchwork)
-install.packages("ggpubr")
+#install.packages("ggpubr")
 library(ggpubr)
 library(ggh4x)
 
@@ -190,7 +190,7 @@ monthly_data <- daily_weather_data %>%
     STRA01RS_MonthlySum  = sum(STRA01RS_DailySum, na.rm = TRUE),
     .groups = 'drop' # Ungroup after summarising
   )
-dates_to_exclude <- as.Date()
+#dates_to_exclude <- as.Date()
 
 # Filter the monthly data to exclude these dates
 monthly_data <- monthly_data %>%
@@ -503,44 +503,98 @@ coastal_data <- coastal_data %>%
 #write.csv(cb_high, "cb_high_freq_data.csv", row.names = FALSE)
 
 #### Yearly Box plots #########################################################################
-p <- ggplot(data = coastal_data, aes(x = site_id, y = numeric_value + 0.1, fill = site_group)) +
-  geom_boxplot(
+percentile_boxplot_stats <- function(x) {
+  # Calculate the required quantiles
+  r <- as.vector(quantile(x, c(0.10, 0.25, 0.50, 0.75, 0.90), na.rm = TRUE))
+  # Name the output elements for geom="boxplot" to recognize the new whisker endpoints
+  names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
+  return(r)
+}
+
+# --- MANUAL TRANSFORMATION SETUP ---
+# 1. Create the new column for the manually logged data
+coastal_data$log_numeric_value <- log10(coastal_data$numeric_value + 0.1)
+
+# 2. Define the correct y-intercept value (approx 2.267)
+MANUAL_Y_INTERCEPT <- log10(185 + 0.1)
+
+# 3. Define the breaks as the logged values
+LOGGED_BREAKS <- log10(c(0.1, 1.1, 10.1, 100.1, 1000.1, 10000.1))
+
+# These are the labels displayed on the axis (remain unchanged)
+FINAL_LABELS_DISPLAY <- c("ND", "1", "10", "100", "1,000", "10,000")
+# --- END SETUP ---
+
+
+p <- ggplot(data = coastal_data, aes(x = site_id, y = log_numeric_value, fill = site_group)) +
+  stat_summary(
+    fun.data = percentile_boxplot_stats,
+    geom = "boxplot",
     colour = "black"
   ) +
+  geom_point(
+    # Use position_jitterdodge to spread the points out slightly 
+    # and align them with the boxplots (Camps Bay vs. Strand)
+    position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.8), 
+    size = 1,              # Adjust size as needed
+    alpha = 0.7,           # Use transparency to avoid overplotting
+    shape = 16,            # Solid circle shape
+    color = "darkgrey"        # Use a contrasting color for visibility
+  ) +
+  geom_hline(
+    # Use the manually calculated y-intercept value
+    yintercept = MANUAL_Y_INTERCEPT,
+    linetype = "dashed",  
+    color = "darkred",  
+    linewidth = 1,
+    show.legend = FALSE
+  ) +
+  annotate(
+    "text",
+    x = 2, 
+    # Position the text relative to the manually logged intercept
+    y = MANUAL_Y_INTERCEPT+0.2, 
+    label = "DWAF Guideline Threshold\n (185 cfu/100 ml)",
+    color = "darkred",
+    size = 3,
+    hjust = 1,  
+    vjust = 1
+  ) +
   scale_y_continuous(
-    # 💥 CRITICAL: Apply the log10 transformation
-    trans = "log10", 
-    # Use the raw counts + 0.1 as the breaks
-    breaks = FINAL_BREAKS_RAW_PLUS_OFFSET, 
+    # **CRITICAL FIX: REMOVE trans = "log10"**
+    # Use the manually LOGGED breaks
+    breaks = LOGGED_BREAKS, 
     # Use the clean labels (ND, 1, 10, etc.)
     labels = FINAL_LABELS_DISPLAY,
+    # Adjust limits to the LOGGED range
+    limits = log10(c(0.1, max(coastal_data$numeric_value, na.rm = TRUE) + 0.1)),
     # Set the axis name correctly
-    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
-    # Ensure limits cover the data range (from 0.1 for ND up to max data + 0.1)
-    limits = c(0.1, max(coastal_all$numeric_value, na.rm = TRUE) + 0.1)
+    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)"
   ) +
-  # Manually set the patterns for the two groups
   scale_fill_manual(
     values = c(
       "Camps Bay" = "grey",
       "Strand" = "white"
     )
   ) +
-  # Add titles and labels for clarity
   labs(
     title = "Yearly Distribution of Enterococci Counts \n (June 2024 - August 2025)",
     x = "Site ID",
-    y = "log(Enterococci Counts (CFU per 100 ml) + 1)",
     fill = "Site Group"
   ) +
   theme_bw() +
-  theme(text = element_text(family = "Century Gothic"),
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        plot.title = element_text(hjust = 0.5)
+  theme(
+    # Apply Century Gothic font
+    text = element_text(family = "Century Gothic", size = 9),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 7),
+    axis.text.y = element_text(size = 7),
+    axis.title = element_text(size = 9),
+    plot.title = element_text(hjust = 0.5, size = 10),
+    strip.text = element_text(face = "bold", family = "Century Gothic", size = 9) 
   )
 p
-ggsave(filename = "Yearly_boxplots.png",
-       plot = p, width = 170, height = 90, units = "mm", dpi = 600)
+ggsave(filename = "Yearly_boxplots_10th_90th_perc.png",
+       plot = p, width = 170, height = 120, units = "mm", dpi = 600)
 
 ######Monthly Boxplots####################################
 #Filter only for Camps Bay
@@ -561,27 +615,62 @@ coastal_cb <- coastal_data %>%
     )
   )
 
-
 #Create the monthly boxplots for Camps Bay
-p <- ggplot(data = coastal_cb, aes(x = sample_month_year, y = numeric_value + 1, fill = site_group)
+p <- ggplot(data = coastal_cb, aes(x = sample_month_year, y = log_numeric_value, fill = site_group)
 ) +
-  # Use geom_boxplot for the distribution
-  geom_boxplot(colour = "black", linewidth = 0.3
+  stat_summary(
+    fun.data = percentile_boxplot_stats,
+    geom = "boxplot",
+    colour = "black",
+    size = 0.3
+  ) +
+  geom_point(
+    position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.8), 
+    size = 1,              # Adjust size as needed
+    alpha = 0.5,           # Use transparency to avoid overplotting
+    shape = 16,            # Solid circle shape
+    color = "darkgrey"        # Use a contrasting color for visibility
+  ) +
+  geom_hline(
+    # Use the manually calculated y-intercept value
+    yintercept = MANUAL_Y_INTERCEPT,
+    linetype = "dashed",  
+    color = "darkred",  
+    linewidth = 0.7,
+    show.legend = FALSE
+  ) +
+  geom_text(
+    # --- Define the data for the annotation inline ---
+    data = data.frame(
+      # IMPORTANT: Replace "CN11" with the actual site_id of your top facet
+      site_id = factor("CN11"), 
+      label_text = "DWAF Guideline Threshold\n(185 cfu/100 ml)",
+      x_coord = 15, 
+      y_coord = MANUAL_Y_INTERCEPT + 1.2 # Y position (above the line)
+    ),
+    aes(
+      x = x_coord,
+      y = y_coord,
+      label = label_text
+    ),
+    color = "darkred",
+    size = 2,
+    hjust = 1,  
+    vjust = 1,
+    inherit.aes = FALSE # Ensures it uses the coordinates defined above, not the main data
   ) +
   # Use facet_wrap to create a separate plot for each site_id
   facet_wrap(~ site_id, scales = "free_x", ncol = 1) + 
-  # Log scale for y-axis (using +1 to handle zeros)
   scale_y_continuous(
-    # 💥 CRITICAL: Apply the log10 transformation
-    trans = "log10", 
-    # Use the raw counts + 0.1 as the breaks
-    breaks = FINAL_BREAKS_RAW_PLUS_OFFSET, 
+    # **CRITICAL FIX: REMOVE trans = "log10"**
+    # Use the manually LOGGED breaks
+    breaks = LOGGED_BREAKS, 
     # Use the clean labels (ND, 1, 10, etc.)
     labels = FINAL_LABELS_DISPLAY,
+    # Adjust limits to the LOGGED range
+    limits = log10(c(0.1, max(coastal_data$numeric_value, na.rm = TRUE) + 0.1)),
     # Set the axis name correctly
-    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
-    # Ensure limits cover the data range (from 0.1 for ND up to max data + 0.1)
-    limits = c(0.1, max(coastal_all$numeric_value, na.rm = TRUE) + 0.1)
+    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)"
   ) +
   # Manual Fill Colors
   scale_fill_manual(
@@ -592,8 +681,7 @@ p <- ggplot(data = coastal_cb, aes(x = sample_month_year, y = numeric_value + 1,
   labs(
     title = "Monthly Distribution of Enterococci Counts \n (Camps Bay June 2024 - August 2025)",
     x = "Month",
-    y = "log(Enterococci Counts (CFU per 100 ml) + 1)",
- #   fill = "Site Group" 
+    y = "log(Enterococci Counts (CFU per 100 ml) + 0.1)"
   ) +
   theme_bw() +
   theme(
@@ -603,11 +691,12 @@ p <- ggplot(data = coastal_cb, aes(x = sample_month_year, y = numeric_value + 1,
     axis.text.y = element_text(size = 7),
     axis.title = element_text(size = 9),
     plot.title = element_text(hjust = 0.5, size = 10),
-    strip.text = element_text(face = "bold", family = "Century Gothic", size = 9) 
+    strip.text = element_text(face = "bold", family = "Century Gothic", size = 9),
+    legend.position = "none"
   )
 p
-ggsave(filename = "Monthly_boxplots_CB.png",
-       plot = p, width = 170, height = 120, units = "mm", dpi = 600)
+ggsave(filename = "Monthly_boxplots_10th_90th_perc_CB.png",
+       plot = p, width = 170, height = 160, units = "mm", dpi = 600)
 
 #Filter only for Strand
 coastal_strand <- coastal_data %>%
@@ -628,25 +717,60 @@ coastal_strand <- coastal_data %>%
   )
 
 #Create the monthly boxplots for Camps Bay
-p <- ggplot(data = coastal_strand, aes(x = sample_month_year, y = numeric_value + 1, fill = site_group)
+p <- ggplot(data = coastal_strand, aes(x = sample_month_year, y = log_numeric_value, fill = site_group)
 ) +
-  # Use geom_boxplot for the distribution
-  geom_boxplot(colour = "black", linewidth = 0.3
+  stat_summary(
+    fun.data = percentile_boxplot_stats,
+    geom = "boxplot",
+    colour = "black",
+    size = 0.3
+  ) +
+  geom_point(
+    position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.8), 
+    size = 1,              # Adjust size as needed
+    alpha = 0.5,           # Use transparency to avoid overplotting
+    shape = 16,            # Solid circle shape
+    color = "darkgrey"        # Use a contrasting color for visibility
+  ) +
+  geom_hline(
+    # Use the manually calculated y-intercept value
+    yintercept = MANUAL_Y_INTERCEPT,
+    linetype = "dashed",  
+    color = "darkred",  
+    linewidth = 0.7,
+    show.legend = FALSE
+  ) +
+  geom_text(
+    # --- Define the data for the annotation inline ---
+    data = data.frame(
+      site_id = factor("XCS26"), 
+      label_text = "DWAF Guideline Threshold\n(185 cfu/100 ml)",
+      x_coord = 2.5, 
+      y_coord = MANUAL_Y_INTERCEPT + 1.2 # Y position (above the line)
+    ),
+    aes(
+      x = x_coord,
+      y = y_coord,
+      label = label_text
+    ),
+    color = "darkred",
+    size = 2,
+    hjust = 1,  
+    vjust = 1,
+    inherit.aes = FALSE # Ensures it uses the coordinates defined above, not the main data
   ) +
   # Use facet_wrap to create a separate plot for each site_id
   facet_wrap(~ site_id, scales = "free_x", ncol = 1) + 
-  # Log scale for y-axis (using +1 to handle zeros)
   scale_y_continuous(
-    # 💥 CRITICAL: Apply the log10 transformation
-    trans = "log10", 
-    # Use the raw counts + 0.1 as the breaks
-    breaks = FINAL_BREAKS_RAW_PLUS_OFFSET, 
+    # **CRITICAL FIX: REMOVE trans = "log10"**
+    # Use the manually LOGGED breaks
+    breaks = LOGGED_BREAKS, 
     # Use the clean labels (ND, 1, 10, etc.)
     labels = FINAL_LABELS_DISPLAY,
+    # Adjust limits to the LOGGED range
+    limits = log10(c(0.1, max(coastal_data$numeric_value, na.rm = TRUE) + 0.1)),
     # Set the axis name correctly
-    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
-    # Ensure limits cover the data range (from 0.1 for ND up to max data + 0.1)
-    limits = c(0.1, max(coastal_all$numeric_value, na.rm = TRUE) + 0.1)
+    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)"
   ) +
   # Manual Fill Colors
   scale_fill_manual(
@@ -655,10 +779,9 @@ p <- ggplot(data = coastal_strand, aes(x = sample_month_year, y = numeric_value 
     )
   ) +
   labs(
-    title = "Monthly Distribution of Enterococci Counts \n (Strand September 2024 - August 2025)",
+    title = "Monthly Distribution of Strand Enterococci Counts \n ( September 2024 - August 2025)",
     x = "Month",
-    y = "log(Enterococci Counts (CFU per 100 ml) + 1)",
-    #   fill = "Site Group" 
+    y = "log(Enterococci Counts (CFU per 100 ml) + 0.1)"
   ) +
   theme_bw() +
   theme(
@@ -668,10 +791,11 @@ p <- ggplot(data = coastal_strand, aes(x = sample_month_year, y = numeric_value 
     axis.text.y = element_text(size = 7),
     axis.title = element_text(size = 9),
     plot.title = element_text(hjust = 0.5, size = 10),
-    strip.text = element_text(face = "bold", family = "Century Gothic", size = 9)  
+    strip.text = element_text(face = "bold", family = "Century Gothic", size = 9),
+    legend.position = "none"
   )
 p
-ggsave(filename = "Monthly_boxplots_strand.png",
+ggsave(filename = "Monthly_boxplots_10th_90th_perc_strand.png",
        plot = p, width = 170, height = 120, units = "mm", dpi = 600)
 
 
@@ -693,40 +817,52 @@ coastal_all <- coastal_data %>%
     )
   )
 
-
-FINAL_BREAKS_RAW_PLUS_OFFSET <- c(0.1, 1, 10, 100, 1000, 10000) 
-
-# These are the labels displayed on the axis
-FINAL_LABELS_DISPLAY <- c("ND", "1", "10", "100", "1,000", "10,000")
-# =========================================================================
-# 2. PLOT GENERATION: SINGLE AXIS (LINEAR Y-SCALE)
-# =========================================================================
-
-p_combined_sites_log <- ggplot(
-  data = coastal_all, 
-  aes(x = sample_month_year, y = numeric_value + 0.1, fill = site_id)
+p_combined_sites_log <- ggplot(data = coastal_all, aes(x = sample_month_year, y = log_numeric_value, fill = site_id)
 ) +
-  
-  geom_boxplot(
-    colour = "black", 
-    linewidth = 0.3,
-    position = position_dodge(width = 0.8) 
+  stat_summary(
+    fun.data = percentile_boxplot_stats,
+    geom = "boxplot",
+    colour = "black",
+    size = 0.3,
+    position = position_dodge(width = 0.8)
   ) +
-  
-  # 💥 FIX: Use scale_y_continuous with the 'trans' argument
+  geom_point(
+    position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.8), 
+    size = 1,              # Adjust size as needed
+    alpha = 0.7,           # Use transparency to avoid overplotting
+    shape = 16,            # Solid circle shape
+    color = "darkgrey"        # Use a contrasting color for visibility
+  ) +
+  geom_hline(
+    # Use the manually calculated y-intercept value
+    yintercept = MANUAL_Y_INTERCEPT,
+    linetype = "dashed",  
+    color = "darkred",  
+    linewidth = 0.7,
+    show.legend = FALSE
+  ) +
+  annotate(
+    "text",
+    x = 2.5, 
+    # Position the text relative to the manually logged intercept
+    y = MANUAL_Y_INTERCEPT + 0.5, 
+    label = "DWAF Guideline Threshold\n (185 cfu/100 ml)",
+    color = "darkred",
+    size = 2.5,
+    hjust = 1,  
+    vjust = 1
+  ) +
   scale_y_continuous(
-    # 💥 CRITICAL: Apply the log10 transformation
-    trans = "log10", 
-    # Use the raw counts + 0.1 as the breaks
-    breaks = FINAL_BREAKS_RAW_PLUS_OFFSET, 
+    # **CRITICAL FIX: REMOVE trans = "log10"**
+    # Use the manually LOGGED breaks
+    breaks = LOGGED_BREAKS, 
     # Use the clean labels (ND, 1, 10, etc.)
     labels = FINAL_LABELS_DISPLAY,
+    # Adjust limits to the LOGGED range
+    limits = log10(c(0.1, max(coastal_data$numeric_value, na.rm = TRUE) + 0.1)),
     # Set the axis name correctly
-    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
-    # Ensure limits cover the data range (from 0.1 for ND up to max data + 0.1)
-    limits = c(0.1, max(coastal_all$numeric_value, na.rm = TRUE) + 0.1)
+    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)"
   ) +
-  
   # Manual Fill Colors
   scale_fill_manual(
     values = c(
@@ -740,7 +876,7 @@ p_combined_sites_log <- ggplot(
   ) +
   
   labs(
-    title = "Monthly Distribution of Enterococci Counts (All 5 Sites)",
+    title = "Monthly Distribution of Enterococci Counts (All Sites)",
     x = "Month"
   ) +
   theme_bw() +
@@ -749,24 +885,20 @@ p_combined_sites_log <- ggplot(
     legend.position = "bottom",
     legend.box = "horizontal",
     legend.title = element_text(size = 7, face = "bold"),
-    legend.text = element_text(size = 6),
+    legend.text = element_text(size = 7),
     axis.title.y.right = element_text(color = "darkred", face = "bold", size = 8),
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 6), 
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 7), 
     axis.title.y.left = element_text(face = "bold", size = 8),
-    axis.text.y.left = element_text(size = 6), 
-    axis.text.y.right = element_text(size = 6),
-    axis.title.x = element_text(face = "bold", size = 8)
+    axis.text.y.left = element_text(size = 7), 
+    axis.text.y.right = element_text(size = 7),
+    axis.title = element_text(face = "bold", size = 8),
+    text = element_text(family = "Century Gothic", size = 9),
+    strip.text = element_text(face = "bold", family = "Century Gothic", size = 9),
+    
   )
 
 print(p_combined_sites_log)
-ggsave(
-  filename = "Monthly_boxplots_All_Sites_Log.png", 
-  plot = p_combined_sites_log, 
-  width = 250, 
-  height = 120, 
-  units = "mm", 
-  dpi = 600
-)
+ggsave(filename = "Monthly_boxplots_All_Sites_Log_10th_90th_perc.png", plot = p_combined_sites_log, width = 250, height = 120, units = "mm", dpi = 600)
 
 #######Seasonal box plots###########################
 coastal_cb_seasonal <- coastal_cb %>%
@@ -784,36 +916,71 @@ coastal_cb_seasonal <- coastal_cb %>%
 
 
 #Create the monthly boxplots for Camps Bay
-p <- ggplot(data = coastal_cb_seasonal, aes(x = season, y = numeric_value + 0.1, fill = site_group)
+p <- ggplot(data = coastal_cb_seasonal, aes(x = season, y = log_numeric_value, fill = site_group)
 ) +
-  # Use geom_boxplot for the distribution
-  geom_boxplot(colour = "black", linewidth = 0.3
+  stat_summary(
+    fun.data = percentile_boxplot_stats,
+    geom = "boxplot",
+    colour = "black",
+    size = 0.3,
+    position = position_dodge(width = 0.8)
+  ) +
+  geom_point(
+    position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.8), 
+    size = 1,              # Adjust size as needed
+    alpha = 0.7,           # Use transparency to avoid overplotting
+    shape = 16,            # Solid circle shape
+    color = "darkgrey"        # Use a contrasting color for visibility
+  ) +
+  geom_hline(
+    # Use the manually calculated y-intercept value
+    yintercept = MANUAL_Y_INTERCEPT,
+    linetype = "dashed",  
+    color = "darkred",  
+    linewidth = 0.7,
+    show.legend = FALSE
+  ) +
+  geom_text(
+    data = data.frame(
+      site_id = factor("CN11"), 
+      label_text = "DWAF Guideline Threshold\n(185 cfu/100 ml)",
+      x_coord = 2.5, 
+      y_coord = MANUAL_Y_INTERCEPT + 0.5 # Y position (above the line)
+    ),
+    aes(
+      x = x_coord,
+      y = y_coord,
+      label = label_text
+    ),
+    color = "darkred",
+    size = 2.5,
+    hjust = 1,  
+    vjust = 1,
+    inherit.aes = FALSE # Ensures it uses the coordinates defined above, not the main data
   ) +
   # Use facet_wrap to create a separate plot for each site_id
-  facet_wrap(~ site_id, scales = "free_x", ncol = 3) + 
-  scale_y_continuous(
-    # 💥 CRITICAL: Apply the log10 transformation
-    trans = "log10", 
-    # Use the raw counts + 0.1 as the breaks
-    breaks = FINAL_BREAKS_RAW_PLUS_OFFSET, 
-    # Use the clean labels (ND, 1, 10, etc.)
-    labels = FINAL_LABELS_DISPLAY,
-    # Set the axis name correctly
-    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
-    # Ensure limits cover the data range (from 0.1 for ND up to max data + 0.1)
-    limits = c(0.1, max(coastal_all$numeric_value, na.rm = TRUE) + 0.1)
-  ) +
+  facet_wrap(~ site_id, scales = "free_x", ncol = 3)+
+    scale_y_continuous(
+      # **CRITICAL FIX: REMOVE trans = "log10"**
+      # Use the manually LOGGED breaks
+      breaks = LOGGED_BREAKS, 
+      # Use the clean labels (ND, 1, 10, etc.)
+      labels = FINAL_LABELS_DISPLAY,
+      # Adjust limits to the LOGGED range
+      limits = log10(c(0.1, max(coastal_data$numeric_value, na.rm = TRUE) + 0.1)),
+      # Set the axis name correctly
+      name = "log(Enterococci Counts (CFU/100 ml) + 0.1)"
+    ) +
   # Manual Fill Colors
   scale_fill_manual(
     values = c(
-      "Camps Bay" = "grey"     
+      "Camps Bay" = "grey50"     
     )
   ) +
   labs(
-    title = "Seasonal Distribution of Enterococci Counts \n (Camps Bay June 2024 - August 2025)",
+    title = "Seasonal Distribution of Camps Bay Enterococci Counts \n (June 2024 - August 2025)",
     x = "Season",
-    y = "log(Enterococci Counts (CFU per 100 ml) + 1)",
-    #   fill = "Site Group" 
+    y = "log(Enterococci Counts (CFU per 100 ml) + 0.1)", 
   ) +
   theme_bw() +
   theme(
@@ -823,10 +990,11 @@ p <- ggplot(data = coastal_cb_seasonal, aes(x = season, y = numeric_value + 0.1,
     axis.text.y = element_text(size = 7),
     axis.title = element_text(size = 9),
     plot.title = element_text(hjust = 0.5, size = 10),
-    strip.text = element_text(face = "bold", family = "Century Gothic", size = 9) 
+    strip.text = element_text(face = "bold", family = "Century Gothic", size = 9),
+    legend.position = "none"
   )
 p
-ggsave(filename = "Seasonal_boxplots_CB.png",
+ggsave(filename = "Seasonal_boxplots_CB_10th_90th_perc.png",
        plot = p, width = 170, height = 120, units = "mm", dpi = 600)
 
 #Filter only for Strand
@@ -844,24 +1012,60 @@ coastal_strand_seasonal <- coastal_strand %>%
   )
 
 #Create the monthly boxplots for Camps Bay
-p <- ggplot(data = coastal_strand_seasonal, aes(x = season, y = numeric_value + 0.1, fill = site_group)
+p <- ggplot(data = coastal_strand_seasonal, aes(x = season, y = log_numeric_value, fill = site_group)
 ) +
-  # Use geom_boxplot for the distribution
-  geom_boxplot(colour = "black", linewidth = 0.3
+  stat_summary(
+    fun.data = percentile_boxplot_stats,
+    geom = "boxplot",
+    colour = "black",
+    size = 0.3,
+    position = position_dodge(width = 0.8)
+  ) +
+  geom_point(
+    position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.8), 
+    size = 1,              # Adjust size as needed
+    alpha = 0.7,           # Use transparency to avoid overplotting
+    shape = 16,            # Solid circle shape
+    color = "darkgrey"        # Use a contrasting color for visibility
+  ) +
+  geom_hline(
+    # Use the manually calculated y-intercept value
+    yintercept = MANUAL_Y_INTERCEPT,
+    linetype = "dashed",  
+    color = "darkred",  
+    linewidth = 0.7,
+    show.legend = FALSE
+  ) +
+  geom_text(
+    data = data.frame(
+      site_id = factor("XCS26"), 
+      label_text = "DWAF Guideline Threshold\n(185 cfu/100 ml)",
+      x_coord = 2.5, 
+      y_coord = MANUAL_Y_INTERCEPT + 0.5 # Y position (above the line)
+    ),
+    aes(
+      x = x_coord,
+      y = y_coord,
+      label = label_text
+    ),
+    color = "darkred",
+    size = 2.5,
+    hjust = 1,  
+    vjust = 1,
+    inherit.aes = FALSE # Ensures it uses the coordinates defined above, not the main data
   ) +
   # Use facet_wrap to create a separate plot for each site_id
   facet_wrap(~ site_id, scales = "free_y", ncol = 3) + 
   scale_y_continuous(
-    # 💥 CRITICAL: Apply the log10 transformation
-    trans = "log10", 
-    # Use the raw counts + 0.1 as the breaks
-    breaks = FINAL_BREAKS_RAW_PLUS_OFFSET, 
+    # **CRITICAL FIX: REMOVE trans = "log10"**
+    # Use the manually LOGGED breaks
+    breaks = LOGGED_BREAKS, 
     # Use the clean labels (ND, 1, 10, etc.)
     labels = FINAL_LABELS_DISPLAY,
+    # Adjust limits to the LOGGED range
+    limits = log10(c(0.1, max(coastal_data$numeric_value, na.rm = TRUE) + 0.1)),
     # Set the axis name correctly
-    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)",
-    # Ensure limits cover the data range (from 0.1 for ND up to max data + 0.1)
-    limits = c(0.1, max(coastal_all$numeric_value, na.rm = TRUE) + 0.1)
+    name = "log(Enterococci Counts (CFU/100 ml) + 0.1)"
   ) +
   # Manual Fill Colors
   scale_fill_manual(
@@ -870,10 +1074,9 @@ p <- ggplot(data = coastal_strand_seasonal, aes(x = season, y = numeric_value + 
     )
   ) +
   labs(
-    title = "Seasonal Distribution of Enterococci Counts \n (Strand September 2024 - August 2025)",
+    title = "Seasonal Distribution of Strand Enterococci Counts \n (September 2024 - August 2025)",
     x = "Season",
-    y = "log(Enterococci Counts (CFU per 100 ml) + 0.1)",
-    #   fill = "Site Group" 
+    y = "log(Enterococci Counts (CFU per 100 ml) + 0.1)", 
   ) +
   theme_bw() +
   theme(
@@ -883,10 +1086,11 @@ p <- ggplot(data = coastal_strand_seasonal, aes(x = season, y = numeric_value + 
     axis.text.y = element_text(size = 7),
     axis.title = element_text(size = 9),
     plot.title = element_text(hjust = 0.5, size = 10),
-    strip.text = element_text(face = "bold", family = "Century Gothic", size = 9)  
+    strip.text = element_text(face = "bold", family = "Century Gothic", size = 9),
+    legend.position = "none"
   )
 p
-ggsave(filename = "Seasonal_boxplots_strand.png",
+ggsave(filename = "Seasonal_boxplots_strand_10th_90th_perc.png",
        plot = p, width = 170, height = 120, units = "mm", dpi = 600)
 
 ########Camps Bay High Frequency Data Plotting ###############################################
