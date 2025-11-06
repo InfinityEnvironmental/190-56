@@ -21,7 +21,7 @@ library(units)
 library(ggpattern)
 library(extrafont)
 library(stringr)
-loadfonts()
+#loadfonts()
 library(scales)
 library(patchwork)
 #install.packages("ggpubr")
@@ -501,6 +501,28 @@ coastal_data <- coastal_data %>%
   )
 #write.csv(coastal_data, "filtered_coastal_data.csv", row.names = FALSE)
 #write.csv(cb_high, "cb_high_freq_data.csv", row.names = FALSE)
+
+daily_stats_summary <- coastal_data %>%
+  # 1. Group the data by site_id and sample_date
+  group_by(site_id) %>%
+  # 2. Calculate the required summary statistics for both variables
+  summarise(
+    # Raw Enterococci Counts ("numeric_value")
+    entero_min = min(numeric_value, na.rm = TRUE),
+    entero_max = max(numeric_value, na.rm = TRUE),
+    entero_mean = mean(numeric_value, na.rm = TRUE),
+    entero_median = median(numeric_value, na.rm = TRUE),
+    
+    # Log-Transformed Value ("log_numeric_value")
+    log_entero_min = min(log_numeric_value, na.rm = TRUE),
+    log_entero_max = max(log_numeric_value, na.rm = TRUE),
+    log_entero_mean = mean(log_numeric_value, na.rm = TRUE),
+    log_entero_median = median(log_numeric_value, na.rm = TRUE),
+    
+    # Keep only the unique entries (in case of multiple identical samples per site/day)
+    .groups = 'drop' 
+  )
+write.csv(daily_stats_summary, "daily_entero_stats_summary.csv", row.names = FALSE)
 
 #### Yearly Box plots #########################################################################
 percentile_boxplot_stats <- function(x) {
@@ -1057,7 +1079,6 @@ p <- ggplot(data = coastal_strand_seasonal, aes(x = season, y = log_numeric_valu
   # Use facet_wrap to create a separate plot for each site_id
   facet_wrap(~ site_id, scales = "free_y", ncol = 3) + 
   scale_y_continuous(
-    # **CRITICAL FIX: REMOVE trans = "log10"**
     # Use the manually LOGGED breaks
     breaks = LOGGED_BREAKS, 
     # Use the clean labels (ND, 1, 10, etc.)
@@ -1138,7 +1159,6 @@ rainfall_6_hourly <- hourly_weather_data %>%
     ),
     .groups = "drop" 
   ) %>%
-  # 💥 FIX: Simplify column renaming to just remove the superfluous "_HourlySum" part
   rename_with(~ sub("_HourlySum", "", .x), .cols = contains("_HourlySum_6HourlySum"))
 
 rainfall_to_plot <- rainfall_6_hourly %>%
@@ -1153,15 +1173,11 @@ rainfall_to_plot <- rainfall_6_hourly %>%
     week
   )
 
-# Add the 'week' column to your bacteria data for consistent faceting.
-# The week definition must match the one used in the rainfall prep.
-TARGET_SITE_ID <- "CN41"
+TARGET_SITE_ID <- "CN10"
 
-# The data is being filtered HERE.
+
 cb_high_plotting <- cb_high_prepared %>%
-  # CRITICAL FIX: Filter for the target site ID
   filter(site_id == TARGET_SITE_ID) %>% 
-  
   mutate(
     Date_Only = as_date(date_time), # Create Date_Only column to join/match week
     # Define the week using the *same logic* as in your rainfall preparation
@@ -1175,104 +1191,127 @@ cb_high_plotting <- cb_high_prepared %>%
   filter(!is.na(week)) %>%
   filter(numeric_value >= 0, !is.na(numeric_value))
 
+# --- MANUAL TRANSFORMATION SETUP ---
+# 1. Create the new column for the manually logged data
+cb_high_plotting$log_numeric_value <- log10(cb_high_plotting$numeric_value + 0.1)
 
-# Redefine the custom transformation to use +0.1 for the axis
-#Not used
-log_plus_01_trans <- scales::trans_new(
-  name = "log10_plus_01",
-  transform = function(x) log10(x + 0.1),
-  inverse = function(x) 10^x - 0.1
-)
+# 2. Define the correct y-intercept value (approx 2.267)
+MANUAL_Y_INTERCEPT <- log10(185 + 0.1)
 
-# --- Primary (Bacteria) Axis Parameters ---
-ACTUAL_MAX_BACT <- max(cb_high_plotting$numeric_value, na.rm = TRUE)
-BACT_MAX_RAW <- 10^ceiling(log10(ACTUAL_MAX_BACT + 0.1))
-BACT_MAX_RAW <- max(BACT_MAX_RAW, 10) 
+# 3. Define the breaks as the logged values
+LOGGED_BREAKS <- log10(c(0.1, 1.1, 10.1, 100.1, 1000.1, 10000.1))
 
-BACT_MAX_PLOT_HEIGHT <- log10(BACT_MAX_RAW + 0.1) 
-Y_MIN_LOG <- log10(0 + 0.1) # -1.0
+# These are the labels displayed on the axis (remain unchanged)
+FINAL_LABELS_DISPLAY <- c("ND", "1", "10", "100", "1,000", "10,000")
+# --- END SETUP ---
+
+Y_MIN_LOG <- LOGGED_BREAKS[1] # This is log10(0.1) = -1.0
+
+# Define the max plot height based on the maximum value in your *fixed* breaks
+BACT_MAX_PLOT_HEIGHT <- max(LOGGED_BREAKS) 
+
+# Your fixed display labels
+FINAL_LABELS_DISPLAY <- c("ND", "1", "10", "100", "1,000", "10,000")
 
 # --- DYNAMIC RAINFALL MAX ---
 RAIN_MAX_TRUE <- max(rainfall_to_plot$Rainfall_Avg, na.rm = TRUE)
-RAIN_MAX_LIN <- RAIN_MAX_TRUE * 1.05 
-RAIN_MIN_LIN <- 0 
+RAIN_MAX_LIN <- RAIN_MAX_TRUE * 1.05
+RAIN_MIN_LIN <- 0
 
-# --- Calculate Factor Z ---
+# --- Calculate Factor Z (The Scaling Factor) ---
 Z_PLOT_RANGE <- BACT_MAX_PLOT_HEIGHT - Y_MIN_LOG
 RAIN_RANGE <- RAIN_MAX_LIN - RAIN_MIN_LIN
 
+# Z maps the linear rainfall range to the log plot height range
 z <- Z_PLOT_RANGE / RAIN_RANGE
-if (is.infinite(z) || is.nan(z)) z <- 1 
+if (is.infinite(z) || is.nan(z) || z == 0) z <- 1 
 
-# --- Dynamic Breaks and Labels for Primary Axis ---
-final_breaks_log_coords <- seq(0, BACT_MAX_PLOT_HEIGHT, by = 1) 
-final_labels_raw <- 10^final_breaks_log_coords
-
-
-#### 4. PLOTTING - LOGGING (USING GEOM_RECT) ####
 
 # Calculate the half-width of the 6-hour bar in seconds
-BAR_HALF_WIDTH_SEC <- 3 * 3600 
+BAR_HALF_WIDTH_SEC <- 3 * 3600
+#Threshold label
+min_date <- min(cb_high_plotting$date_time, na.rm = TRUE)
+LABEL_X_POS <- min_date - seconds(9 * 3600)        # Shift the label 3 hours (10800 seconds) to the left of the min_date
 
 single_site_plot <- ggplot() +
-  
-  # Layer 1: 6-hourly Rainfall (Bars) - Now uses geom_rect
   geom_rect(
     data = rainfall_to_plot %>% filter(Rainfall_Avg > 0),
     aes(
-      #  FIX: Define the time window (xmin/xmax) for the 6-hour bar
-      xmin = Six_Hourly_Timestamp,
-      xmax = Six_Hourly_Timestamp + seconds(2*BAR_HALF_WIDTH_SEC),
+      # Center the 6-hour bar
+      xmin = Six_Hourly_Timestamp - seconds(BAR_HALF_WIDTH_SEC),
+      xmax = Six_Hourly_Timestamp + seconds(BAR_HALF_WIDTH_SEC),
       
-      # ymin is the BASE (ND/0)
+      # ymin is the BASE (ND/-1.0)
       ymin = Y_MIN_LOG,
-      # ymax is the TOP of the scaled bar
-      y = Rainfall_Avg * z + Y_MIN_LOG
+      # ymax is the TOP of the scaled bar: Rainfall_Avg * Z + Y_MIN_LOG
+      ymax = Rainfall_Avg * z + Y_MIN_LOG
     ),
     fill = "lightgrey",
     color = NA,
     alpha = 0.7
   ) +
-  
+  geom_hline(
+    yintercept = MANUAL_Y_INTERCEPT,
+    linetype = "dashed",
+    color = "darkred",
+    linewidth = 0.8
+  ) +
   # Layer 2: Hourly Bacteria Data (Scatterplot)
   geom_point(
     data = cb_high_plotting,
-    # Manually log the Y-AESTHETIC
-    aes(x = date_time, y = log10(numeric_value + 0.1), color = tag), 
+    aes(x = date_time, y = log_numeric_value, color = tag), 
     size = 0.5,
     alpha = 0.7
   ) +
-  
+  geom_text(
+    data = data.frame(
+      week = factor("Week 1"),
+      label_text = "DWAF Guideline Threshold\n(185 cfu/100 ml)",
+      # X-coordinate set to the earliest date for left alignment
+      x_coord = LABEL_X_POS, 
+      # Y position set slightly above the line
+      y_coord = MANUAL_Y_INTERCEPT + 0.6 
+    ),
+    aes(
+      x = x_coord,
+      y = y_coord,
+      label = label_text
+    ),
+    color = "darkred", 
+    size = 2.2,
+    hjust = 0, # Left alignment (0)
+    vjust = 0.5,
+    inherit.aes = FALSE # Ensures it uses the coordinates defined above
+  ) +
   # Faceting: Only by Week
   facet_wrap(
     ~ week,
     scales = "free_x", 
     ncol = 1
   ) +
-  
   # --- Y-Axis with sec_axis and Factor Z ---
   scale_y_continuous(
-    # Primary Y-Axis (Manual Log Scale)
-    breaks = c(Y_MIN_LOG, final_breaks_log_coords), 
-    labels = c("ND", scales::label_comma()(final_labels_raw)), 
+    # Primary Y-Axis (Bacteria - Manual Log Scale)
+    breaks = LOGGED_BREAKS, 
+    labels = FINAL_LABELS_DISPLAY, 
     name = paste0("log(Enterococci Counts (CFU/100 ml) + 0.1)"),
     limits = c(Y_MIN_LOG, BACT_MAX_PLOT_HEIGHT), 
     
     # Secondary Y-Axis (Rainfall - LINEAR SCALE)
     sec.axis = sec_axis(
+      # Trans reverses the scaling: (log_y - Y_MIN_LOG) / Z = Rainfall_Avg
       trans = ~ (. - Y_MIN_LOG) / z, 
       breaks = unique(c(0, pretty(c(RAIN_MIN_LIN, RAIN_MAX_LIN), n = 5))),
       name = "6-Hourly Rainfall Avg (mm)"
     )
   ) +
   
-  # --- X-Axis and Theme ---
+  # --- X-Axis and Theme (Unchanged) ---
   scale_x_datetime(
     labels = date_format("%b %d\n%H:%M"),
-    # Set the break sequence to align with 00:00, 06:00, etc.
     breaks = seq(
       from = as.POSIXct("2025-05-19 00:00:00", tz = "UTC"), 
-      to = max(cb_high_plotting$date_time, na.rm = TRUE), # Go up to the max date
+      to = max(cb_high_plotting$date_time, na.rm = TRUE),
       by = "6 hours"
     )
   ) +
@@ -1303,32 +1342,15 @@ ggsave(
   filename = filename, 
   plot = single_site_plot, 
   width = 170, 
-  height = 100, # Increased height to account for vertical facet strips
+  height = 120, # Increased height to account for vertical facet strips
   units = "mm", 
   dpi = 600
 )
 
 
+#### PLOT 1: ENTEROCOCCI (LOG SCALE, STANDALONE)####
 # Plotting separately
 TARGET_SITE_ID <- "CN11"
-
-# The data is being filtered HERE.
-cb_high_plotting <- cb_high_prepared %>%
-  # CRITICAL FIX: Filter for the target site ID
-  filter(site_id == TARGET_SITE_ID) %>% 
-  
-  mutate(
-    Date_Only = as_date(date_time), # Create Date_Only column to join/match week
-    # Define the week using the *same logic* as in your rainfall preparation
-    week = case_when(
-      Date_Only >= as_date("2025-05-19") & Date_Only <= as_date("2025-05-23") ~ "Week 1",
-      Date_Only >= as_date("2025-05-26") & Date_Only <= as_date("2025-05-30") ~ "Week 2",
-      TRUE ~ NA_character_
-    )
-  ) %>%
-  # Filter out NA weeks if any bacteria data falls in the excluded dates (May 24/25)
-  filter(!is.na(week)) %>%
-  filter(numeric_value >= 0, !is.na(numeric_value)) 
 
 BAR_HALF_WIDTH_SEC <- 3 * 3600 # 3 hours in seconds 
 
@@ -1369,10 +1391,6 @@ master_x_breaks_filtered <- all_x_breaks_full[
     (all_x_breaks_full >= WEEK2_START)
 ]
 
-
-# =========================================================================
-# 1. PLOT 1: ENTEROCOCCI (LOG SCALE, STANDALONE)
-# =========================================================================
 
 p_entero_separate <- ggplot(data = cb_high_plotting, 
                             aes(x = date_time, y = log10(numeric_value+0.1), color = tag)) +
@@ -1425,9 +1443,7 @@ ggsave(
   dpi = 600
 )
 
-# =========================================================================
-# 2. PLOT 2: RAINFALL (LINEAR SCALE, STANDALONE)
-# =========================================================================
+#### PLOT 2: RAINFALL (LINEAR SCALE, STANDALONE) ####
 
 p_rain_separate <- ggplot(data = rainfall_to_plot %>% filter(Rainfall_Avg >= 0), 
                           aes(x = Six_Hourly_Timestamp, y = Rainfall_Avg)) +
