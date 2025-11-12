@@ -1,3 +1,6 @@
+# Create an app that interactively shows the candidate sites for Blue Flag beaches
+
+# Load packages
 library(shiny)
 library(tidyverse)
 library(dbplyr)
@@ -9,15 +12,37 @@ library(extrafont)
 library(httr2)
 library(jsonlite)
 
-# Connect to database
-request()
+# Parameters
+Sys.setenv(apikey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InducnZkdmVzb3Zua21xYmhraGp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NjM4MjYsImV4cCI6MjA1OTQzOTgyNn0.21jkGF09gCaxGXAzKX0VaHCYty76NCYB0heMyWGfe2c")
 
-# Load data from database
-blue_flag <- tbl(con, I("coastal.sites_view")) |>
-  inner_join(tbl(con, I("coastal.results_view"))) |>
-  filter(sample_date > "2024-01-01") |>
-  select(site_id, site_description, long, lat, sample_date, censored_value, numeric_value, filename, lab_code, monitoring_group) |>
-  collect()
+# Connect to REST API
+response_results <- request("https://wnrvdvesovnkmqbhkhjz.supabase.co/rest/v1") |>
+  req_url_path_append("results_view") |>
+  req_headers("apikey" = Sys.getenv("apikey"), "Accept-Profile" = "coastal") |>
+  req_perform()
+
+# Access JSON data from response
+results <- response_results |>
+  resp_body_string() |>
+  fromJSON() |>
+  as_tibble() |>
+  mutate(monitoring_group = str_replace_all(monitoring_group, "_", " ") |> str_to_title()) |>
+  mutate(sample_date = as_date(sample_date))
+
+# Do the same for the sites table
+response_sites <- request("https://wnrvdvesovnkmqbhkhjz.supabase.co/rest/v1") |>
+  req_url_path_append("sites_view") |>
+  req_headers("apikey" = Sys.getenv("apikey"), "Accept-Profile" = "coastal") |>
+  req_perform()
+
+sites <- response_sites |>
+  resp_body_string() |>
+  fromJSON() |>
+  as_tibble()
+
+# Join sites and results
+blue_flag <- sites |>
+  inner_join(results, by = "site_id")
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -28,8 +53,8 @@ ui <- fluidPage(
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
-            selectInput(inputId = "monitoring_group", label = "Data Set", multiple = T, choices = set_names(blue_flag$monitoring_group, blue_flag$monitoring_group |> str_to_title()), selected = "Routine"),
-            dateRangeInput(inputId = "date_range", label = "Date Range")
+            selectInput(inputId = "monitoring_group", label = "Data Set", multiple = T, choices = set_names(blue_flag$monitoring_group, blue_flag$monitoring_group), selected = "Routine"),
+            dateRangeInput(inputId = "date_range", label = "Date Range", start = ymd("2024-12-01"), end = ymd("2025-02-28"))
         ),
 
         # Show a plot of the generated distribution
@@ -50,8 +75,8 @@ server <- function(input, output) {
                ) |>
         group_by(site_id, site_description) |>
         summarise(
-          min_date = min(sample_date),
-          max_date = max(sample_date),
+          min_date = min(sample_date) |> as_date(),
+          max_date = max(sample_date) |> as_date(),
           n = sum(!is.na(numeric_value)),
           hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
           hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
@@ -61,7 +86,10 @@ server <- function(input, output) {
             hazen95 <= 200 ~ "Good",
             hazen95 > 200 & hazen90 > 185 ~ "Poor",
             hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
-          ))
+          )) |>
+        filter(water_quality_category == "Excellent") |>
+        mutate(min_date = as.character(min_date), max_date = as.character(max_date)) |>
+        set_names(c("Site ID", "Site Description", "Earliest Sample", "Latest Sample", "Number of samples", "Hazen 95th Percentile", "Hazen 90th Percentile", "Water Quality Category"))
     })
 }
 
