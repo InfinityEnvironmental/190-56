@@ -6,11 +6,13 @@ library(tidyverse)
 library(dbplyr)
 library(DBI)
 library(sf)
+library(DT)
 library(keyring)
 library(kableExtra)
 library(extrafont)
 library(httr2)
 library(jsonlite)
+library(bslib)
 
 # Parameters
 Sys.setenv(apikey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InducnZkdmVzb3Zua21xYmhraGp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NjM4MjYsImV4cCI6MjA1OTQzOTgyNn0.21jkGF09gCaxGXAzKX0VaHCYty76NCYB0heMyWGfe2c")
@@ -45,7 +47,7 @@ blue_flag <- sites |>
   inner_join(results, by = "site_id")
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(
+ui <- page_navbar(
 
     # Application title
     titlePanel("Blue Flag Candidate Sites"),
@@ -54,12 +56,13 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
             selectInput(inputId = "monitoring_group", label = "Data Set", multiple = T, choices = set_names(blue_flag$monitoring_group, blue_flag$monitoring_group), selected = "Routine"),
-            dateRangeInput(inputId = "date_range", label = "Date Range", start = ymd("2024-12-01"), end = ymd("2025-02-28"))
+            dateRangeInput(inputId = "date_range", label = "Date Range", start = ymd("2024-12-01"), end = ymd("2025-02-28")),
+            selectInput(inputId = "water_quality_category", label = "Water Quality Category", multiple = T, choices = c("Excellent", "Good", "Sufficient", "Poor"), selected = "Excellent")
         ),
 
         # Show a plot of the generated distribution
         mainPanel(
-           tableOutput(outputId = "candidate_sites")
+           dataTableOutput(outputId = "candidate_sites")
         )
     )
 )
@@ -67,7 +70,7 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-    output$candidate_sites <- renderTable({
+    output$candidate_sites <- renderDataTable({
       blue_flag |>
         filter(
           monitoring_group %in% input$monitoring_group,
@@ -78,8 +81,8 @@ server <- function(input, output) {
           min_date = min(sample_date) |> as_date(),
           max_date = max(sample_date) |> as_date(),
           n = sum(!is.na(numeric_value)),
-          hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
-          hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
+          hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE) |> round(1),
+          hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE) |> round(1),
           water_quality_category = case_when(
             n < 10 ~ "TFD*",
             hazen95 <= 100 ~ "Excellent",
@@ -87,7 +90,7 @@ server <- function(input, output) {
             hazen95 > 200 & hazen90 > 185 ~ "Poor",
             hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
           )) |>
-        filter(water_quality_category == "Excellent") |>
+        filter(water_quality_category %in% input$water_quality_category) |>
         mutate(min_date = as.character(min_date), max_date = as.character(max_date)) |>
         set_names(c("Site ID", "Site Description", "Earliest Sample", "Latest Sample", "Number of samples", "Hazen 95th Percentile", "Hazen 90th Percentile", "Water Quality Category"))
     })
