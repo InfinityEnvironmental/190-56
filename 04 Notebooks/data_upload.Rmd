@@ -1850,7 +1850,30 @@ extracted |>
   mutate(results = )
   pull(sample_information)
 ```
+
 # Upload ad-hoc samples
+
+## Check which ad-hoc samples are not yet in the database
+
+```{r check-adhoc}
+results_adhoc <- tbl(con, I("coastal.results_adhoc")) |>
+  select(filename) |>
+  distinct() |>
+  mutate(dataset = "adhoc") |>
+  collect()
+
+results <- tbl(con, I("coastal.results")) |>
+  filter(monitoring_group == "adhoc") |>
+  select(filename) |>
+  distinct() |>
+  mutate(dataset = "main") |>
+  collect()
+
+adhoc <- bind_rows(results_adhoc, results)
+
+setdiff(list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Ad-Hoc Samples/"), adhoc$filename)
+```
+
 
 ```{r data-import}
 tibble(
