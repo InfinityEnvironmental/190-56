@@ -61,40 +61,51 @@ data <- data |>
 # Create the user interface
 ui <- page_fluid(
   theme = bs_theme(version = 5, bootswatch = "minty"),
-  # Top card with controls
+  titlePanel(title = "Coastal Water Quality"),
   layout_column_wrap(
+  # Top card with controls
     card(
-      card_header("Coastal Water Quality"),
+      card_header("Dashboard Options"),
       selectInput(inputId = "site_id", label = "Select location:", choices = set_names(sites$site_id, sites$site_description), selected = NULL),
       selectInput(inputId = "monitoring_group", label = "Data set:", choices = distinct(data, monitoring_group), multiple = T, selected = "Routine"),
       dateRangeInput(inputId = "date_range", label = "Time period:", start = ymd("2025-01-01"), end = "2025-12-31"),
-      ),
-    card(leafletOutput(outputId = "site_map"))),
-  
+    ),
+    card(value_box(title = "Category", value = "Excellent"), value_box(title = "Percentage", value = "11%"), value_box(title = "Date of Last Failure", value = "2025-11-01")),
+    card(card_header("Site Location"), leafletOutput(outputId = "site_map"))
+),
   # Results figure
-  card(
-    card_header("Enterococci (cfu per 100 mL)"),
-    plotOutput(outputId = "plot")),
-  
-  # Data table output
-    dataTableOutput(
-      outputId = "results"
-  ))
-  
+  layout_column_wrap(
+    card(
+      card_header("Enterococci (cfu per 100 mL)"),
+      plotOutput(outputId = "plot")
+    ),
+
+    # Data table output
+    card(
+      card_header("Results"),
+      tableOutput(
+        outputId = "results"
+      ), height = 250
+    )
+  )
+)
+
 
 # Create the server function
 server <- function(input, output, session) {
-  
   # Data table output
-  output$results <- renderDataTable(
+  output$results <- renderTable(
     data |> filter(
       site_id == req(input$site_id),
       monitoring_group == input$monitoring_group,
-      sample_date |> between(input$date_range[1], input$date_range[2])) |>
-      select(sample_date, censored_value, numeric_value) |>
-      set_names(c("Sample Date", "Censored Value", "Numeric Value"))
-    )
-  
+      sample_date |> between(input$date_range[1], input$date_range[2])
+    ) |>
+      select(monitoring_group, sample_date, censored_value) |>
+      mutate(sample_date = as.character(sample_date)) |>
+      set_names(c("Data Set", "Sample Date", "Enterococci")),
+    spacing = "m"
+  )
+
   # Map output
   output$site_map <- renderLeaflet({
     data |>
@@ -104,7 +115,7 @@ server <- function(input, output, session) {
       addProviderTiles(providers$Esri.WorldGrayCanvas) |>
       addCircleMarkers()
   })
-  
+
   # Plot output
   output$plot <- renderPlot({
     data |>
@@ -113,9 +124,10 @@ server <- function(input, output, session) {
         monitoring_group == input$monitoring_group,
         sample_date |> between(input$date_range[1], input$date_range[2])
       ) |>
-      ggplot(aes(x = sample_date, y = numeric_value, colour = monitoring_group)) +
-      geom_line(aes(group = monitoring_group)) +
-      geom_point()
+      ggplot(aes(x = sample_date, y = monitoring_group)) +
+      geom_point(aes(size = numeric_value, colour = monitoring_group)) +
+      geom_text(aes(label = censored_value), angle = 90, hjust = 1) +
+      scale_x_date(date_breaks = "1 month", date_labels = "%b %Y")
   })
 }
 
