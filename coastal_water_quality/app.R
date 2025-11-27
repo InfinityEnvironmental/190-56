@@ -60,7 +60,7 @@ data <- data |>
 
 # Create the user interface
 ui <- page_fluid(
-  
+  theme = bs_theme(version = 5, bootswatch = "minty"),
   # Top card with controls
   layout_column_wrap(
     card(
@@ -77,7 +77,7 @@ ui <- page_fluid(
     plotOutput(outputId = "plot")),
   
   # Data table output
-    DT::DTOutput(
+    dataTableOutput(
       outputId = "results"
   ))
   
@@ -86,13 +86,13 @@ ui <- page_fluid(
 server <- function(input, output, session) {
   
   # Data table output
-  output$results <- DT::renderDT(
+  output$results <- renderDataTable(
     data |> filter(
       site_id == req(input$site_id),
       monitoring_group == input$monitoring_group,
       sample_date |> between(input$date_range[1], input$date_range[2])) |>
-      select(sample_date, monitoring_group, censored_value, numeric_value) |>
-      set_names(c("Sample Date", "Data Set", "Censored Value", "Numeric Value"))
+      select(sample_date, censored_value, numeric_value) |>
+      set_names(c("Sample Date", "Censored Value", "Numeric Value"))
     )
   
   # Map output
