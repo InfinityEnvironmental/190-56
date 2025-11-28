@@ -21,8 +21,10 @@ city_red <- "#9d2235"
 city_brown <- "#47292e"
 city_tan <- "#98871f"
 
-# Water Quality Colours
-c("TFD" = "grey", "Poor" = "#D73027", "Sufficient" = "#FECC5C", "Good" = "#A6D96A", "Excellent" = "#3288BD")
+poor <- "#D73027"
+sufficient <- "#FECC5C"
+good <- "#A6D96A"
+excellent <- "#3288BD"
 
 # Add public key to environment variables
 Sys.setenv(apikey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InducnZkdmVzb3Zua21xYmhraGp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NjM4MjYsImV4cCI6MjA1OTQzOTgyNn0.21jkGF09gCaxGXAzKX0VaHCYty76NCYB0heMyWGfe2c")
@@ -35,7 +37,8 @@ sites <- request("https://wnrvdvesovnkmqbhkhjz.supabase.co/rest/v1") |>
   resp_body_string() |>
   fromJSON() |>
   as_tibble() |>
-  arrange(site_description)
+  arrange(site_description) |>
+  filter(active)
 
 results <- request("https://wnrvdvesovnkmqbhkhjz.supabase.co/rest/v1") |>
   req_url_path_append("results_view") |>
@@ -49,7 +52,8 @@ results <- request("https://wnrvdvesovnkmqbhkhjz.supabase.co/rest/v1") |>
 
 # Join sites and results
 data <- sites |>
-  inner_join(results, by = "site_id")
+  inner_join(results, by = "site_id") |>
+  filter(active)
 
 # Check the data
 data <- data |>
@@ -57,6 +61,8 @@ data <- data |>
     across(c(site_description, site_id, category, coastline), fct),
     monitoring_group = monitoring_group |> str_replace("_", " ") |> str_to_title() |> fct()
   )
+
+data |> distinct(site_id, site_description)
 
 # Create the user interface
 ui <- page_fluid(
@@ -70,7 +76,7 @@ ui <- page_fluid(
       selectInput(inputId = "monitoring_group", label = "Data set:", choices = distinct(data, monitoring_group), multiple = T, selected = "Routine"),
       dateRangeInput(inputId = "date_range", label = "Time period:", start = ymd("2025-01-01"), end = "2025-12-31"),
     ),
-    card(value_box(title = "Category", value = "Excellent"), value_box(title = "Percentage", value = "11%"), value_box(title = "Date of Last Failure", value = "2025-11-01")),
+    card(uiOutput("category"), uiOutput("status"), uiOutput("compliance"), uiOutput("most_recent_failure")),
     card(card_header("Site Location"), leafletOutput(outputId = "site_map"))
 ),
   # Results figure
@@ -93,6 +99,37 @@ ui <- page_fluid(
 
 # Create the server function
 server <- function(input, output, session) {
+  
+  thematic::thematic_shiny()
+  
+  # Calculate Hazen water quality category
+  category <- reactive(data |>
+    filter(
+      site_id == input$site_id,
+      monitoring_group %in% input$monitoring_group,
+      sample_date |> between(input$date_range[1], input$date_range[2])
+    ) |>
+    summarise(
+      min_date = min(sample_date),
+      max_date = max(sample_date),
+      n = sum(!is.na(numeric_value)),
+      hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
+      hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
+      hazen_category = case_when(
+        n < 10 ~ "TFD",
+        hazen95 <= 100 ~ "Excellent",
+        hazen95 <= 200 ~ "Good",
+        hazen95 > 200 & hazen90 > 185 ~ "Poor",
+        hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+      )) |>
+      pull(hazen_category))
+  
+  # Value boxes
+  output$category <- renderUI(value_box(title = "Water Quality Category", value = category(), theme = "red"))
+  output$status <- renderUI(value_box(title = "Current Status", value = "Green", theme = "orange"))
+  output$compliance <- renderUI(value_box(title = "Percentage Compliance", value = "99%", theme = "green"))
+  output$most_recent_failure <- renderUI(value_box(title = "Most Recent Failure", value = "2025-11-01"))
+  
   # Data table output
   output$results <- renderTable(
     data |> filter(
@@ -124,10 +161,9 @@ server <- function(input, output, session) {
         monitoring_group == input$monitoring_group,
         sample_date |> between(input$date_range[1], input$date_range[2])
       ) |>
-      ggplot(aes(x = sample_date, y = monitoring_group)) +
-      geom_point(aes(size = numeric_value, colour = monitoring_group)) +
-      geom_text(aes(label = censored_value), angle = 90, hjust = 1) +
-      scale_x_date(date_breaks = "1 month", date_labels = "%b %Y")
+      ggplot(aes(x = sample_date, y = numeric_value)) +
+      geom_line(aes(colour = monitoring_group)) +
+      geom_point(aes(colour = monitoring_group))
   })
 }
 
