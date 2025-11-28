@@ -60,7 +60,8 @@ data <- data |>
   mutate(
     across(c(site_description, site_id, category, coastline), fct),
     monitoring_group = monitoring_group |> str_replace("_", " ") |> str_to_title() |> fct()
-  )
+  ) |>
+  filter(monitoring_group %in% c("Daily", "Routine"))
 
 data |> distinct(site_id, site_description)
 
@@ -74,7 +75,7 @@ ui <- page_fluid(
       card_header("Dashboard Options"),
       selectInput(inputId = "site_id", label = "Select location:", choices = set_names(sites$site_id, sites$site_description), selected = NULL),
       selectInput(inputId = "monitoring_group", label = "Data set:", choices = distinct(data, monitoring_group), multiple = T, selected = "Routine"),
-      dateRangeInput(inputId = "date_range", label = "Time period:", start = ymd("2025-01-01"), end = "2025-12-31"),
+      dateRangeInput(inputId = "date_range", label = "Time period:", start = ymd("2025-01-01"), end = now()),
     ),
     card(uiOutput("category"), uiOutput("status"), uiOutput("compliance"), uiOutput("most_recent_failure")),
     card(card_header("Site Location"), leafletOutput(outputId = "site_map"))
@@ -124,10 +125,27 @@ server <- function(input, output, session) {
       )) |>
       pull(hazen_category))
   
+  # Calculate the percentage compliance
+  compliance <- reactive(data |>
+    filter(
+      site_id == input$site_id,
+      monitoring_group %in% input$monitoring_group,
+      sample_date |> between(input$date_range[1], input$date_range[2])
+    ) |>
+    summarise(
+      all_samples = n(),
+      samples_exceed = sum(numeric_value > 240),
+      samples_exceed_pct = round(sum(numeric_value > 240) / n() * 100, 0)
+    ) |>
+      pull(samples_exceed_pct))
+  
+  # Calculate current status
+  
+  
   # Value boxes
-  output$category <- renderUI(value_box(title = "Water Quality Category", value = category(), theme = "red"))
   output$status <- renderUI(value_box(title = "Current Status", value = "Green", theme = "orange"))
-  output$compliance <- renderUI(value_box(title = "Percentage Compliance", value = "99%", theme = "green"))
+  output$category <- renderUI(value_box(title = "Water Quality Category", value = category(), theme = "red"))
+  output$compliance <- renderUI(value_box(title = "Percentage Compliance", value = compliance(), theme = "green"))
   output$most_recent_failure <- renderUI(value_box(title = "Most Recent Failure", value = "2025-11-01"))
   
   # Data table output
