@@ -66,43 +66,65 @@ data <- data |>
 data |> distinct(site_id, site_description)
 
 # Create the user interface
-ui <- page_fluid(
-  theme = bs_theme(version = 5, bootswatch = "minty"),
-  titlePanel(title = "Coastal Water Quality"),
-  layout_column_wrap(
-  # Top card with controls
+ui <- page_navbar(
+  theme = bs_theme(bootswatch = "flatly"),
+  title = "Coastal Water Quality",
+  fillable = F,
+  navbar_options = navbar_options(position = "static-top", collapsible = T),
+  position = "fixed-top",
+  nav_panel(
+    title = "All sites",
     card(
-      card_header("Dashboard Options"),
-      selectInput(inputId = "site_id", label = "Select location:", choices = set_names(sites$site_id, sites$site_description), selected = NULL),
-      selectInput(inputId = "monitoring_group", label = "Data set:", choices = distinct(data, monitoring_group), multiple = T, selected = "Routine"),
-      dateRangeInput(inputId = "date_range", label = "Time period:", start = ymd("2025-01-01"), end = now()),
+      card_header("Site Locations"),
+      leafletOutput(outputId = "all_sites_map")
     ),
-    card(uiOutput("category"), uiOutput("status"), uiOutput("compliance"), uiOutput("most_recent_failure")),
-    card(card_header("Site Location"), leafletOutput(outputId = "site_map"))
-),
-  # Results figure
-  layout_column_wrap(
     card(
-      card_header("Enterococci (cfu per 100 mL)"),
-      plotOutput(outputId = "plot")
-    ),
-
-    # Data table output
-    card(
-      card_header("Results"),
-      tableOutput(
-        outputId = "results"
-      ), height = 250
+      card_header("Summary"),
+      DTOutput("summary")
     )
-  )
+  ),
+  nav_panel(
+    title = "By site",
+    titlePanel(title = textOutput("site_name")),
+    selectInput(inputId = "site_id", label = "Select location:", choices = set_names(sites$site_id, sites$site_description), selected = NULL),
+    layout_column_wrap(
+      # Top card with controls
+      card(card_header("Site Location"), leafletOutput(outputId = "site_map")),
+      card(uiOutput("status"), uiOutput("category"), uiOutput("compliance"), uiOutput("most_recent_failure"))
+    ),
+    # Results figure
+    layout_column_wrap(
+      card(
+        card_header("Enterococci (cfu per 100 mL)"),
+        plotOutput(outputId = "plot"),
+        textOutput("plot_text")
+      ),
+
+      # Data table output
+      card(
+        card_header("Enterococci (cfu per 100 mL)"),
+        DTOutput(
+          outputId = "results",
+        ),
+        height = 250
+      )
+    ),
+    fillable = T
+  ),
+  nav_item(popover(
+    bsicons::bs_icon("gear", title = "Dashboard Settings"),
+    title = "Dashboard Settings",
+    placement = "right",
+    selectInput(inputId = "monitoring_group", label = "Data set:", choices = distinct(data, monitoring_group), multiple = T, selected = "Routine"),
+    dateRangeInput(inputId = "date_range", label = "Time period:", start = now() - duration("1 year"), end = now())
+  ))
 )
 
 
 # Create the server function
 server <- function(input, output, session) {
-  
   thematic::thematic_shiny()
-  
+
   # Calculate Hazen water quality category
   category <- reactive(data |>
     filter(
@@ -122,9 +144,10 @@ server <- function(input, output, session) {
         hazen95 <= 200 ~ "Good",
         hazen95 > 200 & hazen90 > 185 ~ "Poor",
         hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
-      )) |>
-      pull(hazen_category))
-  
+      )
+    ) |>
+    pull(hazen_category))
+
   # Calculate the percentage compliance
   compliance <- reactive(data |>
     filter(
@@ -135,35 +158,74 @@ server <- function(input, output, session) {
     summarise(
       all_samples = n(),
       samples_exceed = sum(numeric_value > 240),
-      samples_exceed_pct = round(sum(numeric_value > 240) / n() * 100, 0)
+      samples_exceed_pct = 100 - round(sum(numeric_value > 240) / n() * 100, 0)
     ) |>
-      pull(samples_exceed_pct))
-  
+    pull(samples_exceed_pct))
+
   # Calculate current status
-  
-  
-  # Value boxes
-  output$status <- renderUI(value_box(title = "Current Status", value = "Green", theme = "orange"))
-  output$category <- renderUI(value_box(title = "Water Quality Category", value = category(), theme = "red"))
-  output$compliance <- renderUI(value_box(title = "Percentage Compliance", value = compliance(), theme = "green"))
-  output$most_recent_failure <- renderUI(value_box(title = "Most Recent Failure", value = "2025-11-01"))
-  
-  # Data table output
-  output$results <- renderTable(
-    data |> filter(
-      site_id == req(input$site_id),
-      monitoring_group == input$monitoring_group,
-      sample_date |> between(input$date_range[1], input$date_range[2])
+  status <- reactive(data |>
+    filter(
+      site_id == input$site_id,
+      monitoring_group == input$monitoring_group
     ) |>
-      select(monitoring_group, sample_date, censored_value) |>
-      mutate(sample_date = as.character(sample_date)) |>
-      set_names(c("Data Set", "Sample Date", "Enterococci")),
-    spacing = "m"
+    group_by(site_id) |>
+    arrange(desc(sample_date)) |>
+    slice_head(n = 2) |>
+    summarise(status = case_when(
+      all(numeric_value > 380) ~ "Red",
+      first(numeric_value) > 240 ~ "Amber",
+      .default = "Green"
+    )) |>
+    mutate(colour = status |> str_to_lower()) |>
+    pull(status, colour))
+
+  # Calculate the most recent failure
+  most_recent_failure <- reactive(data |>
+    filter(
+      site_id == input$site_id,
+      monitoring_group %in% input$monitoring_group,
+      numeric_value > 240
+    ) |>
+    arrange(desc(sample_date)) |>
+    slice(1) |>
+    mutate(sample_date = format(sample_date, "%d %b %Y")) |>
+    pull(sample_date))
+
+  # Render site name
+  output$site_name <- renderText(sites |>
+    filter(site_id == input$site_id) |>
+    pull(site_description))
+
+  # Value boxes
+  output$status <- renderUI(value_box(title = "Current Status", value = status()[1], theme = case_when(status() == "Green" ~ "green", status() == "Amber" ~ "orange", status() == "Red" ~ "red")))
+  output$category <- renderUI(value_box(title = "Water Quality Category", value = category(), theme = case_when(category() == "Excellent" ~ "blue", category() == "Good" ~ "green", category() == "Sufficient" ~ "orange", category() == "Poor" ~ "red", category() == "TFD" ~ "grey")))
+  output$compliance <- renderUI(value_box(title = "Percentage Compliance", value = str_c(compliance(), "%"), theme = case_when(compliance() > 90 ~ "green", between(compliance(), 75, 90) ~ "orange", compliance() < 75 ~ "red")))
+  output$most_recent_failure <- renderUI(value_box(title = "Most Recent Failure", value = if (length(most_recent_failure()) == 1) most_recent_failure() else "No failures"))
+
+  # Data table output
+  output$results <- renderDT(
+    datatable(
+      data |> filter(
+        site_id == req(input$site_id),
+        monitoring_group == input$monitoring_group,
+        sample_date |> between(input$date_range[1], input$date_range[2])
+      ) |>
+        select(monitoring_group, sample_date, censored_value, numeric_value) |>
+        mutate(sample_date = as.character(format(sample_date, "%d %b %Y"))) |>
+        set_names(c("Data Set", "Date", "Result", "Numeric Result")),
+      options = list(paging = F, filtering = F, searching = F, columnDefs = list(list(visible = FALSE, targets = 4)))
+    ) |>
+      formatStyle(
+        columns = "Result",
+        valueColumns = "Numeric Result",
+        backgroundColor = styleInterval(240, c("green", "red")),
+        color = "white"
+      )
   )
 
   # Map output
   output$site_map <- renderLeaflet({
-    data |>
+    summary() |>
       distinct(site_id, long, lat) |>
       filter(site_id == input$site_id) |>
       leaflet() |>
@@ -171,19 +233,103 @@ server <- function(input, output, session) {
       addCircleMarkers()
   })
 
+  # Map output
+  output$all_sites_map <- renderLeaflet({
+    data |>
+      distinct(site_id, site_description, long, lat) |>
+      leaflet() |>
+      addProviderTiles(providers$Esri.WorldGrayCanvas) |>
+      addCircleMarkers(label = ~site_description, layerId = ~site_id)
+  })
+
   # Plot output
   output$plot <- renderPlot({
     data |>
       filter(
         site_id == input$site_id,
-        monitoring_group == input$monitoring_group,
+        monitoring_group %in% input$monitoring_group,
         sample_date |> between(input$date_range[1], input$date_range[2])
       ) |>
       ggplot(aes(x = sample_date, y = numeric_value)) +
       geom_line(aes(colour = monitoring_group)) +
-      geom_point(aes(colour = monitoring_group))
+      geom_hline(aes(yintercept = 240), linetype = 2) +
+      geom_point(aes(colour = monitoring_group)) +
+      coord_flip() +
+      scale_x_date(name = "Sample Date", date_breaks = "1 month", date_labels = "%b %Y") +
+      scale_y_continuous(name = "Result") +
+      scale_colour_discrete(name = "Data Set") +
+      theme(
+        legend.position = "bottom",
+        axis.title.y = element_blank()
+      )
   })
+  # Plot explanation output
+  output$plot_text <- renderText("According to the National Water Quality Guidelines, the threshold for a single water sample to be considered safe for recreational use is 240 cfu per 100 mL for Enterococci.")
+
+  # All water quality category data
+  water_quality_category <- reactive(data |>
+    filter(
+      monitoring_group %in% input$monitoring_group,
+      sample_date |> between(input$date_range[1], input$date_range[2])
+    ) |>
+    group_by(site_id, site_description, long, lat) |>
+    summarise(
+      min_date = min(sample_date),
+      max_date = max(sample_date),
+      n = sum(!is.na(numeric_value)),
+      hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
+      hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
+      hazen_category = case_when(
+        n < 10 ~ "TFD",
+        hazen95 <= 100 ~ "Excellent",
+        hazen95 <= 200 ~ "Good",
+        hazen95 > 200 & hazen90 > 185 ~ "Poor",
+        hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+      )
+    ))
+  
+  # All status data
+  water_quality_status <- reactive(
+    data |>
+      filter(
+        monitoring_group == input$monitoring_group
+      ) |>
+      group_by(site_id) |>
+      arrange(desc(sample_date)) |>
+      slice_head(n = 2) |>
+      summarise(status = case_when(
+        all(numeric_value > 380) ~ "Red",
+        first(numeric_value) > 240 ~ "Amber",
+        .default = "Green"
+      ))
+  )
+  
+  # All compliance data
+  water_quality_compliance <- reactive(
+    data |>
+      filter(
+        monitoring_group %in% input$monitoring_group,
+        sample_date |> between(input$date_range[1], input$date_range[2])
+      ) |>
+      group_by(site_id) |>
+      summarise(
+        all_samples = n(),
+        samples_compliant = sum(numeric_value > 240),
+        samples_compliant_pct = 100 - round(sum(numeric_value > 240) / n() * 100, 0)
+      )
+  )
+  
+  summary <- reactive(
+    water_quality_category() |>
+      inner_join(water_quality_status(), by = "site_id") |>
+      inner_join(water_quality_compliance(), by = "site_id")
+  )
+  
+  output$summary <- renderDT(summary() |>
+                               select(site_id, site_description, hazen_category, status, samples_compliant_pct) |>
+                               set_names("Site ID", "Description", "Water Quality Category", "Current Status", "Compliance"))
 }
+
 
 # Run the application
 shinyApp(ui = ui, server = server)
