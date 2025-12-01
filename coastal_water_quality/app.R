@@ -81,8 +81,20 @@ ui <- page_navbar(
     ),
     card(
       card_header("Summary"),
-      textOutput("text"),
-      DTOutput("summary")
+      navset_pill(
+        nav_panel(
+          title = "Water Quality",
+          DTOutput("water_quality_table")
+        ),
+        nav_panel(
+          title = "Current Status",
+          DTOutput("status_table")
+        ),
+        nav_panel(
+          title = "Compliance",
+          DTOutput("compliance_table")
+        )
+      )
     )
   ),
   nav_panel(
@@ -118,6 +130,7 @@ ui <- page_navbar(
     title = "Dashboard Settings",
     placement = "right",
     selectInput(inputId = "monitoring_group", label = "Data set:", choices = distinct(data, monitoring_group), multiple = T, selected = "Routine"),
+    selectInput(inputId = "category", label = "Category", choices = distinct(data, category), multiple = T, selected = c("Recreational Node", "Coastal Monitoring Point")),
     dateRangeInput(inputId = "date_range", label = "Time period:", start = now() - duration("1 year"), end = now())
   ))
 )
@@ -131,6 +144,7 @@ server <- function(input, output, session) {
     filter(
       site_id == input$site_id,
       monitoring_group %in% input$monitoring_group,
+      category %in% input$category,
       sample_date |> between(input$date_range[1], input$date_range[2])
     ) |>
     summarise(
@@ -154,6 +168,7 @@ server <- function(input, output, session) {
     filter(
       site_id == input$site_id,
       monitoring_group %in% input$monitoring_group,
+      category %in% input$category,
       sample_date |> between(input$date_range[1], input$date_range[2])
     ) |>
     summarise(
@@ -167,7 +182,8 @@ server <- function(input, output, session) {
   status <- reactive(data |>
     filter(
       site_id == input$site_id,
-      monitoring_group == input$monitoring_group
+      monitoring_group == input$monitoring_group,
+      category %in% input$category
     ) |>
     group_by(site_id) |>
     arrange(desc(sample_date)) |>
@@ -226,7 +242,7 @@ server <- function(input, output, session) {
 
   # Map output
   output$site_map <- renderLeaflet({
-    summary() |>
+    water_quality() |>
       distinct(site_id, long, lat) |>
       filter(site_id == input$site_id) |>
       leaflet() |>
@@ -235,12 +251,28 @@ server <- function(input, output, session) {
   })
 
   # Map output
+  col <- colorFactor(palette = c(excellent, good, sufficient, poor), domain = c("Excellent", "Good", "Sufficient", "Poor"), ordered = T)
+
   output$all_sites_map <- renderLeaflet({
-    summary() |>
-      distinct(site_id, site_description, long, lat) |>
+    water_quality() |>
+      distinct(site_id, site_description, long, lat, hazen_category) |>
       leaflet() |>
       addProviderTiles(providers$Esri.WorldGrayCanvas) |>
-      addCircleMarkers(label = ~site_description, layerId = ~site_id)
+      addCircleMarkers(
+        label = ~site_description,
+        stroke = F,
+        layerId = ~site_id,
+        color = ~ col(hazen_category),
+        fillOpacity = 0.75,
+        radius = 5
+      ) |>
+      addLegend(
+        "bottomright",
+        pal = col,
+        values = ~hazen_category,
+        title = "Water Quality",
+        opacity = 1
+      )
   })
 
   # Plot output
@@ -264,39 +296,55 @@ server <- function(input, output, session) {
         axis.title.y = element_blank()
       )
   })
-  
+
   # Plot explanation output
   output$plot_text <- renderText("According to the National Water Quality Guidelines, the threshold for a single water sample to be considered safe for recreational use is 240 cfu per 100 mL for Enterococci.")
 
   # All water quality category data
-  water_quality_category <- reactive(data |>
-    filter(
-      monitoring_group %in% input$monitoring_group,
-      sample_date |> between(input$date_range[1], input$date_range[2])
-    ) |>
-    group_by(site_id, site_description, long, lat) |>
-    summarise(
-      min_date = min(sample_date),
-      max_date = max(sample_date),
-      n = sum(!is.na(numeric_value)),
-      hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
-      hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
-      hazen_category = case_when(
-        n < 10 ~ "TFD",
-        hazen95 <= 100 ~ "Excellent",
-        hazen95 <= 200 ~ "Good",
-        hazen95 > 200 & hazen90 > 185 ~ "Poor",
-        hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
-      )
-    ))
-  
-  # All status data
-  water_quality_status <- reactive(
+  water_quality <- reactive(
     data |>
       filter(
-        monitoring_group == input$monitoring_group
+        monitoring_group %in% input$monitoring_group,
+        category %in% input$category,
+        sample_date |> between(input$date_range[1], input$date_range[2])
       ) |>
-      group_by(site_id) |>
+      group_by(site_id, site_description, long, lat) |>
+      summarise(
+        min_date = min(sample_date),
+        max_date = max(sample_date),
+        n = sum(!is.na(numeric_value)),
+        hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
+        hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
+        hazen_category = case_when(
+          n < 10 ~ "TFD",
+          hazen95 <= 100 ~ "Excellent",
+          hazen95 <= 200 ~ "Good",
+          hazen95 > 200 & hazen90 > 185 ~ "Poor",
+          hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+        )
+      )
+  )
+  
+  output$water_quality_table <- renderDT({
+    datatable(water_quality() |>
+      ungroup() |>
+      select(site_id, site_description, hazen_category) |>
+      set_names("Site ID", "Site Description", "Water Quality Category"),
+      options = list(paging = F, filtering = F, searching = F)) |>
+      formatStyle(
+        columns = "Water Quality Category",
+        backgroundColor = styleEqual(levels = c("Excellent", "Good", "Sufficient", "Poor"), values = c(excellent, good, sufficient, poor))
+      )
+  })
+
+  # All status data
+  status <- reactive(
+    data |>
+      filter(
+        monitoring_group %in% input$monitoring_group,
+        category %in% input$category,
+      ) |>
+      group_by(site_id, site_description) |>
       arrange(desc(sample_date)) |>
       slice_head(n = 2) |>
       summarise(status = case_when(
@@ -306,14 +354,26 @@ server <- function(input, output, session) {
       ))
   )
   
+  output$status_table <- renderDT(
+    datatable(status() |>
+      select(site_id, site_description, status) |>
+      set_names(c("Site ID", "Site Description", "Current Status")),
+      options = list(paging = F, filtering = F, searching = F)) |>
+      formatStyle(
+        columns = "Current Status",
+        backgroundColor = styleEqual(levels = c("Green", "Amber", "Red"), values = c(good, sufficient, poor))
+      )
+  )
+
   # All compliance data
-  water_quality_compliance <- reactive(
+  compliance <- reactive(
     data |>
       filter(
         monitoring_group %in% input$monitoring_group,
+        category %in% input$category,
         sample_date |> between(input$date_range[1], input$date_range[2])
       ) |>
-      group_by(site_id) |>
+      group_by(site_id, site_description) |>
       summarise(
         all_samples = n(),
         samples_compliant = sum(numeric_value > 240),
@@ -321,28 +381,42 @@ server <- function(input, output, session) {
       )
   )
   
+  output$compliance_table <- renderDT(
+    datatable(compliance() |>
+      select(site_id, site_description, samples_compliant_pct) |>
+      mutate(samples_compliant_pct = str_c(samples_compliant_pct, "%")) |>
+      set_names("Site ID", "Site Description", "Compliance"),
+      options = list(paging = F, filtering = F, searching = F)) |>
+      formatStyle(
+        columns = "Compliance",
+        backgroundColor = styleInterval(cuts = c(50, 75), values = c(poor, sufficient, good))
+      )
+  )
+
   # Create summary table
   summary <- reactive(
     water_quality_category() |>
       inner_join(water_quality_status(), by = "site_id") |>
       inner_join(water_quality_compliance(), by = "site_id")
   )
-  
+
   output$summary <- renderDT({
-    datatable(summary() |>
-      ungroup() |>
-      select(site_id, site_description, status, hazen_category, samples_compliant_pct) |>
-      set_names(c("Site ID", "Description", "Current Status", "Water Quality", "Compliance")),
-      selection = "single")
+    datatable(
+      summary() |>
+        ungroup() |>
+        select(site_id, site_description, status, hazen_category, samples_compliant_pct) |>
+        set_names(c("Site ID", "Description", "Current Status", "Water Quality", "Compliance")),
+      selection = "single"
+    )
   })
-  
+
   observeEvent(input$all_sites_map_marker_click, {
     click <- input$all_sites_map_marker_click
     output$text <- renderText(click$id)
     nav_select(session, id = "tabs", selected = "By site")
     updateSelectInput(session, inputId = "site_id", selected = click$id)
   })
-  
+
   observeEvent(input$summary_rows_selected, {
     click <- input$summary_rows_selected
     nav_select(session, id = "tabs", selected = "By site")
