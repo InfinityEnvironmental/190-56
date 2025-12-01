@@ -67,6 +67,7 @@ data |> distinct(site_id, site_description)
 
 # Create the user interface
 ui <- page_navbar(
+  id = "tabs",
   theme = bs_theme(bootswatch = "flatly"),
   title = "Coastal Water Quality",
   fillable = F,
@@ -80,6 +81,7 @@ ui <- page_navbar(
     ),
     card(
       card_header("Summary"),
+      textOutput("text"),
       DTOutput("summary")
     )
   ),
@@ -119,7 +121,6 @@ ui <- page_navbar(
     dateRangeInput(inputId = "date_range", label = "Time period:", start = now() - duration("1 year"), end = now())
   ))
 )
-
 
 # Create the server function
 server <- function(input, output, session) {
@@ -235,7 +236,7 @@ server <- function(input, output, session) {
 
   # Map output
   output$all_sites_map <- renderLeaflet({
-    data |>
+    summary() |>
       distinct(site_id, site_description, long, lat) |>
       leaflet() |>
       addProviderTiles(providers$Esri.WorldGrayCanvas) |>
@@ -263,6 +264,7 @@ server <- function(input, output, session) {
         axis.title.y = element_blank()
       )
   })
+  
   # Plot explanation output
   output$plot_text <- renderText("According to the National Water Quality Guidelines, the threshold for a single water sample to be considered safe for recreational use is 240 cfu per 100 mL for Enterococci.")
 
@@ -319,17 +321,34 @@ server <- function(input, output, session) {
       )
   )
   
+  # Create summary table
   summary <- reactive(
     water_quality_category() |>
       inner_join(water_quality_status(), by = "site_id") |>
       inner_join(water_quality_compliance(), by = "site_id")
   )
   
-  output$summary <- renderDT(summary() |>
-                               select(site_id, site_description, hazen_category, status, samples_compliant_pct) |>
-                               set_names("Site ID", "Description", "Water Quality Category", "Current Status", "Compliance"))
+  output$summary <- renderDT({
+    datatable(summary() |>
+      ungroup() |>
+      select(site_id, site_description, status, hazen_category, samples_compliant_pct) |>
+      set_names(c("Site ID", "Description", "Current Status", "Water Quality", "Compliance")),
+      selection = "single")
+  })
+  
+  observeEvent(input$all_sites_map_marker_click, {
+    click <- input$all_sites_map_marker_click
+    output$text <- renderText(click$id)
+    nav_select(session, id = "tabs", selected = "By site")
+    updateSelectInput(session, inputId = "site_id", selected = click$id)
+  })
+  
+  observeEvent(input$summary_rows_selected, {
+    click <- input$summary_rows_selected
+    nav_select(session, id = "tabs", selected = "By site")
+    updateSelectInput(session, inputId = "site_id", selected = click$site_id)
+  })
 }
-
 
 # Run the application
 shinyApp(ui = ui, server = server)
