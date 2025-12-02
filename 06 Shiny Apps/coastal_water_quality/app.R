@@ -26,6 +26,9 @@ sufficient <- "#FECC5C"
 good <- "#A6D96A"
 excellent <- "#3288BD"
 
+# Add public key to environment variables
+Sys.setenv(apikey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InducnZkdmVzb3Zua21xYmhraGp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NjM4MjYsImV4cCI6MjA1OTQzOTgyNn0.21jkGF09gCaxGXAzKX0VaHCYty76NCYB0heMyWGfe2c")
+
 # Connect to REST API
 sites <- request("https://wnrvdvesovnkmqbhkhjz.supabase.co/rest/v1") |>
   req_url_path_append("sites_view") |>
