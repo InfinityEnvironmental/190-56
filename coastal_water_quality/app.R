@@ -26,9 +26,6 @@ sufficient <- "#FECC5C"
 good <- "#A6D96A"
 excellent <- "#3288BD"
 
-# Add public key to environment variables
-Sys.setenv(apikey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InducnZkdmVzb3Zua21xYmhraGp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NjM4MjYsImV4cCI6MjA1OTQzOTgyNn0.21jkGF09gCaxGXAzKX0VaHCYty76NCYB0heMyWGfe2c")
-
 # Connect to REST API
 sites <- request("https://wnrvdvesovnkmqbhkhjz.supabase.co/rest/v1") |>
   req_url_path_append("sites_view") |>
@@ -68,7 +65,7 @@ data |> distinct(site_id, site_description)
 # Create the user interface
 ui <- page_navbar(
   id = "tabs",
-  theme = bs_theme(bootswatch = "flatly"),
+  theme = bs_theme(bootswatch = "flatly", base_font = "Century Gothic"),
   title = "Coastal Water Quality",
   fillable = F,
   navbar_options = navbar_options(position = "static-top", collapsible = T),
@@ -77,7 +74,8 @@ ui <- page_navbar(
     title = "All sites",
     card(
       card_header("Site Locations"),
-      leafletOutput(outputId = "all_sites_map")
+      leafletOutput(outputId = "all_sites_map"),
+      textOutput("map_description")
     ),
     card(
       card_header("Summary"),
@@ -132,12 +130,13 @@ ui <- page_navbar(
     selectInput(inputId = "monitoring_group", label = "Data set:", choices = distinct(data, monitoring_group), multiple = T, selected = "Routine"),
     selectInput(inputId = "category", label = "Category", choices = distinct(data, category), multiple = T, selected = c("Recreational Node", "Coastal Monitoring Point")),
     dateRangeInput(inputId = "date_range", label = "Time period:", start = now() - duration("1 year"), end = now())
-  ))
+  )),
+  textOutput("footer")
 )
 
 # Create the server function
 server <- function(input, output, session) {
-  thematic::thematic_shiny()
+  thematic::thematic_shiny(font = "Century Gothic")
 
   # Calculate Hazen water quality category
   category <- reactive(data |>
@@ -274,6 +273,8 @@ server <- function(input, output, session) {
         opacity = 1
       )
   })
+  
+  output$map_description <- renderText("Click on a site for more details")
 
   # Plot output
   output$plot <- renderPlot({
@@ -285,15 +286,19 @@ server <- function(input, output, session) {
       ) |>
       ggplot(aes(x = sample_date, y = numeric_value)) +
       geom_line(aes(colour = monitoring_group)) +
-      geom_hline(aes(yintercept = 240), linetype = 2) +
+      geom_hline(aes(yintercept = 240, linetype = "240 cfu per 100 mL")) +
       geom_point(aes(colour = monitoring_group)) +
       coord_flip() +
       scale_x_date(name = "Sample Date", date_breaks = "1 month", date_labels = "%b %Y") +
       scale_y_continuous(name = "Result") +
       scale_colour_discrete(name = "Data Set") +
+      scale_linetype_manual(name = "Single-sample threshold", values = c("240 cfu per 100 mL" = 2)) +
       theme(
         legend.position = "bottom",
-        axis.title.y = element_blank()
+        axis.title.y = element_blank(),
+        legend.direction = "vertical",
+        panel.background = element_rect(fill = NA, colour = "lightgrey"),
+        panel.grid = element_blank()
       )
   })
 
@@ -328,17 +333,18 @@ server <- function(input, output, session) {
   output$water_quality_table <- renderDT({
     datatable(water_quality() |>
       ungroup() |>
-      select(site_id, site_description, hazen_category) |>
-      set_names("Site ID", "Site Description", "Water Quality Category"),
+      select(site_description, hazen_category) |>
+      set_names("Site Description", "Water Quality Category"),
       options = list(paging = F, filtering = F, searching = F)) |>
       formatStyle(
         columns = "Water Quality Category",
-        backgroundColor = styleEqual(levels = c("Excellent", "Good", "Sufficient", "Poor"), values = c(excellent, good, sufficient, poor))
+        backgroundColor = styleEqual(levels = c("Excellent", "Good", "Sufficient", "Poor"), values = c(excellent, good, sufficient, poor)),
+        color = "white"
       )
   })
 
   # All status data
-  status <- reactive(
+  status_table <- reactive(
     data |>
       filter(
         monitoring_group %in% input$monitoring_group,
@@ -355,18 +361,20 @@ server <- function(input, output, session) {
   )
   
   output$status_table <- renderDT(
-    datatable(status() |>
-      select(site_id, site_description, status) |>
-      set_names(c("Site ID", "Site Description", "Current Status")),
+    datatable(status_table() |>
+                ungroup() |>
+      select(site_description, status) |>
+      set_names(c("Site Description", "Current Status")),
       options = list(paging = F, filtering = F, searching = F)) |>
       formatStyle(
         columns = "Current Status",
-        backgroundColor = styleEqual(levels = c("Green", "Amber", "Red"), values = c(good, sufficient, poor))
+        backgroundColor = styleEqual(levels = c("Green", "Amber", "Red"), values = c(good, sufficient, poor)),
+        color = "white"
       )
   )
 
   # All compliance data
-  compliance <- reactive(
+  compliance_table <- reactive(
     data |>
       filter(
         monitoring_group %in% input$monitoring_group,
@@ -382,14 +390,17 @@ server <- function(input, output, session) {
   )
   
   output$compliance_table <- renderDT(
-    datatable(compliance() |>
-      select(site_id, site_description, samples_compliant_pct) |>
-      mutate(samples_compliant_pct = str_c(samples_compliant_pct, "%")) |>
-      set_names("Site ID", "Site Description", "Compliance"),
-      options = list(paging = F, filtering = F, searching = F)) |>
+    datatable(compliance_table() |>
+                ungroup() |>
+      select(site_description, samples_compliant_pct) |>
+      mutate(compliance = str_c(samples_compliant_pct, "%")) |>
+      set_names("Site Description", "Compliance Numeric", "Compliance"),
+      options = list(paging = F, filtering = F, searching = F, columnDefs = list(list(visible = FALSE, targets = 2)))) |>
       formatStyle(
         columns = "Compliance",
-        backgroundColor = styleInterval(cuts = c(50, 75), values = c(poor, sufficient, good))
+        valueColumns = "Compliance Numeric",
+        backgroundColor = styleInterval(cuts = c(50, 75), values = c(poor, sufficient, good)),
+        color = "white"
       )
   )
 
@@ -422,6 +433,9 @@ server <- function(input, output, session) {
     nav_select(session, id = "tabs", selected = "By site")
     updateSelectInput(session, inputId = "site_id", selected = click$site_id)
   })
+  
+  # Create footer
+  output$footer <- renderText(str_c("Showing only data from samples collected between ", input$daterange[1], " and ", input$daterange[2], ". Please click the gear icon for other settings.", sep = ""))
 }
 
 # Run the application
