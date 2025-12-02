@@ -218,7 +218,7 @@ server <- function(input, output, session) {
   # Value boxes
   output$status <- renderUI(value_box(title = "Current Status", value = status()[1], theme = case_when(status() == "Green" ~ "green", status() == "Amber" ~ "orange", status() == "Red" ~ "red")))
   output$category <- renderUI(value_box(title = "Water Quality Category", value = category(), theme = case_when(category() == "Excellent" ~ "blue", category() == "Good" ~ "green", category() == "Sufficient" ~ "orange", category() == "Poor" ~ "red", category() == "TFD" ~ "grey")))
-  output$compliance <- renderUI(value_box(title = "Percentage Compliance", value = str_c(compliance(), "%"), theme = case_when(compliance() > 90 ~ "green", between(compliance(), 50, 75) ~ "orange", compliance() < 50 ~ "red")))
+  output$compliance <- renderUI(value_box(title = "Percentage Compliance", value = str_c(compliance(), "%"), theme = case_when(compliance() > 75 ~ "green", between(compliance(), 50, 75) ~ "orange", compliance() < 50 ~ "red")))
   output$most_recent_failure <- renderUI(value_box(title = "Most Recent Failure", value = if (length(most_recent_failure()) == 1) most_recent_failure() else "No failures"))
 
   # Data table output
