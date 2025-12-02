@@ -218,7 +218,7 @@ server <- function(input, output, session) {
   # Value boxes
   output$status <- renderUI(value_box(title = "Current Status", value = status()[1], theme = case_when(status() == "Green" ~ "green", status() == "Amber" ~ "orange", status() == "Red" ~ "red")))
   output$category <- renderUI(value_box(title = "Water Quality Category", value = category(), theme = case_when(category() == "Excellent" ~ "blue", category() == "Good" ~ "green", category() == "Sufficient" ~ "orange", category() == "Poor" ~ "red", category() == "TFD" ~ "grey")))
-  output$compliance <- renderUI(value_box(title = "Percentage Compliance", value = str_c(compliance(), "%"), theme = case_when(compliance() > 90 ~ "green", between(compliance(), 75, 90) ~ "orange", compliance() < 75 ~ "red")))
+  output$compliance <- renderUI(value_box(title = "Percentage Compliance", value = str_c(compliance(), "%"), theme = case_when(compliance() > 90 ~ "green", between(compliance(), 50, 75) ~ "orange", compliance() < 50 ~ "red")))
   output$most_recent_failure <- renderUI(value_box(title = "Most Recent Failure", value = if (length(most_recent_failure()) == 1) most_recent_failure() else "No failures"))
 
   # Data table output
@@ -338,12 +338,23 @@ server <- function(input, output, session) {
       ungroup() |>
       select(site_description, hazen_category) |>
       set_names("Site Description", "Water Quality Category"),
-      options = list(paging = F, filtering = F, searching = F)) |>
+      options = list(paging = F, filtering = F, searching = F),
+      selection = "single") |>
       formatStyle(
         columns = "Water Quality Category",
         backgroundColor = styleEqual(levels = c("Excellent", "Good", "Sufficient", "Poor"), values = c(excellent, good, sufficient, poor)),
         color = "white"
       )
+  })
+  
+  observeEvent(input$water_quality_table_rows_selected, {
+    click <- input$water_quality_table_rows_selected
+    site_id <- water_quality() |>
+      ungroup() |>
+      slice(click) |>
+      pull(site_id)
+    nav_select(session, id = "tabs", selected = "By site")
+    updateSelectInput(session, inputId = "site_id", selected = site_id)
   })
 
   # All status data
@@ -368,7 +379,8 @@ server <- function(input, output, session) {
                 ungroup() |>
       select(site_description, status) |>
       set_names(c("Site Description", "Current Status")),
-      options = list(paging = F, filtering = F, searching = F)) |>
+      options = list(paging = F, filtering = F, searching = F),
+      selection = "single") |>
       formatStyle(
         columns = "Current Status",
         backgroundColor = styleEqual(levels = c("Green", "Amber", "Red"), values = c(good, sufficient, poor)),
@@ -376,6 +388,16 @@ server <- function(input, output, session) {
       )
   )
 
+  observeEvent(input$status_table_rows_selected, {
+    click <- input$status_table_rows_selected
+    site_id <- status_table() |>
+      ungroup() |>
+      slice(click) |>
+      pull(site_id)
+    nav_select(session, id = "tabs", selected = "By site")
+    updateSelectInput(session, inputId = "site_id", selected = site_id)
+  })
+  
   # All compliance data
   compliance_table <- reactive(
     data |>
@@ -398,7 +420,8 @@ server <- function(input, output, session) {
       select(site_description, samples_compliant_pct) |>
       mutate(compliance = str_c(samples_compliant_pct, "%")) |>
       set_names("Site Description", "Compliance Numeric", "Compliance"),
-      options = list(paging = F, filtering = F, searching = F, columnDefs = list(list(visible = FALSE, targets = 2)))) |>
+      options = list(paging = F, filtering = F, searching = F, columnDefs = list(list(visible = FALSE, targets = 2))),
+      selection = "single") |>
       formatStyle(
         columns = "Compliance",
         valueColumns = "Compliance Numeric",
@@ -406,6 +429,16 @@ server <- function(input, output, session) {
         color = "white"
       )
   )
+  
+  observeEvent(input$compliance_table_rows_selected, {
+    click <- input$compliance_table_rows_selected
+    site_id <- compliance_table() |>
+      ungroup() |>
+      slice(click) |>
+      pull(site_id)
+    nav_select(session, id = "tabs", selected = "By site")
+    updateSelectInput(session, inputId = "site_id", selected = site_id)
+  })
 
   # Create summary table
   summary <- reactive(
