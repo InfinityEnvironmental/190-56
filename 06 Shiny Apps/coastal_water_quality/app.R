@@ -130,8 +130,8 @@ ui <- page_navbar(
     bsicons::bs_icon("gear", title = "Dashboard Settings"),
     title = "Dashboard Settings",
     placement = "right",
-    selectInput(inputId = "monitoring_group", label = "Data set:", choices = distinct(data, monitoring_group), multiple = T, selected = "Routine"),
-    selectInput(inputId = "category", label = "Category", choices = distinct(data, category), multiple = T, selected = c("Recreational Node", "Coastal Monitoring Point")),
+    selectInput(inputId = "monitoring_group", label = "Data set:", choices = distinct(data, monitoring_group), multiple = T, selected = c("Routine", "Daily")),
+    selectInput(inputId = "category", label = "Category", choices = distinct(data, category), multiple = T, selected = c("Recreational Node")),
     dateRangeInput(inputId = "date_range", label = "Time period:", start = now() - duration("1 year"), end = now())
   )),
   textOutput("footer")
@@ -226,7 +226,7 @@ server <- function(input, output, session) {
     datatable(
       data |> filter(
         site_id == req(input$site_id),
-        monitoring_group == input$monitoring_group,
+        monitoring_group %in% input$monitoring_group,
         sample_date |> between(input$date_range[1], input$date_range[2])
       ) |>
         select(monitoring_group, sample_date, censored_value, numeric_value) |>
