@@ -184,7 +184,7 @@ server <- function(input, output, session) {
   status <- reactive(data |>
     filter(
       site_id == input$site_id,
-      monitoring_group == input$monitoring_group,
+      monitoring_group %in% input$monitoring_group,
       category %in% input$category
     ) |>
     group_by(site_id) |>
