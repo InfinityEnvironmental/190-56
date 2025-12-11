@@ -1821,10 +1821,6 @@ ROLLBACK;
 COMMIT;
 ```
 
-```{r}
-
-```
-
 # Extract data from scanned pdfs
 
 ```{r exctract-scanned-data}
@@ -1832,14 +1828,24 @@ extracted <- tibble(
   filename_long = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Blue Flag/", pattern = "*.pdf", full.names = T),
   filename_short = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Blue Flag/", pattern = "*.pdf")
 ) |>
-  mutate(text = map(filename_long, ~pdf_ocr_text(.x, options = list(tessedit_pageseg_mode = 1))))
+  mutate(text = map(filename_long, ~pdf_ocr_text(.x, options = list(tessedit_pageseg_mode = 4), dpi = 200)))
 
 extracted |>
-  mutate(text = map(text, ~unlist(.x))) |>
-  mutate(sample_date = map(text, ~keep(.x, str_detect(.x, "Date sampled:")))) |>
-  mutate(sample_information = map(text, ~keep(.x, str_detect(.x, "Temperature on arrival")))) |>
-  mutate(results = )
-  pull(sample_information)
+  unnest(text) |>
+  mutate(text = str_split(text, "\n")) |>
+  mutate(sample_date = map(text, ~keep(.x, ~str_detect(.x, "DATE SAMPLED")) |> str_extract("\\d{4}-\\d{2}-\\d{2}") |> ymd())) |>
+  mutate(sample_time = map(text, ~keep(.x, ~str_detect(.x, "TIME SAMPLED"))|> str_extract("O?\\d{1,2}(h|H)\\d{2}") |> str_replace("O", "0") |> str_replace("h|H", ":"))) |>
+  mutate(sample_temp_c = map(text, ~keep(.x, ~str_detect(.x, "Temperature")) |> str_extract("\\d{1,2}\\.\\d{1}") |> as.numeric())) |>
+  mutate(site_name = map(text, ~keep(.x, ~str_detect(.x, "PRODUCT IDENTIFICATION")))) |>
+  mutate(ecoli = map(text, ~keep(.x, ~str_detect(.x, "E.\\s?coli")))) |>
+  mutate(enterococci = map(text, ~keep(.x, ~str_detect(.x, "Enterococci")))) |>
+  select(filename_short, sample_date, sample_time, sample_temp_c, site_name, ecoli, enterococci) |>
+  unnest(sample_date, sample_time, sample_temp_c, site_name, ecoli, enterococci) |>
+  
+  # Clean site names
+  mutate(site_name = str_remove_all(site_name, "(PRODUCT IDENTIFICATION)|(Sea Water)|[:punct:]|W\\d{3}") |> str_trim()) |>
+  mutate(ecoli = str_extract(ecoli, "(?<=5221)(.*)$") |> str_extract("(ND|>150|\\d{1,3})")) |>
+  mutate(enterococci = str_extract(enterococci, "(?<=((7899-2)|(SANS me)))(.*)$") |> str_extract("(ND|>150|\\d{1,3})"))
 ```
 
 # Upload ad-hoc samples
