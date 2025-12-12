@@ -85,7 +85,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_237(08.12.2025).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_239(10.12.2025).pdf"
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
@@ -211,7 +211,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml, sample_temp_c, filename
 FROM coastal.results
-WHERE sample_date = '2025-12-08' AND monitoring_group = 'routine';
+WHERE sample_date = '2025-12-10' AND monitoring_group = 'routine';
 ```
 
 ```{sql, connection = con}
@@ -294,7 +294,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.229.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.231.pdf"
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/")
 
@@ -415,7 +415,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml, monitoring_group
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2025-12-08';
+WHERE monitoring_group = 'daily' AND sample_date = '2025-12-10';
 ```
 
 ```{sql, connection = con}
@@ -466,7 +466,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Infinity Environmental AD.310.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Infinity Environmental AD.313.pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/")
 
 # Extract the pdf data
@@ -581,7 +581,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2025-12-08';
+WHERE monitoring_group = 'daily' AND sample_date = '2025-12-10';
 ```
 
 ```{sql, connection = con}
