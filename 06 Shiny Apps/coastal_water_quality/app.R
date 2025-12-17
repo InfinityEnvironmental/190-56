@@ -105,7 +105,7 @@ ui <- page_navbar(
     layout_column_wrap(
       # Top card with controls
       card(card_header("Site Location"), leafletOutput(outputId = "site_map")),
-      card(uiOutput("status"), uiOutput("category"), uiOutput("compliance"), uiOutput("most_recent_failure"))
+      card(uiOutput("status"), uiOutput("category"), uiOutput("summer_category"), uiOutput("compliance"), uiOutput("most_recent_failure"))
     ),
     # Results figure
     layout_column_wrap(
@@ -164,6 +164,31 @@ server <- function(input, output, session) {
       )
     ) |>
     pull(hazen_category))
+  
+  # Calculate Hazen water quality category for summer only
+  summer_category <- reactive(data |>
+                         filter(
+                           site_id == input$site_id,
+                           monitoring_group %in% input$monitoring_group,
+                           category %in% input$category,
+                           sample_date |> between(input$date_range[1], input$date_range[2]),
+                           month(sample_date) %in% c(10, 11, 12, 1, 2, 3)
+                         ) |>
+                         summarise(
+                           min_date = min(sample_date),
+                           max_date = max(sample_date),
+                           n = sum(!is.na(numeric_value)),
+                           hazen95 = quantile(numeric_value, 0.95, type = 5, na.rm = TRUE),
+                           hazen90 = quantile(numeric_value, 0.9, type = 5, na.rm = TRUE),
+                           hazen_category = case_when(
+                             n < 10 ~ "TFD",
+                             hazen95 <= 100 ~ "Excellent",
+                             hazen95 <= 200 ~ "Good",
+                             hazen95 > 200 & hazen90 > 185 ~ "Poor",
+                             hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+                           )
+                         ) |>
+                         pull(hazen_category))
 
   # Calculate the percentage compliance
   compliance <- reactive(data |>
@@ -218,6 +243,7 @@ server <- function(input, output, session) {
   # Value boxes
   output$status <- renderUI(value_box(title = "Current Status", value = status()[1], theme = case_when(status() == "Green" ~ "green", status() == "Amber" ~ "orange", status() == "Red" ~ "red")))
   output$category <- renderUI(value_box(title = "Water Quality Category", value = category(), theme = case_when(category() == "Excellent" ~ "blue", category() == "Good" ~ "green", category() == "Sufficient" ~ "orange", category() == "Poor" ~ "red", category() == "TFD" ~ "grey")))
+  output$summer_category <- renderUI(value_box(title = "Summer Water Quality Category", value = summer_category(), theme = case_when(summer_category() == "Excellent" ~ "blue", summer_category() == "Good" ~ "green", summer_category() == "Sufficient" ~ "orange", summer_category() == "Poor" ~ "red", summer_category() == "TFD" ~ "grey")))
   output$compliance <- renderUI(value_box(title = "Percentage Compliance", value = str_c(compliance(), "%"), theme = case_when(compliance() > 75 ~ "green", between(compliance(), 50, 75) ~ "orange", compliance() < 50 ~ "red")))
   output$most_recent_failure <- renderUI(value_box(title = "Most Recent Failure", value = if (length(most_recent_failure()) == 1) most_recent_failure() else "No failures"))
 
