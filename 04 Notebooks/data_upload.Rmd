@@ -9,6 +9,7 @@ output: html_document
 
 Make sure that you are working in the outfalls project, found in the working directory.
 
+<<<<<<< HEAD
 ## Load required packages
 
 ```{r message = FALSE}
@@ -85,7 +86,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_243(17.12.2025).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_240(11.12.2025).pdf"
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
@@ -294,7 +295,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.231.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.233.pdf"
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/")
 
@@ -415,7 +416,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml, monitoring_group
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2025-12-10';
+WHERE monitoring_group = 'daily' AND sample_date = '2025-12-12';
 ```
 
 ```{sql, connection = con}
@@ -466,7 +467,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Infinity Environmental AD.313.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Infinity Environmental AD.314.pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/")
 
 # Extract the pdf data
@@ -581,7 +582,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, enterococci_cfu_per_100ml
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2025-12-10';
+WHERE monitoring_group = 'daily' AND sample_date = '2025-12-11';
 ```
 
 ```{sql, connection = con}
@@ -1823,18 +1824,30 @@ COMMIT;
 
 # Extract data from scanned pdfs
 
+```{r check-uploaded}
+uploaded <- tbl(con, I("coastal.results")) |>
+  filter(monitoring_group == "blue_flag") |>
+  pull(filename)
+
+sharepoint <- list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Blue Flag/", pattern = "*.pdf")
+
+to_upload <- setdiff(sharepoint, uploaded)
+```
+
 ```{r exctract-scanned-data}
 extracted <- tibble(
   filename_long = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Blue Flag/", pattern = "*.pdf", full.names = T),
   filename_short = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Blue Flag/", pattern = "*.pdf")
 ) |>
-  mutate(text = map(filename_long, ~pdf_ocr_text(.x, options = list(tessedit_pageseg_mode = 4), dpi = 200)))
+  mutate(text = map(filename_long, ~pdf_ocr_text(.x, options = list(tessedit_pageseg_mode = 4), dpi = 200))) |>
+  filter(filename_short %in% to_upload)
 
-extracted |>
+blue_flag <- extracted |>
   unnest(text) |>
   mutate(text = str_split(text, "\n")) |>
   mutate(sample_date = map(text, ~keep(.x, ~str_detect(.x, "DATE SAMPLED")) |> str_extract("\\d{4}-\\d{2}-\\d{2}") |> ymd())) |>
-  mutate(sample_time = map(text, ~keep(.x, ~str_detect(.x, "TIME SAMPLED"))|> str_extract("O?\\d{1,2}(h|H)\\d{2}") |> str_replace("O", "0") |> str_replace("h|H", ":"))) |>
+  mutate(sample_time = map(text, ~keep(.x, ~str_detect(.x, "TIME SAMPLED"))|> str_extract("O{0,2}\\d{0,2}(h|H)\\d{0,2}O{0,2}") |> str_replace_all("O", "0") |> str_replace("h|H", ":"))) |>
+  # mutate(sample_time = map(text, ~keep(.x, ~str_detect(.x, "TIME SAMPLED"))|> str_remove("TIME SAMPLED: ") |> str_trim() |> str_replace_all("O", "0") |> str_replace("h|H", ":"))) |>
   mutate(sample_temp_c = map(text, ~keep(.x, ~str_detect(.x, "Temperature")) |> str_extract("\\d{1,2}\\.\\d{1}") |> as.numeric())) |>
   mutate(site_name = map(text, ~keep(.x, ~str_detect(.x, "PRODUCT IDENTIFICATION")))) |>
   mutate(ecoli = map(text, ~keep(.x, ~str_detect(.x, "E.\\s?coli")))) |>
@@ -1843,9 +1856,31 @@ extracted |>
   unnest(sample_date, sample_time, sample_temp_c, site_name, ecoli, enterococci) |>
   
   # Clean site names
-  mutate(site_name = str_remove_all(site_name, "(PRODUCT IDENTIFICATION)|(Sea Water)|[:punct:]|W\\d{3}") |> str_trim()) |>
+  mutate(site_name = str_remove_all(site_name, "(PRODUCT IDENTIFICATION)|(Sea Water)|[:punct:]|[Ww]\\d{3}") |> str_trim()) |>
   mutate(ecoli = str_extract(ecoli, "(?<=5221)(.*)$") |> str_extract("(ND|>150|\\d{1,3})")) |>
-  mutate(enterococci = str_extract(enterococci, "(?<=((7899-2)|(SANS me)))(.*)$") |> str_extract("(ND|>150|\\d{1,3})"))
+  mutate(enterococci = str_extract(enterococci, "(?<=((7899-2)|(SANS me)))(.*)$") |> str_extract("(ND|>150|\\d{1,3})")) |>
+  
+  # Map to site IDs
+   mutate(site_id = case_when(
+    site_name |> str_to_lower() |> str_detect("bikini") ~ "XCS08",
+    site_name |> str_to_lower() |> str_detect("camps bay") ~ "CN11",
+    site_name |> str_to_lower() |> str_detect("clifton") ~ "CN09",
+    site_name |> str_to_lower() |> str_detect("fish hoek") ~ "CS41",
+    site_name |> str_to_lower() |> str_detect("hout bay") ~ "XCN10",
+    site_name |> str_to_lower() |> str_detect("llandudno") ~ "XCN03",
+    site_name |> str_to_lower() |> str_detect("melkbosstrand") ~ "XCN07",
+    site_name |> str_to_lower() |> str_detect("mnandi") ~ "CS19",
+    site_name |> str_to_lower() |> str_detect("muizenberg") ~ "CS34",
+    site_name |> str_to_lower() |> str_detect("seaforth") ~ "XCS13",
+    site_name |> str_to_lower() |> str_detect("silwerstroom") ~ "XCN14",
+    site_name |> str_to_lower() |> str_detect("strandfontein") ~ "CS45",
+    site_name |> str_to_lower() |> str_detect("strand beach") ~ "XCS26",
+  )) |>
+  select(site_id, site_name, sample_date, sample_time, sample_temp_c, ecoli, enterococci, filename_short)
+  
+  # Check the data
+  blue_flag
+  
 ```
 
 # Upload ad-hoc samples
