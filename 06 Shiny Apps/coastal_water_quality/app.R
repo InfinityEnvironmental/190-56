@@ -160,7 +160,7 @@ server <- function(input, output, session) {
         hazen95 <= 100 ~ "Excellent",
         hazen95 <= 200 ~ "Good",
         hazen95 > 200 & hazen90 > 185 ~ "Poor",
-        hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+        hazen95 > 200 & hazen90 <= 185 ~ "Sufficient"
       )
     ) |>
     pull(hazen_category))
@@ -185,7 +185,7 @@ server <- function(input, output, session) {
                              hazen95 <= 100 ~ "Excellent",
                              hazen95 <= 200 ~ "Good",
                              hazen95 > 200 & hazen90 > 185 ~ "Poor",
-                             hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+                             hazen95 > 200 & hazen90 <= 185 ~ "Sufficient"
                            )
                          ) |>
                          pull(hazen_category))
@@ -354,7 +354,7 @@ server <- function(input, output, session) {
           hazen95 <= 100 ~ "Excellent",
           hazen95 <= 200 ~ "Good",
           hazen95 > 200 & hazen90 > 185 ~ "Poor",
-          hazen95 > 200 & hazen90 < 185 ~ "Sufficient"
+          hazen95 > 200 & hazen90 <= 185 ~ "Sufficient"
         )
       )
   )
