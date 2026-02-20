@@ -1858,7 +1858,7 @@ blue_flag <- extracted |>
   
   # Clean site names
   mutate(site_name = str_remove_all(site_name, "(PRODUCT IDENTIFICATION)|(Sea Water)|[:punct:]|[Ww]\\d{3}") |> str_trim()) |>
-  mutate(ecoli = str_extract(ecoli, "(?<=5221)(.*)$") |> str_extract("(ND|>150|\\d{1,3})")) |>
+  mutate(ecoli = str_extract(ecoli, "(?<=(5|6)221)(.*)$") |> str_extract("(ND|>150|\\d{1,3})")) |>
   mutate(enterococci = str_extract(enterococci, "(?<=((7899-2)|(SANS me)))(.*)$") |> str_extract("(ND|>150|\\d{1,3})")) |>
   
   # Map to site IDs
@@ -1869,19 +1869,74 @@ blue_flag <- extracted |>
     site_name |> str_to_lower() |> str_detect("fish hoek") ~ "CS41",
     site_name |> str_to_lower() |> str_detect("hout bay") ~ "XCN10",
     site_name |> str_to_lower() |> str_detect("llandudno") ~ "XCN03",
-    site_name |> str_to_lower() |> str_detect("melkbosstrand") ~ "XCN07",
+    site_name |> str_to_lower() |> str_detect("melkbos") ~ "XCN07",
     site_name |> str_to_lower() |> str_detect("mnandi") ~ "CS19",
     site_name |> str_to_lower() |> str_detect("muizenberg") ~ "CS34",
     site_name |> str_to_lower() |> str_detect("seaforth") ~ "XCS13",
-    site_name |> str_to_lower() |> str_detect("silwerstroom") ~ "XCN14",
+    site_name |> str_to_lower() |> str_detect("sil(w|v)erstroom") ~ "XCN14",
     site_name |> str_to_lower() |> str_detect("strandfontein") ~ "CS45",
     site_name |> str_to_lower() |> str_detect("strand beach") ~ "XCS26",
   )) |>
   select(site_id, site_name, sample_date, sample_time, sample_temp_c, ecoli, enterococci, filename_short)
   
   # Check the data
-  blue_flag
+  blue_flag |>
+    mutate(enterococci = if_else(site_id == "CS45" & sample_date == "2025-12-05", "31", enterococci)) |>
+    mutate(sample_time = if_else(site_id == "XCN07" & sample_date == "2026-02-10", "09:05", sample_time)) |>
+    copy_to(dest = con, name = "blue_flag", temporary = T, overwrite = T)
+```
+
+```{sql, connection = con}
+BEGIN;
+```
+
+```{sql, connection = con}
+SELECT * FROM coastal.results WHERE monitoring_group = 'blue_flag';
+```
+
+```{sql, connection = con}
+INSERT INTO coastal.results (site_id, sample_date, sample_time, sample_temp_c, censored_value, filename, lab_code, monitoring_group, parameter)
+SELECT
+  site_id,
+  sample_date::date,
+  sample_time::time,
+  sample_temp_c,
+  ecoli,
+  filename_short AS filename,
+  'SABS' AS lab_code,
+  'blue_flag' AS monitoring_group,
+  'Escherichia coli' AS parameter
+FROM blue_flag;
+```
+
+```{sql, connection = con}
+SELECT * FROM coastal.results WHERE parameter = 'Escherichia coli';
+```
+
+```{sql, connection = con}
+ROLLBACK;
+```
+
+```{sql, connection = con}
+COMMIT;
+```
+
+```{r check-blue-flag-resamples}
+coastal <- inner_join(
+ tbl(con, I("coastal.sites_view")) |> collect(),
+ tbl(con, I("coastal.results_view")) |> collect(),
+ by = "site_id"
+)
   
+# Keep only the Blue Flag data
+coastal |>
+  filter(monitoring_group == "blue_flag", sample_date >= "2025-10-01") |>
+  select(site_description, sample_date, censored_value) |>
+  arrange(site_description, sample_date) |>
+  distinct(sample_date) |>
+  mutate(week = floor_date(sample_date, "week"), day = wday(sample_date, label = T, abbr = F)) |>
+  complete(week, day) |>
+  pivot_wider(names_from = day, values_from = sample_date)
 ```
 
 # Upload ad-hoc samples
