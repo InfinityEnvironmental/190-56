@@ -85,7 +85,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_27(16.02.2026).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_28(17.02.2026).pdf"
 
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
@@ -165,13 +165,13 @@ tbl <- tibble(number = sample_number,
     filename = filename
     ) |>
   select(-text) |>
-  rename(enterococci_cfu_per_100ml = result) |>
+  rename(censored_value = result) |>
   mutate(site_id = case_when(
     str_detect(site_id, "\\d{3}") & str_detect(site_id, "1$") ~ str_replace(site_id, "1$", "I"),
     str_detect(site_id, "\\d{3}") & str_detect(site_id, "0$") ~ str_replace(site_id, "0$", "O"),
     .default = site_id
   )) |>
-  mutate(enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "None found", "ND")) |>
+  mutate(censored_value = str_replace(censored_value, "None found", "ND")) |>
   mutate(site_id = if_else(site_id == "CNS30", "XCS30", site_id))
 
 # Check data
@@ -200,18 +200,18 @@ WITH cte AS
   sample_time::time,
   analysis_completed,
   sample_temp_c,
-  enterococci_cfu_per_100ml,
+  censored_value,
   filename,
   'WLAB'::coastal.lab AS lab_code,
   'routine'::coastal.monitoring_group AS monitoring_group
 FROM coastal)
-INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code, monitoring_group)
+INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename, lab_code, monitoring_group)
 SELECT * FROM cte;
 ```
 
 ```{sql, connection = con}
 SELECT
-  site_id, sample_date, sample_time, enterococci_cfu_per_100ml, sample_temp_c, filename
+  site_id, sample_date, sample_time, censored_value, sample_temp_c, filename
 FROM coastal.results
 WHERE sample_date = '2026-02-16' AND monitoring_group = 'routine';
 ```
