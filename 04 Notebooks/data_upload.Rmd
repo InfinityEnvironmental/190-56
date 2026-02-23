@@ -86,7 +86,10 @@ files |>
 ```{r extract-pdf}
 # Select the pdf that you want to import
 path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_28(17.02.2026).pdf"
+<<<<<<< HEAD
 
+=======
+>>>>>>> 64192be084d2142497da1bf61045ec0718226c94
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
@@ -213,7 +216,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value, sample_temp_c, filename
 FROM coastal.results
-WHERE sample_date = '2026-02-16' AND monitoring_group = 'routine';
+WHERE sample_date = '2026-02-17' AND monitoring_group = 'routine';
 ```
 
 ```{sql, connection = con}
@@ -296,7 +299,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.26.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.27.pdf"
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/")
 
@@ -380,8 +383,8 @@ tbl <- tibble(number = sample_number,
       monitoring_group = if_else(str_detect(text, "Backline"), "adhoc", "daily")
       ) |>
   select(-text) |>
-  rename(enterococci_cfu_per_100ml = result) |>
-  mutate(enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "None found", "ND"))
+  rename(censored_value = result) |>
+  mutate(censored_value = str_replace(censored_value, "None found", "ND"))
 
 # Check data
 tbl
@@ -404,20 +407,20 @@ WITH cte AS
   sample_time::time,
   analysis_completed,
   sample_temp_c,
-  enterococci_cfu_per_100ml,
+  censored_value,
   filename,
   'WLAB'::coastal.lab AS lab_code,
   monitoring_group::coastal.monitoring_group
 FROM coastal)
-INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code, monitoring_group)
+INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename, lab_code, monitoring_group)
 SELECT * FROM cte;
 ```
 
 ```{sql, connection = con}
 SELECT
-  site_id, sample_date, sample_time, enterococci_cfu_per_100ml, monitoring_group
+  site_id, sample_date, sample_time, censored_value, monitoring_group
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2026-02-16';
+WHERE monitoring_group = 'daily' AND sample_date = '2026-02-17';
 ```
 
 ```{sql, connection = con}
@@ -468,7 +471,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Infinity Environmental AD.26.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Infinity Environmental AD.27.pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/")
 
 # Extract the pdf data
@@ -546,8 +549,8 @@ tbl <- tibble(number = sample_number,
       filename = filename |> str_remove(path)
       ) |>
   select(-text) |>
-  rename(enterococci_cfu_per_100ml = result) |>
-  mutate(enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "None found", "ND"))
+  rename(censored_value = result) |>
+  mutate(censored_value = str_replace(censored_value, "None found", "ND"))
 
 # Check data
 tbl
@@ -570,20 +573,20 @@ WITH cte AS
   sample_time::time,
   analysis_completed,
   sample_temp_c,
-  enterococci_cfu_per_100ml,
+  censored_value,
   filename,
   'WLAB'::coastal.lab AS lab_code,
   'daily'::coastal.monitoring_group
 FROM coastal)
-INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code, monitoring_group)
+INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename, lab_code, monitoring_group)
 SELECT * FROM cte;
 ```
 
 ```{sql, connection = con}
 SELECT
-  site_id, sample_date, sample_time, enterococci_cfu_per_100ml
+  site_id, sample_date, sample_time, censored_value
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2026-02-16';
+WHERE monitoring_group = 'daily' AND sample_date = '2026-02-17';
 ```
 
 ```{sql, connection = con}
@@ -618,8 +621,8 @@ upload <- tibble(
   mutate(censored_value = map(censored_value, ~.x[[1]])) |>
   unnest(censored_value) |>
   select(site_id, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename_short) |>
-  rename(enterococci_cfu_per_100ml = censored_value) |>
-  mutate(enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "None found", "ND")) |>
+  rename(censored_value = censored_value) |>
+  mutate(censored_value = str_replace(censored_value, "None found", "ND")) |>
   filter(site_id != "CN16B")
 
 # Upload to temporary table in the database
@@ -641,9 +644,9 @@ SELECT * FROM coastal.results;
 ```{sql, connection = con}
 WITH cte AS
 (SELECT
-  site_id, sample_date, sample_time::time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename_short AS filename, 'WLAB'::coastal.lab AS lab_code, 'daily'::coastal.monitoring_group AS monitoring_group
+  site_id, sample_date, sample_time::time, analysis_completed, sample_temp_c, censored_value, filename_short AS filename, 'WLAB'::coastal.lab AS lab_code, 'daily'::coastal.monitoring_group AS monitoring_group
 FROM saunders)
-INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code, monitoring_group)
+INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename, lab_code, monitoring_group)
 SELECT * FROM cte;
 ```
 
@@ -794,7 +797,7 @@ tbl <- tibble(
   time = time,
   analysis_completed = analysis_completed,
   sample_temp_c = sample_temp_c,
-  enterococci_cfu_per_100ml = result,
+  censored_value = result,
   filename = filename
 ) |>
   arrange(time)
@@ -901,7 +904,7 @@ read_page <- function(page){
     time = time,
     analysis_completed = analysis_completed,
     sample_temp_c = sample_temp_c,
-    enterococci_cfu_per_100ml = result,
+    censored_value = result,
     filename = filename
   ) |>
     arrange(time)
@@ -938,17 +941,17 @@ WITH cte AS
   time::time,
   analysis_completed,
   sample_temp_c,
-  enterococci_cfu_per_100ml,
+  censored_value,
   filename,
   'WLAB'::coastal.lab AS lab_code
 FROM coastal)
-INSERT INTO coastal.high_frequency_samples (site_id, tag, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code)
+INSERT INTO coastal.high_frequency_samples (site_id, tag, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename, lab_code)
 SELECT * FROM cte;
 ```
 
 ```{sql, connection = con}
 SELECT
-  site_id, tag, sample_date, sample_time, enterococci_cfu_per_100ml, sample_temp_c, filename
+  site_id, tag, sample_date, sample_time, censored_value, sample_temp_c, filename
 FROM coastal.high_frequency_samples
 WHERE sample_date = '2025-05-30'
 ORDER BY sample_date, sample_time;
@@ -1065,13 +1068,13 @@ SELECT * FROM coastal.high_frequency_samples;
 ```
 
 ```{sql connection = con}
-INSERT INTO coastal.high_frequency_samples (site_id, tag, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code)
+INSERT INTO coastal.high_frequency_samples (site_id, tag, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename, lab_code)
 VALUES
   ('CN41', 'A', '2025-05-27', '23:03:00', '2025-05-30', 3.6, '20', 'Infinity Environmental AD.145(CN).pdf', 'WLAB');
 ```
 
 ```{sql connection = con}
-SELECT * FROM coastal.high_frequency_samples WHERE sample_date = '2025-05-27' AND enterococci_cfu_per_100ml = '20';
+SELECT * FROM coastal.high_frequency_samples WHERE sample_date = '2025-05-27' AND censored_value = '20';
 ```
 
 ```{sql connection = con}
@@ -1158,8 +1161,8 @@ tbl <- tibble(
     filename = filename |> str_remove(path)
       ) |>
   select(-text) |>
-  rename(enterococci_cfu_per_100ml = result) |>
-  mutate(enterococci_cfu_per_100ml = str_replace(enterococci_cfu_per_100ml, "None found", "ND"))
+  rename(censored_value = result) |>
+  mutate(censored_value = str_replace(censored_value, "None found", "ND"))
 
 # Check data
 tbl
@@ -1181,7 +1184,7 @@ SELECT * FROM coastal.triplicate_results;
 ```
 
 ```{sql connection = con}
-INSERT INTO coastal.triplicate_results (sample_id, site_id, sample_date, sample_time, analysis_completed, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code)
+INSERT INTO coastal.triplicate_results (sample_id, site_id, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename, lab_code)
 SELECT
   sample_id,
   site_id,
@@ -1189,7 +1192,7 @@ SELECT
   sample_time::time,
   analysis_completed,
   sample_temp_c,
-  enterococci_cfu_per_100ml,
+  censored_value,
   filename,
   'WLAB'::coastal.lab AS lab_code
 FROM coastal;
@@ -1261,14 +1264,14 @@ ORDER BY month, lab_code;
 ```
 
 ```{sql, connection = con}
-INSERT INTO coastal.triplicate_results (sample_id, site_id, sample_date, sample_time, sample_temp_c, enterococci_cfu_per_100ml, filename, lab_code)
+INSERT INTO coastal.triplicate_results (sample_id, site_id, sample_date, sample_time, sample_temp_c, censored_value, filename, lab_code)
 SELECT
   sample_id,
   site_id,
   sample_date,
   sample_time,
   sample_temp_c,
-  enterococci_cfu_per_100ml,
+  censored_value,
   filename,
   lab_code::coastal.lab
 FROM triplicates;
@@ -1285,7 +1288,7 @@ ORDER BY to_char(sample_date, 'month'), lab_code;
 ```
 
 ```{sql, connection = con}
-SELECT filename, enterococci_cfu_per_100ml FROM coastal.triplicate_results WHERE sample_date > '2025-08-01'
+SELECT filename, censored_value FROM coastal.triplicate_results WHERE sample_date > '2025-08-01'
 ORDER BY sample_date, lab_code;
 ```
 
@@ -1354,7 +1357,7 @@ SELECT
   sample_date,
   censored_value
 FROM lims)
-INSERT INTO coastal.results (site_id, sample_date, enterococci_cfu_per_100ml, lab_code, monitoring_group)
+INSERT INTO coastal.results (site_id, sample_date, censored_value, lab_code, monitoring_group)
 SELECT
   site_id,
   sample_date,
@@ -1453,7 +1456,7 @@ WITH cte AS
   'SABS'::coastal.lab,
   'blue_flag'::coastal.monitoring_group
 FROM blue_flag)
-INSERT INTO coastal.results (site_id, sample_date, enterococci_cfu_per_100ml, filename, lab_code, monitoring_group)
+INSERT INTO coastal.results (site_id, sample_date, censored_value, filename, lab_code, monitoring_group)
 SELECT * FROM cte;
 ```
 
@@ -1559,7 +1562,7 @@ SELECT
   'SABS'::coastal.lab,
   'routine'::coastal.monitoring_group
 FROM sabs_clean)
-INSERT INTO coastal.results (site_id, sample_date, enterococci_cfu_per_100ml, filename, lab_code, monitoring_group)
+INSERT INTO coastal.results (site_id, sample_date, censored_value, filename, lab_code, monitoring_group)
 SELECT * FROM cte;
 ```
 
@@ -1581,7 +1584,7 @@ COMMIT;
 sabs_daily_clean <- read_csv("02 Output Data/sabs_daily_clean.csv")
 
 sabs_daily_clean |>
-  group_by(sample_date, site_id, enterococci_cfu_per_100ml) |>
+  group_by(sample_date, site_id, censored_value) |>
   count() |>
   arrange(-n)
 
@@ -1858,7 +1861,7 @@ blue_flag <- extracted |>
   
   # Clean site names
   mutate(site_name = str_remove_all(site_name, "(PRODUCT IDENTIFICATION)|(Sea Water)|[:punct:]|[Ww]\\d{3}") |> str_trim()) |>
-  mutate(ecoli = str_extract(ecoli, "(?<=5221)(.*)$") |> str_extract("(ND|>150|\\d{1,3})")) |>
+  mutate(ecoli = str_extract(ecoli, "(?<=(5|6)221)(.*)$") |> str_extract("(ND|>150|\\d{1,3})")) |>
   mutate(enterococci = str_extract(enterococci, "(?<=((7899-2)|(SANS me)))(.*)$") |> str_extract("(ND|>150|\\d{1,3})")) |>
   
   # Map to site IDs
@@ -1869,19 +1872,74 @@ blue_flag <- extracted |>
     site_name |> str_to_lower() |> str_detect("fish hoek") ~ "CS41",
     site_name |> str_to_lower() |> str_detect("hout bay") ~ "XCN10",
     site_name |> str_to_lower() |> str_detect("llandudno") ~ "XCN03",
-    site_name |> str_to_lower() |> str_detect("melkbosstrand") ~ "XCN07",
+    site_name |> str_to_lower() |> str_detect("melkbos") ~ "XCN07",
     site_name |> str_to_lower() |> str_detect("mnandi") ~ "CS19",
     site_name |> str_to_lower() |> str_detect("muizenberg") ~ "CS34",
     site_name |> str_to_lower() |> str_detect("seaforth") ~ "XCS13",
-    site_name |> str_to_lower() |> str_detect("silwerstroom") ~ "XCN14",
+    site_name |> str_to_lower() |> str_detect("sil(w|v)erstroom") ~ "XCN14",
     site_name |> str_to_lower() |> str_detect("strandfontein") ~ "CS45",
     site_name |> str_to_lower() |> str_detect("strand beach") ~ "XCS26",
   )) |>
   select(site_id, site_name, sample_date, sample_time, sample_temp_c, ecoli, enterococci, filename_short)
   
   # Check the data
-  blue_flag
+  blue_flag |>
+    mutate(enterococci = if_else(site_id == "CS45" & sample_date == "2025-12-05", "31", enterococci)) |>
+    mutate(sample_time = if_else(site_id == "XCN07" & sample_date == "2026-02-10", "09:05", sample_time)) |>
+    copy_to(dest = con, name = "blue_flag", temporary = T, overwrite = T)
+```
+
+```{sql, connection = con}
+BEGIN;
+```
+
+```{sql, connection = con}
+SELECT * FROM coastal.results WHERE monitoring_group = 'blue_flag';
+```
+
+```{sql, connection = con}
+INSERT INTO coastal.results (site_id, sample_date, sample_time, sample_temp_c, censored_value, filename, lab_code, monitoring_group, parameter)
+SELECT
+  site_id,
+  sample_date::date,
+  sample_time::time,
+  sample_temp_c,
+  ecoli,
+  filename_short AS filename,
+  'SABS' AS lab_code,
+  'blue_flag' AS monitoring_group,
+  'Escherichia coli' AS parameter
+FROM blue_flag;
+```
+
+```{sql, connection = con}
+SELECT * FROM coastal.results WHERE parameter = 'Escherichia coli';
+```
+
+```{sql, connection = con}
+ROLLBACK;
+```
+
+```{sql, connection = con}
+COMMIT;
+```
+
+```{r check-blue-flag-resamples}
+coastal <- inner_join(
+ tbl(con, I("coastal.sites_view")) |> collect(),
+ tbl(con, I("coastal.results_view")) |> collect(),
+ by = "site_id"
+)
   
+# Keep only the Blue Flag data
+coastal |>
+  filter(monitoring_group == "blue_flag", sample_date >= "2025-10-01") |>
+  select(site_description, sample_date, censored_value) |>
+  arrange(site_description, sample_date) |>
+  distinct(sample_date) |>
+  mutate(week = floor_date(sample_date, "week"), day = wday(sample_date, label = T, abbr = F)) |>
+  complete(week, day) |>
+  pivot_wider(names_from = day, values_from = sample_date)
 ```
 
 # Upload ad-hoc samples
