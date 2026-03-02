@@ -1958,15 +1958,15 @@ results <- tbl(con, I("coastal.results")) |>
 
 adhoc <- bind_rows(results_adhoc, results)
 
-setdiff(list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Ad-Hoc Samples/"), adhoc$filename)
+files_not_uploaded <- setdiff(list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Ad-Hoc Samples/"), adhoc$filename)
 ```
-
 
 ```{r data-import}
 tibble(
-  filename_short = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Saunders Rocks/", pattern = "*.pdf"),
-  filename_long = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Saunders Rocks/", pattern = "*.pdf", full.names = T)
+  filename_short = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Ad-Hoc Samples/", pattern = "*.pdf"),
+  filename_long = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Ad-Hoc Samples/", pattern = "*.pdf", full.names = T)
 ) |>
+  filter(filename_short %in% files_not_uploaded) |>
   mutate(pdf_data = map(filename_long, ~ pdf_text(.x) |>
     str_split("\n") |>
     unlist())) |>
@@ -1974,24 +1974,20 @@ tibble(
   mutate(analysis_completed = map(pdf_data, ~keep(.x, ~str_detect(.x, "Analysis completed")) |> str_remove("Analysis completed:") |> str_trim() |> dmy())) |>
   mutate(sample_temp_c = map(pdf_data, ~keep(.x, ~str_detect(.x, "Sample temperature")) |> str_remove("Sample temperature:") |> str_trim() |> str_remove("ºC") |> as.numeric())) |>
   mutate(data = map(pdf_data, ~{
-    .x |> tail_while(~!str_detect(.x, "Sample number")) |> head_while(~!str_detect(.x, "colony forming")) |> keep(~str_length(.x) > 0)
+    .x |>
+      head_while(~!str_detect(.x, "colony forming units")) |>
+      tail_while(~!str_detect(.x, "cfu per 100 m")) |>
+      discard(~.x == "")
   })) |>
-  mutate(site_id = map(data, ~str_extract(.x, "CN16\\s[BIO]") |> str_replace("\\s", ""))) |>
-  mutate(sample_time = map(data, ~str_extract(.x, "\\d{2}h\\d{2}") |> str_replace("h", ":"))) |>
-  mutate(censored_value = map(data, ~str_sub(.x, 35) |> str_trim() |> str_split("\\s{5,}"))) |>
-  unnest(sample_date, analysis_completed, sample_temp_c, site_id, sample_time, censored_value) |>
-  unnest_wider(censored_value, names_sep = "_") |>
-  rename("Enterococci" = censored_value_1, "Escherichia coli" = censored_value_2) |>
-  pivot_longer(cols = c("Enterococci", "Escherichia coli"), names_to = "parameter", values_to = "censored_value") |>
-  select(site_id, sample_date, sample_time, analysis_completed, sample_temp_c, parameter, censored_value, filename_short) |>
-  mutate(censored_value = str_replace(censored_value, "None found", "ND")) |>
-  filter(!is.na(censored_value)) |>
-  
-  # Remove the data that have been uploaded to the CWQ database
-  filter(site_id == "CN16B") |>
+  mutate(description = "Saunders Stormwater") |>
+  mutate(sample_time = "11:14") |>
+  mutate(censored_value = "2 340 000") |>
+  select(-c(pdf_data, data)) |>
+  unnest() |>
+  select(description, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename_short) |>
   
   # Upload to database
-  copy_to(dest = con, name = "saunders", temporary = T, overwrite = T)
+  copy_to(dest = con, name = "adhoc", temporary = T, overwrite = T)
 ```
 
 ```{sql, connection = con}
@@ -1999,33 +1995,23 @@ BEGIN;
 ```
 
 ```{sql, connection = con}
+INSERT INTO coastal.results_adhoc (description, sample_date, sample_time, analysis_completed, sample_temp_c, parameter, censored_value, unit, filename, lab_code)
 SELECT
-  site_id,
-  sample_date,
-  sample_time,
-  analysis_completed,
-  sample_temp_c,
-  parameter,
-  censored_value,
-  'cfu per 100 mL' AS unit,
-  filename_short
-FROM saunders;
-```
-
-```{sql, connection = con}
-INSERT INTO coastal.results_adhoc(description, sample_date, sample_time, analysis_completed, sample_temp_c, parameter, censored_value, unit, filename, lab_code)
-SELECT
-  site_id,
-  sample_date,
+  description,
+  sample_date::date,
   sample_time::time,
   analysis_completed,
   sample_temp_c,
-  parameter,
+  'Escherichia coli' AS parameter,
   censored_value,
   'cfu per 100 mL' AS unit,
-  filename_short,
+  filename_short AS filename,
   'WLAB' AS lab_code
-FROM saunders;
+FROM adhoc;
+```
+
+```{sql, connection = con}
+SELECT * FROM coastal.results_adhoc WHERE sample_date = '2026-02-25';
 ```
 
 ```{sql, connection = con}
@@ -2049,27 +2035,4 @@ ROLLBACK;
 
 ```{sql, connection = con}
 COMMIT;
-```
-
-## Find Simons Town diving school and Woolies paddle pool samples
-
-```{r extract-data}
-tibble(
-  filename_long = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/", pattern = "*.pdf", full.names = T) |> keep(~str_detect(.x, "CWQ")),
-  filename_short = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/", pattern = "*.pdf") |> keep(~str_detect(.x, "CWQ"))
-) |>
-  mutate(pdf_data = map(filename_long, ~pdf_text(.x) |> str_split("\n"))) |>
-  mutate(data = map(pdf_data, ~map(.x, ~{
-    .x |>
-      head_while(~!str_detect(.x, "colony")) |>
-      tail_while(~!str_detect(.x, "Sample number")) |>
-      keep(~str_length(.x)>0)
-  }) |> unlist())) |>
-  arrange(filename_short) |>
-  unnest(data) |>
-  select(filename_short, data) |>
-  mutate(sample_date = str_extract(filename_short, "\\d{1,2}\\.\\d{2}\\.\\d{4}") |> dmy()) |>
-  filter(sample_date |> between(ymd("2025-09-01"), ymd("2025-11-01"))) |>
-  filter(data |> str_to_lower() |> str_detect("(simon)|(driving)|(diving)|(wool)|(adhoc)|(ad hoc)"))
-  
 ```
