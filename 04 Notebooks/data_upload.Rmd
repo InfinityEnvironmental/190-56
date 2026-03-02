@@ -1822,7 +1822,9 @@ ROLLBACK;
 COMMIT;
 ```
 
-# Extract data from scanned pdfs
+# Blue Flag Data Upload
+
+## Extract data from scanned pdfs
 
 ```{r check-uploaded}
 uploaded <- tbl(con, I("coastal.results")) |>
@@ -1839,8 +1841,8 @@ extracted <- tibble(
   filename_long = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Blue Flag/", pattern = "*.pdf", full.names = T),
   filename_short = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Blue Flag/", pattern = "*.pdf")
 ) |>
-  mutate(text = map(filename_long, ~pdf_ocr_text(.x, options = list(tessedit_pageseg_mode = 4), dpi = 200))) |>
-  filter(filename_short %in% to_upload)
+  filter(filename_short %in% to_upload) |>
+  mutate(text = map(filename_long, ~pdf_ocr_text(.x, options = list(tessedit_pageseg_mode = 4), dpi = 300)))
 
 blue_flag <- extracted |>
   unnest(text) |>
@@ -1853,7 +1855,8 @@ blue_flag <- extracted |>
   mutate(ecoli = map(text, ~keep(.x, ~str_detect(.x, "E.\\s?coli")))) |>
   mutate(enterococci = map(text, ~keep(.x, ~str_detect(.x, "Enterococci")))) |>
   select(filename_short, sample_date, sample_time, sample_temp_c, site_name, ecoli, enterococci) |>
-  unnest(sample_date, sample_time, sample_temp_c, site_name, ecoli, enterococci) |>
+  
+  unnest(c(sample_date, sample_time, sample_temp_c, site_name, ecoli, enterococci), keep_empty = T) |>
   
   # Clean site names
   mutate(site_name = str_remove_all(site_name, "(PRODUCT IDENTIFICATION)|(Sea Water)|[:punct:]|[Ww]\\d{3}") |> str_trim()) |>
@@ -1876,12 +1879,16 @@ blue_flag <- extracted |>
     site_name |> str_to_lower() |> str_detect("strandfontein") ~ "CS45",
     site_name |> str_to_lower() |> str_detect("strand beach") ~ "XCS26",
   )) |>
-  select(site_id, site_name, sample_date, sample_time, sample_temp_c, ecoli, enterococci, filename_short)
+  select(site_id, site_name, sample_date, sample_time, sample_temp_c, ecoli, enterococci, filename_short) |>
+  mutate(enterococci = if_else(site_id == "CS45" & sample_date == "2026-02-17", "13", enterococci)) |>
+  drop_na(site_id) |>
+  
+  # Pivot data
+  pivot_longer(cols = c("ecoli", "enterococci"), names_to = "parameter", values_to = "censored_value") |>
+  mutate(parameter = if_else(parameter == "ecoli", "Escherichia coli", "Enterococci"))
   
   # Check the data
   blue_flag |>
-    mutate(enterococci = if_else(site_id == "CS45" & sample_date == "2025-12-05", "31", enterococci)) |>
-    mutate(sample_time = if_else(site_id == "XCN07" & sample_date == "2026-02-10", "09:05", sample_time)) |>
     copy_to(dest = con, name = "blue_flag", temporary = T, overwrite = T)
 ```
 
@@ -1894,22 +1901,22 @@ SELECT * FROM coastal.results WHERE monitoring_group = 'blue_flag';
 ```
 
 ```{sql, connection = con}
-INSERT INTO coastal.results (site_id, sample_date, sample_time, sample_temp_c, censored_value, filename, lab_code, monitoring_group, parameter)
+-- INSERT INTO coastal.results (site_id, sample_date, sample_time, sample_temp_c, parameter, censored_value, filename, lab_code, monitoring_group)
 SELECT
   site_id,
   sample_date::date,
   sample_time::time,
   sample_temp_c,
-  ecoli,
+  parameter,
+  censored_value,
   filename_short AS filename,
   'SABS' AS lab_code,
-  'blue_flag' AS monitoring_group,
-  'Escherichia coli' AS parameter
+  'blue_flag' AS monitoring_group
 FROM blue_flag;
 ```
 
 ```{sql, connection = con}
-SELECT * FROM coastal.results WHERE parameter = 'Escherichia coli';
+SELECT * FROM coastal.results WHERE monitoring_group = 'blue_flag' AND sample_date > '2026-01-13';
 ```
 
 ```{sql, connection = con}
