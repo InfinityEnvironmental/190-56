@@ -295,7 +295,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.35.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.36.pdf"
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/")
 
@@ -416,7 +416,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value, monitoring_group
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2026-02-27';
+WHERE monitoring_group = 'daily' AND sample_date = '2026-03-02';
 ```
 
 ```{sql, connection = con}
@@ -467,7 +467,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Infinity Environmental AD.39.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Infinity Environmental AD.41.pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/")
 
 # Extract the pdf data
@@ -582,7 +582,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2026-02-27';
+WHERE monitoring_group = 'daily' AND sample_date = '2026-03-02';
 ```
 
 ```{sql, connection = con}
@@ -1974,7 +1974,6 @@ tibble(
   filename_long = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Ad-Hoc Samples/", pattern = "*.pdf", full.names = T)
 ) |>
   filter(filename_short %in% files_not_uploaded) |>
-  slice(2) |>
   mutate(pdf_data = map(filename_long, ~ pdf_text(.x) |>
     str_split("\n") |>
     unlist())) |>
@@ -1987,12 +1986,12 @@ tibble(
       tail_while(~!str_detect(.x, "cfu per 100 m")) |>
       discard(~.x == "")
   })) |>
-  mutate(site_id = "CN21") |>
-  mutate(censored_value = "101") |>
-  mutate(sample_time = "08:03") |>
+  mutate(description = "Clifton South Beach") |>
+  mutate(censored_value = "171") |>
+  mutate(sample_time = "10:50") |>
   select(-pdf_data, -data) |>
   unnest() |>
-  select(site_id, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename_short) |>
+  select(description, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename_short) |>
   
   # Upload to database
   copy_to(dest = con, name = "adhoc", temporary = T, overwrite = T)
@@ -2003,9 +2002,9 @@ BEGIN;
 ```
 
 ```{sql, connection = con}
-INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, parameter, censored_value, unit, filename, lab_code, monitoring_group)
+INSERT INTO coastal.results_adhoc (description, sample_date, sample_time, analysis_completed, sample_temp_c, parameter, censored_value, unit, filename, lab_code)
 SELECT
-  site_id,
+  description,
   sample_date::date,
   sample_time::time,
   analysis_completed,
@@ -2014,13 +2013,12 @@ SELECT
   censored_value,
   'cfu per 100 mL' AS unit,
   filename_short AS filename,
-  'WLAB' AS lab_code,
-  'adhoc' AS monitoring_group
+  'WLAB' AS lab_code
 FROM adhoc;
 ```
 
 ```{sql, connection = con}
-SELECT * FROM coastal.results WHERE sample_date = '2026-02-27' AND monitoring_group = 'adhoc';
+SELECT * FROM coastal.results_adhoc WHERE sample_date = '2026-03-02';
 ```
 
 ```{sql, connection = con}
