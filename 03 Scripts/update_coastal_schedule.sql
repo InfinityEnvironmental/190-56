@@ -8,7 +8,7 @@ WITH schedule_insert AS
 	sample_date::date,
 	trim(initcap(to_char(sample_date, 'day')))::varchar(9) AS day,
 	((date_trunc('week', sample_date)::date - '2026-03-09') / 7 + 1)::varchar(1) AS week
-FROM generate_series('2026-03-09'::date, '2026-4-03'::date, '1 day'::interval) sample_date) -- Change start and end dates
+FROM generate_series('2026-03-09'::date, '2026-04-03'::date, '1 day'::interval) sample_date) -- Change start and end dates
 SELECT
 	a.sample_date,
 	a.week,
@@ -31,8 +31,4 @@ SELECT * FROM coastal.planned_schedule_view WHERE date >= '2026-03-09';
 
 ROLLBACK;
 COMMIT;
-
-SELECT * FROM strandfontein.water_samples;
-
-ALTER TABLE strandfontein.water_samples ADD COLUMN lab_duplicate boolean DEFAULT false NOT NULL;
 
