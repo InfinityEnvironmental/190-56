@@ -85,7 +85,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_39(04.03.2026).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_40(05.03.2026).pdf"
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
@@ -212,7 +212,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value, sample_temp_c, filename
 FROM coastal.results
-WHERE sample_date = '2026-03-04' AND monitoring_group = 'routine';
+WHERE sample_date = '2026-03-05' AND monitoring_group = 'routine';
 ```
 
 ```{sql, connection = con}
@@ -295,7 +295,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.38.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.40.pdf"
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/")
 
@@ -416,7 +416,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value, monitoring_group
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2026-03-04';
+WHERE monitoring_group = 'daily' AND sample_date = '2026-03-06';
 ```
 
 ```{sql, connection = con}
@@ -467,7 +467,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Infinity Environmental AD.46.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Infinity Environmental AD.51.pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/")
 
 # Extract the pdf data
@@ -538,7 +538,7 @@ tbl <- tibble(number = sample_number,
   select(text, result) |>
   mutate(
       site_id = str_extract(text, "[:upper:]{2,3}\\s?\\d{2}\\d?\\s?[AOIWETC]?") |> str_remove_all("\\s"),
-      sample_time = str_extract(text, "\\d{1,2}[hH]\\d{2}") |> str_replace("[hH]", ":"),
+      sample_time = str_extract(text, "\\d{1,2}h\\d{2}") |> str_replace("h", ":"),
       sample_date = sample_date,
       analysis_completed = analysis_completed,
       sample_temp_c = sample_temp_c,
@@ -549,8 +549,6 @@ tbl <- tibble(number = sample_number,
   mutate(censored_value = str_replace(censored_value, "None found", "ND"))
 
 # Check data
-tbl <- tbl |> 
-  filter(!is.na(site_id))
 tbl
 
 # Copy to database
@@ -584,7 +582,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2026-03-04';
+WHERE monitoring_group = 'daily' AND sample_date = '2026-03-06';
 ```
 
 ```{sql, connection = con}
