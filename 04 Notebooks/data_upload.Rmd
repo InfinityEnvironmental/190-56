@@ -1882,12 +1882,14 @@ blue_flag <- extracted |>
     site_name |> str_to_lower() |> str_detect("strand beach") ~ "XCS26",
   )) |>
   select(site_id, site_name, sample_date, sample_time, sample_temp_c, ecoli, enterococci, filename_short) |>
-  mutate(enterococci = if_else(site_id == "CS45" & sample_date == "2026-02-17", "13", enterococci)) |>
   drop_na(site_id) |>
   
   # Pivot data
   pivot_longer(cols = c("ecoli", "enterococci"), names_to = "parameter", values_to = "censored_value") |>
-  mutate(parameter = if_else(parameter == "ecoli", "Escherichia coli", "Enterococci"))
+  mutate(parameter = if_else(parameter == "ecoli", "Escherichia coli", "Enterococci")) |>
+  
+  # Make adjustments
+  mutate(censored_value = if_else(site_id == "XCN10" & sample_date == "2026-02-24" & parameter == "Enterococci", "27", censored_value))
   
   # Check the data
   blue_flag |>
@@ -1903,7 +1905,7 @@ SELECT * FROM coastal.results WHERE monitoring_group = 'blue_flag';
 ```
 
 ```{sql, connection = con}
--- INSERT INTO coastal.results (site_id, sample_date, sample_time, sample_temp_c, parameter, censored_value, filename, lab_code, monitoring_group)
+INSERT INTO coastal.results (site_id, sample_date, sample_time, sample_temp_c, parameter, censored_value, filename, lab_code, monitoring_group)
 SELECT
   site_id,
   sample_date::date,
@@ -1918,7 +1920,7 @@ FROM blue_flag;
 ```
 
 ```{sql, connection = con}
-SELECT * FROM coastal.results WHERE monitoring_group = 'blue_flag' AND sample_date > '2026-01-13';
+SELECT * FROM coastal.results WHERE monitoring_group = 'blue_flag' AND sample_date >= '2026-02-23';
 ```
 
 ```{sql, connection = con}
@@ -1988,25 +1990,15 @@ tibble(
       tail_while(~!str_detect(.x, "cfu per 100 m")) |>
       discard(~.x == "")
   })) |>
-  mutate(site_id = "CN16O") |>
-  mutate(censored_value = "30") |>
-  mutate(sample_time = "10:55") |>
+  mutate(site_id = "CN21") |>
+  mutate(censored_value = map(data, ~str_extract(.x, "\\d{2,3}$"))) |>
+  mutate(sample_time = map(data, ~str_extract(.x, "\\d{2}h\\d{2}") |> str_replace("h", ":"))) |>
   select(-pdf_data, -data) |>
   unnest() |>
   select(site_id, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename_short) |>
   
   # Upload to database
   copy_to(dest = con, name = "adhoc", temporary = T, overwrite = T)
-
-c("apple banana pear")
-apple,
-pear,
-banana,
-next time,
-apple,
-pear,
-banana,
-next time
 ```
 
 ```{sql, connection = con}
@@ -2031,22 +2023,7 @@ FROM adhoc;
 ```
 
 ```{sql, connection = con}
-SELECT * FROM coastal.results WHERE sample_date = '2026-03-03' AND monitoring_group = 'adhoc';
-```
-
-```{sql, connection = con}
-SELECT
-  filename,
-  description,
-  parameter,
-  censored_value
-FROM coastal.results_adhoc
-ORDER BY random()
-LIMIT 5;
-```
-
-```{sql, connection = con}
-SELECT * FROM coastal.results_adhoc;
+SELECT * FROM coastal.results WHERE sample_date > '2026-03-03' AND monitoring_group = 'adhoc';
 ```
 
 ```{sql, connection = con}
