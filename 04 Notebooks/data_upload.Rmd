@@ -85,7 +85,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_41(09.03.2026).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_42(10.03.2026).pdf"
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
@@ -212,7 +212,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value, sample_temp_c, filename
 FROM coastal.results
-WHERE sample_date = '2026-03-09' AND monitoring_group = 'routine';
+WHERE sample_date = '2026-03-10' AND monitoring_group = 'routine';
 ```
 
 ```{sql, connection = con}
@@ -295,7 +295,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.41.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.42.pdf"
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/")
 
@@ -416,7 +416,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value, monitoring_group
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2026-03-09';
+WHERE monitoring_group = 'daily' AND sample_date = '2026-03-10';
 ```
 
 ```{sql, connection = con}
@@ -467,7 +467,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Infinity Environmental AD.53.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Infinity Environmental AD.54.pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/")
 
 # Extract the pdf data
@@ -582,7 +582,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2026-03-09';
+WHERE monitoring_group = 'daily' AND sample_date = '2026-03-10';
 ```
 
 ```{sql, connection = con}
