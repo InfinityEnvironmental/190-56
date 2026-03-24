@@ -97,8 +97,7 @@ pdf_data <- pdf_text(path) |>
 sample_date <- pdf_data |>
   unlist() |> 
   keep(~str_detect(.x, "Sample taken")) |>
-  str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
-  pluck(1) |>
+  str_extract_all("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
   dmy()
 
 # Extract the analysis date
@@ -178,6 +177,7 @@ tbl
 
 # Copy to database
 tbl |>
+  mutate(sample_date = ymd("2026-03-17"), analysis_completed = ymd("2026-03-19")) |>
   copy_to(dest = con, name = "coastal", overwrite = TRUE)
 ```
 
@@ -212,7 +212,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value, sample_temp_c, filename
 FROM coastal.results
-WHERE sample_date = '2026-03-18' AND monitoring_group = 'routine';
+WHERE sample_date = '2026-03-17' AND monitoring_group = 'routine';
 ```
 
 ```{sql, connection = con}
