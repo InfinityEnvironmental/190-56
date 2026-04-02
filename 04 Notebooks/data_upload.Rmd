@@ -18,6 +18,7 @@ library(DBI)
 library(pdftools)
 library(readxl)
 library(tesseract)
+library(httr2)
 ```
 
 ## Set working directory for all code chunks to project root directory
@@ -2031,3 +2032,36 @@ ROLLBACK;
 ```{sql, connection = con}
 COMMIT;
 ```
+
+# Authenticating with Supabase REST API
+
+```{r creating-a-login-with-supabase}
+request <- request("https://wnrvdvesovnkmqbhkhjz.supabase.co/rest/v1/") |>
+  req_url_path_append("results_view") |>
+  req_headers(
+    "apikey" = "sb_publishable_WdjSFiirJ1Hf5R46QXHgTQ_JTCXC9Wb",
+    "Authorization" = "Bearer sb_publishable_WdjSFiirJ1Hf5R46QXHgTQ_JTCXC9Wb",
+    "Accept-Profile" = "coastal"
+  )
+
+response <- request |>
+  req_perform()
+
+response |>
+  resp_raw() |>
+  jsonlite::fromJSON()
+
+# Now I want to authenticate
+Sys.setenv(
+  "SUPABASE_ANON_KEY" = "sb_publishable_WdjSFiirJ1Hf5R46QXHgTQ_JTCXC9Wb",
+  "SUPABASE_AUTH_URL" = "https://wnrvdvesovnkmqbhkhjz.supabase.co/auth/v1/"
+  )
+
+request(str_c(Sys.getenv("SUPABASE_URL"), "token?grant_type=password")) |>
+  req_headers(
+    apikey = Sys.getenv("SUPABASE_ANON_KEY"),
+    "Content-Type" = "application/json"
+  )
+```
+
+"
