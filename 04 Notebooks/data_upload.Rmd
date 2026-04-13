@@ -2035,32 +2035,77 @@ COMMIT;
 # Authenticating with Supabase REST API
 
 ```{r creating-a-login-with-supabase}
-request <- request("https://wnrvdvesovnkmqbhkhjz.supabase.co/rest/v1/") |>
-  req_url_path_append("results_view") |>
-  req_headers(
-    "apikey" = "sb_publishable_WdjSFiirJ1Hf5R46QXHgTQ_JTCXC9Wb",
-    "Authorization" = "Bearer sb_publishable_WdjSFiirJ1Hf5R46QXHgTQ_JTCXC9Wb",
-    "Accept-Profile" = "coastal"
-  )
+# Set environment variables
+Sys.setenv("API_KEY" = "sb_publishable_WdjSFiirJ1Hf5R46QXHgTQ_JTCXC9Wb",
+           "BASE_URL" = "https://wnrvdvesovnkmqbhkhjz.supabase.co/")
 
-response <- request |>
+# Request User Sign Up
+signup_request <- request("https://wnrvdvesovnkmqbhkhjz.supabase.co") |>
+  req_url_path_append("auth/v1/signup") |>
+  req_headers_redacted(
+    "apikey" = Sys.getenv("SUPABASE_CLIENT_API_KEY")
+  ) |>
+  req_body_json(list(email = "francois.vanschalkwyk@outlook.com", password = "TheBiggestZ49"))
+
+signup_response <- request2 |> req_perform()
+
+# Log in as a user
+login_request <- request(Sys.getenv("BASE_URL")) |>
+  req_method("POST") |>
+  req_url_path_append("auth/v1/token") |>
+  req_url_query(grant_type = "password") |>
+  req_headers(
+    "apikey" = Sys.getenv("API_KEY"),
+    "Content-Type" = "application/json"
+  ) |>
+  req_body_json(list(
+    email = "francois.vanschalkwyk@outlook.com",
+    password = "TheBiggestZ49"
+  ))
+
+login_response <- login_request |>
   req_perform()
 
-response |>
-  resp_raw() |>
+# Extract JWT from response
+successful <- login_response |>
+  resp_body_json()
+
+# Set user JWT as environmental variable
+Sys.setenv("USER_JWT" = successful$access_token, "REFRESH_TOKEN" = successful$refresh_token)
+
+data_request <- request(Sys.getenv("BASE_URL")) |>
+  req_url_path_append("rest/v1/results_view") |>
+  req_headers_redacted(
+    "apikey" = Sys.getenv("API_KEY"),
+    "Accept-Profile" = "coastal"
+  ) |>
+  req_auth_bearer_token(Sys.getenv("USER_JWT"))
+
+data_response <- data_request |> req_perform()
+
+data_response |>
+  resp_body_string() |>
   jsonlite::fromJSON()
 
-# Now I want to authenticate
-Sys.setenv(
-  "SUPABASE_ANON_KEY" = "sb_publishable_WdjSFiirJ1Hf5R46QXHgTQ_JTCXC9Wb",
-  "SUPABASE_AUTH_URL" = "https://wnrvdvesovnkmqbhkhjz.supabase.co/auth/v1/"
+# Refresh Token
+refresh_request <- request(Sys.getenv("BASE_URL")) |>
+  req_method("POST") |>
+  req_url_path_append("auth/v1/token") |>
+  req_url_query(grant_type = "refresh_token") |>
+  req_headers(
+    "apikey" = Sys.getenv("API_KEY"),
+    "Content-Type" = "application/json"
+  ) |>
+  req_body_json(
+    list(refresh_token = Sys.getenv("REFRESH_TOKEN"))
   )
 
-request(str_c(Sys.getenv("SUPABASE_URL"), "token?grant_type=password")) |>
-  req_headers(
-    apikey = Sys.getenv("SUPABASE_ANON_KEY"),
-    "Content-Type" = "application/json"
-  )
+refresh_response <- refresh_request |> req_perform()
+
+body <- refresh_response |>
+  resp_body_json()
+
+# Set user JWT as environmental variable
+Sys.setenv("USER_JWT" = body$access_token, "REFRESH_TOKEN" = body$refresh_token)
 ```
 
-"
