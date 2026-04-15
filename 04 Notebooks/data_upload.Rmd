@@ -2037,7 +2037,9 @@ COMMIT;
 ```{r creating-a-login-with-supabase}
 # Set environment variables
 Sys.setenv("API_KEY" = "sb_publishable_WdjSFiirJ1Hf5R46QXHgTQ_JTCXC9Wb",
-           "BASE_URL" = "https://wnrvdvesovnkmqbhkhjz.supabase.co/")
+           "BASE_URL" = "https://wnrvdvesovnkmqbhkhjz.supabase.co/",
+           "EMAIL" = "francois.vanschalkwyk@outlook.com",
+           "PASSWORD" = "TheBiggestZ49")
 
 # Request User Sign Up
 signup_request <- request("https://wnrvdvesovnkmqbhkhjz.supabase.co") |>
@@ -2074,10 +2076,10 @@ successful <- login_response |>
 Sys.setenv("USER_JWT" = successful$access_token, "REFRESH_TOKEN" = successful$refresh_token)
 
 data_request <- request(Sys.getenv("BASE_URL")) |>
-  req_url_path_append("rest/v1/results_view") |>
+  req_url_path_append("rest/v1/coastal_results") |>
   req_headers_redacted(
     "apikey" = Sys.getenv("API_KEY"),
-    "Accept-Profile" = "coastal"
+    "Accept-Profile" = "api"
   ) |>
   req_auth_bearer_token(Sys.getenv("USER_JWT"))
 
