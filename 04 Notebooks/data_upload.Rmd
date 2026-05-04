@@ -280,19 +280,15 @@ tibble(filename = list.files(str_c("../../Infinity/Coastal Water Quality - Docum
   unnest(sample_date) |>
   filter(!filename %in% (database |> filter(year(sample_date) == year(now())) |> pull(filename)))
 
-# Check which files are not yet in database
-files |>
-  left_join(database, by = c("filename" = "filename"), keep = TRUE) |>
-  filter(is.na(filename.y))
 ```
 
 ### Extract data from pdf
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/Oelofse G.73.pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/2026/Oelofse G.74.pdf"
 
-filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/")
+filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/2026/")
 
 # Extract the pdf data
 pdf_data <- pdf_text(path) |>
@@ -411,7 +407,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value, monitoring_group
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2026-04-24';
+WHERE monitoring_group = 'daily' AND sample_date = '2026-04-28';
 ```
 
 ```{sql, connection = con}
