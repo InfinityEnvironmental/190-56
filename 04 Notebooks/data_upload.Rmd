@@ -259,30 +259,26 @@ COMMIT;
 ### Check which pdf files have not yet been imported
 
 ```{r not-yet-imported}
-# List of files in folder
-files_list <- list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/", pattern = "*.pdf")
-
-extract_sample_date <- function(filename){
-  sample_date <- pdf_text(paste("../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/", filename, sep = "")) |>
-    str_split("\\n") |>
-    unlist() |>
-    keep(~str_detect(.x, "Sample taken")) |>
-    str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
-    pluck(1) |>
-    dmy()
-  
-  tibble(filename = filename, sample_date = sample_date)
-}
-
-# Map the function across the list of files in the directory
-files <- map_df(files_list, ~extract_sample_date(.x))
-
 # Retrieve a list of sample dates from the results table in database
 database <- tbl(con, I("coastal.results")) |>
-  filter(monitoring_group == "daily") |>
-  distinct(filename) |>
+  filter(monitoring_group == "daily", site_id %in% c("XCS34", "XCS26")) |>
+  distinct(filename, sample_date) |>
   collect() |>
   arrange(desc(filename))
+
+# List of files in folder
+tibble(filename = list.files(str_c("../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/", year(now())), pattern = "*.pdf")) |>
+  mutate(sample_date = map(filename, ~{
+    pdf_text(str_c(str_c("../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/", year(now()), "/"), .x, sep = "")) |>
+      str_split("\\n") |>
+      unlist() |>
+      keep(~str_detect(.x, "Sample taken")) |>
+      str_extract("\\d{1,2}\\s[:alpha:]{3,12}\\s\\d{4}") |>
+      pluck(1) |>
+      dmy()
+  })) |>
+  unnest(sample_date) |>
+  filter(!filename %in% (database |> filter(year(sample_date) == year(now())) |> pull(filename)))
 
 # Check which files are not yet in database
 files |>
