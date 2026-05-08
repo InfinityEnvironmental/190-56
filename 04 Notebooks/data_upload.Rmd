@@ -1875,10 +1875,7 @@ blue_flag <- extracted |>
   
   # Pivot data
   pivot_longer(cols = c("ecoli", "enterococci"), names_to = "parameter", values_to = "censored_value") |>
-  mutate(parameter = if_else(parameter == "ecoli", "Escherichia coli", "Enterococci")) |>
-  
-  # Make adjustments
-  mutate(censored_value = if_else(site_id == "XCN10" & sample_date == "2026-02-24" & parameter == "Enterococci", "27", censored_value))
+  mutate(parameter = if_else(parameter == "ecoli", "Escherichia coli", "Enterococci"))
   
   # Check the data
   blue_flag |>
@@ -1890,7 +1887,7 @@ BEGIN;
 ```
 
 ```{sql, connection = con}
-SELECT * FROM coastal.results WHERE monitoring_group = 'blue_flag';
+SELECT * FROM coastal.results WHERE monitoring_group = 'blue_flag' ORDER BY sample_date DESC;
 ```
 
 ```{sql, connection = con}
@@ -1909,7 +1906,7 @@ FROM blue_flag;
 ```
 
 ```{sql, connection = con}
-SELECT * FROM coastal.results WHERE monitoring_group = 'blue_flag' AND sample_date >= '2026-02-23';
+SELECT * FROM coastal.results WHERE monitoring_group = 'blue_flag' AND sample_date >= '2026-03-11';
 ```
 
 ```{sql, connection = con}
