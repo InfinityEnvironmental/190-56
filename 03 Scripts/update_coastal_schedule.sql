@@ -2,13 +2,15 @@
 
 BEGIN;
 
+SELECT max(version) FROM coastal.
+
 WITH schedule_insert AS
 (WITH schedule AS
 (SELECT
 	sample_date::date,
 	trim(initcap(to_char(sample_date, 'day')))::varchar(9) AS day,
-	((date_trunc('week', sample_date)::date - '2026-05-04') / 7 + 1)::varchar(1) AS week
-FROM generate_series('2026-05-04'::date, '2026-05-29'::date, '1 day'::interval) sample_date) -- Change start and end dates
+	((date_trunc('week', sample_date)::date - '2026-06-01') / 7 + 1)::varchar(1) AS week
+FROM generate_series('2026-06-01'::date, '2026-06-29'::date, '1 day'::interval) sample_date) -- Change start and end dates
 SELECT
 	a.sample_date,
 	a.week,
@@ -25,11 +27,13 @@ INSERT INTO coastal.schedule_planned (date, week, day, site_id, samplers, monito
 SELECT * FROM schedule_insert;
 
 SELECT * FROM coastal.planned_schedule_view
-WHERE date >= '2026-05-04'
-ORDER BY date, samplers, site_id;
+WHERE date >= '2026-06-01'
+ORDER BY date, monitoring_group, samplers, site_id;
 
-SELECT * FROM coastal.planned_schedule_view WHERE date >= '2026-05-04';
+-- Export the following to csv
+SELECT * FROM coastal.planned_schedule_view WHERE date >= '2026-06-01' AND monitoring_group = 'routine';
 
 ROLLBACK;
 COMMIT;
+
 
