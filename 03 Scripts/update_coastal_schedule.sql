@@ -1,39 +1,45 @@
--- Script to create update or create new schedule for coastal water quality samples
-
 BEGIN;
 
-SELECT max(version) FROM coastal.
-
-WITH schedule_insert AS
-(WITH schedule AS
-(SELECT
-	sample_date::date,
-	trim(initcap(to_char(sample_date, 'day')))::varchar(9) AS day,
-	((date_trunc('week', sample_date)::date - '2026-06-01') / 7 + 1)::varchar(1) AS week
-FROM generate_series('2026-06-01'::date, '2026-06-29'::date, '1 day'::interval) sample_date) -- Change start and end dates
+WITH turbidity AS (SELECT
+	a.label,
+	'Turbidity' AS parameter,
+	'NTU' AS unit,
+	a.numeric_value
+FROM (VALUES
+	('W31', 25.6),
+	('W32', 22.5),
+	('W33', 34.8),
+	('W34', 44.0),
+	('W35', 26.3),
+	('W36', 41.3),
+	('W37', 66.1),
+	('W38', 110),
+	('W39', 29.8),
+	('W40', 24.4),
+	('W41', 30.0),
+	('W42', 23.7),
+	('W43', 26.4)
+	) a(label, numeric_value))
+INSERT INTO strandfontein.water_results_insitu (result_id, parameter, mean_value, unit)
 SELECT
-	a.sample_date,
-	a.week,
-	lower(a.day)::coastal.weekday AS day,
-	b.site_id,
-	CASE
-		WHEN b.samplers = 'Coastal Management Branch' THEN 'cmb'::coastal.branch
-		WHEN b.samplers = 'Scientific Services Branch' THEN 'ssb'::coastal.branch
-		END AS samplers,
-	b.monitoring_group
-FROM schedule a JOIN coastal.schedule b ON a.week = b.week AND a.day = b.day
-WHERE version = 6 AND a.day NOT IN ('Saturday', 'Sunday')) -- Which version of the schedule do I want to use as a template
-INSERT INTO coastal.schedule_planned (date, week, day, site_id, samplers, monitoring_group)
-SELECT * FROM schedule_insert;
+	b.result_id,
+	c.parameter,
+	c.numeric_value,
+	c.unit
+FROM strandfontein.water_samples a
+	JOIN strandfontein.water_results b ON a.sample_id = b.sample_id
+	JOIN turbidity c ON a.label = c.label AND b.suite = 'insitu';
 
-SELECT * FROM coastal.planned_schedule_view
-WHERE date >= '2026-06-01'
-ORDER BY date, monitoring_group, samplers, site_id;
-
--- Export the following to csv
-SELECT * FROM coastal.planned_schedule_view WHERE date >= '2026-06-01' AND monitoring_group = 'routine';
+SELECT * FROM strandfontein.water_samples a
+	JOIN strandfontein.water_results b USING (sample_id)
+	JOIN strandfontein.water_results_insitu c USING (result_id)
+WHERE a.sample_date = '2026-05-22' AND c.parameter = 'Turbidity';
 
 ROLLBACK;
 COMMIT;
 
+SELECT * FROM strandfontein.water_insitu_view;
+
+SELECT * FROM strandfontein.water_results_insitu;
+ALTER TABLE strandfontein.water_results_insitu ALTER COLUMN filename DROP NOT NULL;
 

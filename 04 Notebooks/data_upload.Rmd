@@ -2068,7 +2068,7 @@ successful <- login_response |>
 Sys.setenv("USER_JWT" = successful$access_token, "REFRESH_TOKEN" = successful$refresh_token)
 
 data_request <- request(Sys.getenv("BASE_URL")) |>
-  req_url_path_append("rest/v1/sampling_frequency") |>
+  req_url_path_append("rest/v1/overview") |>
   req_headers_redacted(
     "apikey" = Sys.getenv("API_KEY"),
     "Accept-Profile" = "api"
