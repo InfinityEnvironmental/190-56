@@ -2103,3 +2103,131 @@ body <- refresh_response |>
 Sys.setenv("USER_JWT" = body$access_token, "REFRESH_TOKEN" = body$refresh_token)
 ```
 
+# Upload Strand high-frequency sampling data
+
+```{r}
+#| label: upload-bacteria
+
+# Get filenames
+tibble(
+  filename_long = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand High-Frequency 2026/WALAB/", full.names = T),
+  filename = list.files("../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand High-Frequency 2026/WALAB/")
+) |>
+  mutate(pdf_data = map(filename_long, ~ pdf_text(.x) |> str_split("\n"))) |>
+  unnest(pdf_data) |>
+  
+  # Extract sample date
+  mutate(sample_date = map(pdf_data, ~ {
+    .x |>
+      keep(~ str_detect(.x, "Sample taken")) |>
+      str_remove("\\*Sample taken:\\s*") |>
+      dmy()
+  })) |>
+  
+  # Extract analysis completed date
+  mutate(analysis_completed = map(pdf_data, ~ {
+    .x |>
+      keep(~ str_detect(.x, "Analysis completed:")) |>
+      str_remove("Analysis completed:\\s*") |>
+      dmy()
+  })) |>
+  
+  # Extract sample temperature
+  mutate(sample_temperature = map(pdf_data, ~ {
+    .x |>
+      keep(~ str_detect(.x, "Sample temperature:")) |>
+      str_remove_all("Sample temperature:\\s*|ºC") |>
+      as.numeric()
+  })) |>
+  
+  # Extract results
+  mutate(data = map(pdf_data, ~ {
+    .x |>
+      head_while(~ !str_detect(.x, "colony forming units")) |>
+      tail_while(~ !str_detect(.x, "Sample Description")) |>
+      keep(~ str_length(.x) > 0) |>
+      str_trim() |>
+      str_remove("^\\d{1,2}\\s*")
+  })) |>
+  
+  # Extract data
+  mutate(
+    site_id = map(data, ~ {
+      str_extract_all(.x, "(XCS26)|(XCS34)")
+    }),
+    sample_time = map(data, ~{
+      str_extract_all(.x, "\\d{2}h\\d{2}")
+    }),
+    tag = map(data, ~{
+      str_extract_all(.x, "\\s[ABCD]\\s") |>
+        str_trim()
+    }),
+    censored_value = map(data, ~{
+      str_extract_all(.x, "\\s(\\d{1,4}|(None found))($|\\s)") |>
+        str_trim() |>
+        unlist()
+    })
+  ) |>
+  pull(censored_value)
+  unnest(sample_date, analysis_completed, sample_temperature, site_id, sample_time, tag, censored_value) |>
+  select(site_id, sample_date, analysis_completed, sample_time, tag, sample_temperature, censored_value, filename) |>
+  mutate(tag = replace_na(tag, "A")) |>
+  arrange(filename, sample_date, site_id, sample_time)
+
+# Upload to database
+bacteria |>
+  copy_to(dest = con, name = "bacteria", temporary = T, overwrite = T)
+```
+
+```{sql}
+#| connection: con
+
+BEGIN;
+```
+
+```{sql}
+#| connection: con
+
+SELECT * FROM bacteria;
+```
+
+```{sql}
+#| connection: con
+
+INSERT INTO princessvlei.water_results_microbiology (result_id, sample_date, analysis_completed, sample_temperature, parameter, unit, censored_value, filename)
+SELECT
+  b.result_id,
+  c.sample_date,
+  c.analysis_completed,
+  c.sample_temperature,
+  c.parameter,
+  c.unit,
+  c.censored_value,
+  c.filename
+FROM princessvlei.water_samples a
+  JOIN princessvlei.water_results b USING (sample_id)
+  JOIN bacteria c ON a.label = c.sample_id AND b.suite = 'microbiology';
+```
+
+```{sql}
+#| connection: con
+
+SELECT *
+FROM princessvlei.water_samples a
+  JOIN princessvlei.water_results b USING (sample_id)
+  JOIN princessvlei.water_results_microbiology c USING (result_id)
+WHERE a.monitoring_group = 'Pollution Tracking' AND b.suite = 'microbiology';
+```
+
+```{sql}
+#| connection: con
+
+ROLLBACK;
+```
+
+```{sql}
+#| connection: con
+
+COMMIT;
+```
+
