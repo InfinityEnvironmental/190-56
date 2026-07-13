@@ -86,7 +86,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_126(08.07.2026).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_127(08.07.2026).pdf"
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
@@ -211,7 +211,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value, sample_temp_c, filename
 FROM coastal.results
-WHERE sample_date = '2026-07-06' AND monitoring_group = 'routine';
+WHERE sample_date = '2026-07-08' AND monitoring_group = 'routine';
 ```
 
 ```{sql, connection = con}
