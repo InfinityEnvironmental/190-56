@@ -114,7 +114,7 @@ analysis_completed <- pdf_data |>
 sample_temp_c <- pdf_data |>
   unlist() |> 
   keep(~str_detect(.x, "Sample temperature:")) |>
-  str_extract("(?<=(Sample temperature:\\s))\\d{1,2}\\.\\d") |>
+  str_extract("(?<=(Sample temperature:\\s?))\\d{1,2}\\.\\d") |>
   pluck(1) |>
   as.numeric()
 
