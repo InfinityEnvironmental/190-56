@@ -86,7 +86,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_144(03.08.2026).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/CWQ_146(05.08.2026).pdf"
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/SSB CMB Monitoring/")
 
@@ -211,7 +211,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value, sample_temp_c, filename
 FROM coastal.results
-WHERE sample_date = '2026-08-03' AND monitoring_group = 'routine';
+WHERE sample_date = '2026-08-05' AND monitoring_group = 'routine';
 ```
 
 ```{sql, connection = con}
@@ -231,19 +231,19 @@ BEGIN;
 ```{sql connection = con}
 INSERT INTO coastal.results (site_id, sample_date, sample_time, analysis_completed, sample_temp_c, censored_value, filename, lab_code, monitoring_group)
 SELECT
-  'XCS26' AS site_id,
-  '2026-07-17'::date AS sample_date,
-  '09:19'::time AS sample_time,
-  '2026-07-19'::date AS analysis_completed,
-   3.4 AS sample_temp_c,
-  '30' AS censored_value,
-  'Strand_55(17.07.2026).pdf' AS filename,
+  'CN36' AS site_id,
+  '2026-08-05'::date AS sample_date,
+  '12:40'::time AS sample_time,
+  '2026-08-05'::date AS analysis_completed,
+   8.1 AS sample_temp_c,
+  '40' AS censored_value,
+  'CWQ_146(105.08.2026).pdf' AS filename,
   'WLAB'::coastal.lab AS lab_code,
-  'daily'::coastal.monitoring_group AS monitoring_group;
+  'routine'::coastal.monitoring_group AS monitoring_group;
 ```
 
 ```{sql connection = con}
-SELECT * FROM coastal.results WHERE sample_date = '2026-07-17' AND monitoring_group = 'daily';
+SELECT * FROM coastal.results WHERE sample_date = '2026-08-05' AND monitoring_group = 'routine';
 ```
 
 ```{sql connection = con}
@@ -285,7 +285,7 @@ tibble(filename = list.files(str_c("../../Infinity/Coastal Water Quality - Docum
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/2026/Strand_67(04.08.2026).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/2026/Strand_68(05.08.2026).pdf"
 
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Strand Daily/2026/")
 
@@ -406,7 +406,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value, monitoring_group
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2026-08-04';
+WHERE monitoring_group = 'daily' AND sample_date = '2026-08-05';
 ```
 
 ```{sql, connection = con}
@@ -457,7 +457,7 @@ files |>
 
 ```{r extract-pdf}
 # Select the pdf that you want to import
-path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Daily_66(04.08.2026).pdf"
+path <- "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/Daily_67(05.08.2026).pdf"
 filename <- str_remove(path, "../../Infinity/Coastal Water Quality - Documents/Shared Results/Atlantic Daily/")
 
 # Extract the pdf data
@@ -572,7 +572,7 @@ SELECT * FROM cte;
 SELECT
   site_id, sample_date, sample_time, censored_value
 FROM coastal.results
-WHERE monitoring_group = 'daily' AND sample_date = '2026-08-04';
+WHERE monitoring_group = 'daily' AND sample_date = '2026-08-05';
 ```
 
 ```{sql, connection = con}
