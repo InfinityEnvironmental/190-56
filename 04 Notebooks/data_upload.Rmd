@@ -175,7 +175,6 @@ tbl <- tibble(number = sample_number,
 
 # Check data
 tbl
-tbl <- tbl %>% filter(!is.na(site_id))
 
 # Copy to database
 tbl |> copy_to(dest = con, name = "coastal", overwrite = TRUE)
