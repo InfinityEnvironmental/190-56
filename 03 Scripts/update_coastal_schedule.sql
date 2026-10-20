@@ -10,7 +10,7 @@ WITH schedule_insert AS
 	sample_date::date,
 	trim(initcap(to_char(sample_date, 'day')))::varchar(9) AS day,
 	((date_trunc('week', sample_date)::date - '2026-10-19') / 7 + 1)::varchar(1) AS week
-FROM generate_series('2026-09-21'::date, '2026-11-13'::date, '1 day'::interval) sample_date) -- Change start and end dates
+FROM generate_series('2026-10-19'::date, '2026-11-13'::date, '1 day'::interval) sample_date) -- Change start and end dates
 SELECT
 	a.sample_date,
 	a.week,
@@ -22,7 +22,7 @@ SELECT
 		END AS samplers,
 	b.monitoring_group
 FROM schedule a JOIN coastal.schedule b ON a.week = b.week AND a.day = b.day
-WHERE version = 6 AND a.day NOT IN ('Saturday', 'Sunday')) -- Which version of the schedule do I want to use as a template
+WHERE version = 7 AND a.day NOT IN ('Saturday', 'Sunday')) -- Which version of the schedule do I want to use as a template
 INSERT INTO coastal.schedule_planned (date, week, day, site_id, samplers, monitoring_group)
 SELECT * FROM schedule_insert;
 
